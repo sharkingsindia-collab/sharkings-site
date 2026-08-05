@@ -223,13 +223,15 @@ async function sendFrontendEmail(payload) {
   try {
     const formData = new FormData();
     formData.append('access_key', EMAIL_CONFIG.WEB3FORMS_KEY);
+    formData.append('from_name', 'Sharkings Website Contact');
     formData.append('subject', payload.subject);
     formData.append('name', payload.name);
-    formData.append('email', payload.email);
+    formData.append('replyto', payload.email && payload.email !== 'no-reply@sharkingsinteriors.in' ? payload.email : EMAIL_CONFIG.COMPANY_EMAIL);
     formData.append('phone', payload.phone);
     formData.append('message', payload.message);
     formData.append('html', payload.html);
     formData.append('to', EMAIL_CONFIG.COMPANY_EMAIL);
+    formData.append('botcheck', ''); // Honeypot field for Web3Forms spam prevention
 
     const response = await fetch('https://api.web3forms.com/submit', {
       method: 'POST',
