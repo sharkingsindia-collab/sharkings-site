@@ -228,7 +228,7 @@ async function sendFrontendEmail(payload) {
     formData.append('name', payload.name);
     formData.append('replyto', payload.email && payload.email !== 'no-reply@sharkingsinteriors.in' ? payload.email : EMAIL_CONFIG.COMPANY_EMAIL);
     formData.append('phone', payload.phone);
-    formData.append('message', payload.message);
+    formData.append('message', payload.message); 
     formData.append('html', payload.html);
     formData.append('to', EMAIL_CONFIG.COMPANY_EMAIL);
     formData.append('botcheck', ''); // Honeypot field for Web3Forms spam prevention
