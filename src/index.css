@@ -138,10 +138,10 @@ html {
 /* ===== PERFORMANCE & RENDER OPTIMIZATIONS ===== */
 
 /* Enable browser content-visibility for offscreen sections */
-section:not(#hero) {
+/* Enable browser content-visibility for offscreen sections — excluding sticky containers */
+section:not(#hero):not(#services) {
   content-visibility: auto;
   contain-intrinsic-size: 1px 800px;
-  contain: layout style paint;
 }
 
 /* Contain layout/paint for heavy structural elements */
@@ -184,7 +184,7 @@ section, header, footer {
 }
 
 /* Lazy image loading optimization */
-img {
+img[loading="lazy"] {
   content-visibility: auto;
 }
 

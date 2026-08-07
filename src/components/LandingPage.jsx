@@ -25,8 +25,7 @@ const LandingPage = ({ onNavigate }) => {
   const [prevActiveIndex, setPrevActiveIndex] = useState(null);
   const [isPaused, setIsPaused] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [scrollY, setScrollY] = useState(0);
-  const [scrollProgress, setScrollProgress] = useState(0);
+
   const [isDesktop, setIsDesktop] = useState(true);
 
   // 3D Studio state (Modular Kitchen)
@@ -46,7 +45,6 @@ const LandingPage = ({ onNavigate }) => {
   const testimonialRef = useRef(null);
   const showroomRef = useRef(null);
   const getInTouchRef = useRef(null);
-  const scrollTickRef = useRef(false);
 
   // Monitor viewport size for responsive layout styling
   useEffect(() => {
@@ -114,50 +112,7 @@ const LandingPage = ({ onNavigate }) => {
     };
   }, [isPaused, loading]);
 
-  // Track window scroll for parallax effects - throttled with rAF for high performance
-  useEffect(() => {
-    let lastScrollProgress = -1;
 
-    const handleScroll = () => {
-      if (scrollTickRef.current) return;
-      scrollTickRef.current = true;
-      requestAnimationFrame(() => {
-        scrollTickRef.current = false;
-        const scrollPos = window.scrollY;
-
-        // Only update scrollY while Hero parallax is visible (first 110% of viewport)
-        if (scrollPos <= window.innerHeight * 1.1) {
-          setScrollY(scrollPos);
-        }
-
-        if (servicesRef.current) {
-          const rect = servicesRef.current.getBoundingClientRect();
-          const sectionHeight = rect.height;
-          const viewportHeight = window.innerHeight;
-          const scrolled = -rect.top;
-          const totalScrollable = sectionHeight - viewportHeight;
-
-          let newProgress = 0;
-          if (scrolled >= 0 && scrolled <= totalScrollable) {
-            newProgress = scrolled / totalScrollable;
-            if (newProgress !== lastScrollProgress) {
-              lastScrollProgress = newProgress;
-              setScrollProgress(newProgress);
-            }
-          } else if (scrolled > totalScrollable && lastScrollProgress !== 1) {
-            lastScrollProgress = 1;
-            setScrollProgress(1);
-          } else if (scrolled < 0 && lastScrollProgress !== 0) {
-            lastScrollProgress = 0;
-            setScrollProgress(0);
-          }
-        }
-      });
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   // Mouse move – only on desktop, subtle ambient shift
   const handleMouseMove = useCallback((e) => {
@@ -184,17 +139,6 @@ const LandingPage = ({ onNavigate }) => {
     setActiveIndex(index);
   };
 
-  // Parallax Scroll calculations
-  const heroOpacity = Math.max(0, 1 - scrollY / (window.innerHeight * 0.7));
-  const heroTextY = scrollY * 0.2;
-  const heroBgY = scrollY * 0.35;
-
-  // Cinematic Framed Card Reveal Transition Calculations
-  const frameProgress = typeof window !== 'undefined' ? Math.min(scrollY / window.innerHeight, 1) : 0;
-  const heroScale = 1 - frameProgress * 0.08;
-  const heroRadius = frameProgress * 24;
-  const heroPadding = frameProgress * 16;
-
   return (
     <div className="relative w-full bg-luxury-charcoal text-luxury-cream">
       <Navbar onNavigate={onNavigate} />
@@ -210,19 +154,12 @@ const LandingPage = ({ onNavigate }) => {
         handlePrev={handlePrev}
         handleNext={handleNext}
         selectSlide={selectSlide}
-        heroPadding={heroPadding}
-        heroRadius={heroRadius}
-        heroScale={heroScale}
-        heroBgY={heroBgY}
-        heroTextY={heroTextY}
-        heroOpacity={heroOpacity}
       />
 
       <WhyUs whyUsRef={whyUsRef} />
 
       <ServicesSlider
         servicesRef={servicesRef}
-        scrollProgress={scrollProgress}
         onNavigate={onNavigate}
       />
 

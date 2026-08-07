@@ -1,5 +1,5 @@
 
-import { memo } from 'react';
+import { memo, useRef, useEffect, useCallback } from 'react';
 import slogo from '../../assets/slogo.webp';
 
 const localSlides = [
@@ -48,14 +48,110 @@ function Hero({
   handleMouseMove,
   handlePrev,
   handleNext,
-  selectSlide,
-  heroPadding,
-  heroRadius,
-  heroScale,
-  heroBgY,
-  heroTextY,
-  heroOpacity
+  selectSlide
 }) {
+  // Refs for scroll-driven DOM elements (no React re-renders)
+  const heroOuterRef = useRef(null);
+  const heroInnerRef = useRef(null);
+  const navControlsRef = useRef(null);
+  const indicatorsRef = useRef(null);
+  const scrollIndicatorRef = useRef(null);
+  const slideImgRefs = useRef([]);
+  const slideTextRefs = useRef([]);
+  const rafRef = useRef(null);
+  const lastScrollRef = useRef(-1);
+
+  // Direct DOM scroll handler — zero re-renders
+  const updateParallax = useCallback(() => {
+    const scrollPos = window.scrollY;
+    const vh = window.innerHeight;
+
+    // Only compute while hero is visible
+    if (scrollPos > vh * 1.1) return;
+
+    // Skip if scroll position hasn't changed meaningfully
+    if (Math.abs(scrollPos - lastScrollRef.current) < 0.5) return;
+    lastScrollRef.current = scrollPos;
+
+    // Parallax values
+    const opacity = Math.max(0, 1 - scrollPos / (vh * 0.7));
+    const textY = scrollPos * 0.2;
+    const bgY = scrollPos * 0.35;
+
+    // Frame reveal values
+    const frameProgress = Math.min(scrollPos / vh, 1);
+    const scale = 1 - frameProgress * 0.08;
+    const radius = frameProgress * 24;
+    const padding = frameProgress * 16;
+
+    // Apply outer container padding
+    if (heroOuterRef.current) {
+      heroOuterRef.current.style.padding = `${padding}px`;
+    }
+
+    // Apply inner container scale + borderRadius
+    if (heroInnerRef.current) {
+      heroInnerRef.current.style.borderRadius = `${radius}px`;
+      heroInnerRef.current.style.transform = `scale(${scale})`;
+    }
+
+    // Apply slide image parallax
+    slideImgRefs.current.forEach((img) => {
+      if (img) {
+        // Keep existing mouse offset by reading current mouse values
+        img.dataset.bgY = bgY;
+      }
+    });
+
+    // Apply text overlay translateY + opacity
+    slideTextRefs.current.forEach((el) => {
+      if (el) {
+        el.style.transform = `translateY(${textY}px)`;
+        // Only apply opacity to the active slide's text (handled via data attribute)
+        if (el.dataset.active === 'true') {
+          el.style.opacity = opacity;
+        }
+      }
+    });
+
+    // Apply opacity to nav controls, indicators, scroll indicator
+    if (navControlsRef.current) navControlsRef.current.style.opacity = opacity;
+    if (indicatorsRef.current) indicatorsRef.current.style.opacity = opacity;
+    if (scrollIndicatorRef.current) scrollIndicatorRef.current.style.opacity = opacity;
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (rafRef.current) return;
+      rafRef.current = requestAnimationFrame(() => {
+        rafRef.current = null;
+        updateParallax();
+      });
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    updateParallax(); // initial
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, [updateParallax]);
+
+  // Update active state data attributes when activeIndex changes
+  useEffect(() => {
+    slideTextRefs.current.forEach((el, idx) => {
+      if (el) {
+        el.dataset.active = idx === activeIndex ? 'true' : 'false';
+        if (idx !== activeIndex) {
+          el.style.opacity = 0;
+        }
+      }
+    });
+    // Re-run parallax to apply correct opacity to new active slide
+    updateParallax();
+  }, [activeIndex, updateParallax]);
+
   const smoothScrollToTarget = (targetSelector) => {
     const elem = document.querySelector(targetSelector);
     if (!elem) return;
@@ -140,7 +236,7 @@ function Hero({
 
           {/* Dynamic Status Typography & High-Tech Counter */}
           <div className="flex flex-col items-center space-y-2 text-center pt-6">
-            <span className="font-serif text-[20px] sm:text-xs tracking-[0.45em] text-luxury-sage ">
+            <span className="font-serif text-[10px] sm:text-xs tracking-[0.45em] text-luxury-sage ">
               {progress < 35
                 ? 'LOADING HOME PORTFOLIO'
                 : progress < 75
@@ -157,18 +253,14 @@ function Hero({
 
       {/* HERO SECTION CONTAINER */}
       <div
+        ref={heroOuterRef}
         className="relative w-full h-screen min-h-[640px] bg-luxury-charcoal z-10 overflow-hidden"
         onMouseMove={handleMouseMove}
-        style={{
-          padding: `${heroPadding}px`,
-          willChange: 'padding'
-        }}
       >
         <div
-          className="relative w-full h-full overflow-hidden bg-luxury-charcoal shadow-2xl transition-all duration-100 ease-out"
+          ref={heroInnerRef}
+          className="relative w-full h-full overflow-hidden bg-luxury-charcoal shadow-2xl"
           style={{
-            borderRadius: `${heroRadius}px`,
-            transform: `scale(${heroScale})`,
             willChange: 'transform, border-radius'
           }}
         >
@@ -202,22 +294,24 @@ function Hero({
                       }`}
                   >
                     <img
+                      ref={(el) => { slideImgRefs.current[idx] = el; }}
                       src={slide.image}
                       alt={slide.alt || "Sharkings Interior - Bespoke Luxury Interior Design"}
                       decoding="async"
                       fetchPriority={idx === 0 ? "high" : "low"}
                       className="w-full h-full object-cover"
                       style={{
-                        transform: `translate3d(${mousePos.x * -0.2}px, calc(${mousePos.y * -0.2}px + ${heroBgY}px), 0)`
+                        transform: `translate3d(${mousePos.x * -0.2}px, ${mousePos.y * -0.2}px, 0)`
                       }}
                     />
                   </div>
 
                   <div
-                    className="absolute inset-0 flex flex-col justify-center px-6 sm:px-12 lg:px-24 pt-24 sm:pt-28 lg:pt-32 pb-16 sm:pb-20 lg:pb-24 z-30 transition-all"
+                    ref={(el) => { slideTextRefs.current[idx] = el; }}
+                    data-active={isActive ? 'true' : 'false'}
+                    className="absolute inset-0 flex flex-col justify-center px-6 sm:px-12 lg:px-24 pt-24 sm:pt-28 lg:pt-32 pb-16 sm:pb-20 lg:pb-24 z-30"
                     style={{
-                      transform: `translateY(${heroTextY}px)`,
-                      opacity: isActive ? heroOpacity : 0
+                      opacity: isActive ? 1 : 0
                     }}
                   >
                     <div className="max-w-2xl lg:max-w-3xl space-y-4 sm:space-y-6">
@@ -296,8 +390,8 @@ function Hero({
 
           {/* Navigation Controls */}
           <div
+            ref={navControlsRef}
             className="absolute bottom-8 sm:bottom-10 right-6 sm:right-12 lg:right-24 z-30 flex items-center gap-4 transition-opacity duration-300"
-            style={{ opacity: heroOpacity }}
           >
             <button
               onClick={handlePrev}
@@ -342,8 +436,8 @@ function Hero({
 
           {/* Indicators */}
           <div
+            ref={indicatorsRef}
             className="hidden md:flex absolute bottom-8 sm:bottom-10 left-6 sm:left-12 lg:left-24 z-30 items-center gap-6 transition-opacity duration-300"
-            style={{ opacity: heroOpacity }}
           >
             {localSlides.map((_, idx) => (
               <button
@@ -369,8 +463,8 @@ function Hero({
 
           {/* Scroll Down Indicator */}
           <div
+            ref={scrollIndicatorRef}
             className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 hidden lg:flex flex-col items-center gap-2 transition-opacity duration-300"
-            style={{ opacity: heroOpacity }}
           >
             <span className="font-sans text-[9px] tracking-[0.3em] uppercase text-luxury-cream/30">
               Scroll Down

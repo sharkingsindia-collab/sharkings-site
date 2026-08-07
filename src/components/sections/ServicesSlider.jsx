@@ -1,13 +1,67 @@
-import { memo } from 'react';
+import { memo, useRef, useEffect, useCallback } from 'react';
 import modularKitchenImg from '../../assets/modular-kitchen.webp';
 import acpelvationImg from '../../assets/ACP-elevation.webp';
 import falseCeilingImg from '../../assets/false-ceiling-work.webp';
 
 function ServicesSlider({ 
   servicesRef, 
-  scrollProgress, 
   onNavigate 
 }) {
+  const slideTrackRef = useRef(null);
+  const progressBarRef = useRef(null);
+  const rafIdRef = useRef(null);
+  const lastProgressRef = useRef(-1);
+
+  // Direct DOM manipulation scroll handler — no React state, no re-renders
+  const updateTransform = useCallback(() => {
+    if (!servicesRef?.current) return;
+
+    const rect = servicesRef.current.getBoundingClientRect();
+    const sectionHeight = rect.height;
+    const viewportHeight = window.innerHeight;
+    const scrolled = -rect.top;
+    const totalScrollable = sectionHeight - viewportHeight;
+
+    let progress = 0;
+    if (scrolled >= 0 && totalScrollable > 0) {
+      progress = Math.min(Math.max(scrolled / totalScrollable, 0), 1);
+    } else if (scrolled > totalScrollable) {
+      progress = 1;
+    }
+
+    // Skip DOM write if progress hasn't meaningfully changed (avoid redundant paints)
+    if (Math.abs(progress - lastProgressRef.current) < 0.0001) return;
+    lastProgressRef.current = progress;
+
+    if (slideTrackRef.current) {
+      slideTrackRef.current.style.transform = `translate3d(-${progress * 300}vw, 0, 0)`;
+    }
+    if (progressBarRef.current) {
+      progressBarRef.current.style.width = `${progress * 100}%`;
+    }
+  }, [servicesRef]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (rafIdRef.current) return; // already scheduled
+      rafIdRef.current = requestAnimationFrame(() => {
+        rafIdRef.current = null;
+        updateTransform();
+      });
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    // Run once on mount to set initial position
+    updateTransform();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (rafIdRef.current) {
+        cancelAnimationFrame(rafIdRef.current);
+      }
+    };
+  }, [updateTransform]);
+
   return (
     <div 
       ref={servicesRef} 
@@ -21,11 +75,12 @@ function ServicesSlider({
         <div className="absolute w-[450px] h-[450px] bg-luxury-red/5 rounded-full blur-[130px] -left-20 top-20 pointer-events-none" />
         <div className="absolute w-[450px] h-[450px] bg-luxury-sage/4 rounded-full blur-[130px] -right-20 bottom-20 pointer-events-none" />
 
-        {/* Horizontal Slide Row - instant 1:1 scroll translation */}
+        {/* Horizontal Slide Row - direct DOM transform, no React re-renders */}
         <div 
+          ref={slideTrackRef}
           className="flex h-full will-change-transform"
           style={{ 
-            transform: `translate3d(-${scrollProgress * 300}vw, 0, 0)`,
+            transform: 'translate3d(0, 0, 0)',
             width: '400vw'
           }}
         >
@@ -227,8 +282,9 @@ function ServicesSlider({
         {/* Timeline Bar showing horizontal progress */}
         <div className="absolute bottom-8 left-6 md:left-16 right-6 md:right-16 h-[1px] bg-luxury-cream/10 z-30">
           <div 
+            ref={progressBarRef}
             className="h-full bg-luxury-sage will-change-transform"
-            style={{ width: `${scrollProgress * 100}%` }}
+            style={{ width: '0%' }}
           />
         </div>
 

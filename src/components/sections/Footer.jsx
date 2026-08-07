@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import { memo } from 'react';
 import slogo from '../../assets/slogo.webp';
 
 function Footer({ onNavigate }) {
@@ -48,7 +48,7 @@ function Footer({ onNavigate }) {
               </a>
               <div>
                 <h4 className="font-display text-sm sm:text-lg font-bold text-white tracking-wider uppercase leading-none">
-                  SHARKINGS INTERIORS &amp; EXTERIORS
+                  SHARKINGS INTERIORS & EXTERIORS
                 </h4>
                 <span className="text-[8px] sm:text-[9px] font-sans font-bold tracking-[0.25em] text-[#c5a059] uppercase block mt-1">
                   FULL-SERVICE INTERIOR DESIGN FIRM
@@ -58,7 +58,7 @@ function Footer({ onNavigate }) {
 
             {/* Description - hidden on small mobile for compactness */}
             <p className="hidden sm:block font-sans text-xs text-white/70 font-light leading-relaxed max-w-sm">
-              Since 2010, Sharkings Interiors &amp; Exteriors is a full-service interior design firm in Madurai &amp; Ramanathapuram, specializing in both residential and commercial design.
+              Since 2010, Sharkings Interiors & Exteriors is a full-service interior design firm in Madurai & Ramanathapuram, specializing in both residential and commercial design.
             </p>
 
             {/* Contact Details */}

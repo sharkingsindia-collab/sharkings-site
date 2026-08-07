@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
+Disallow: /node_modules/
+Disallow: /src/
+Disallow: /.git/
 
+# Sitemap
 Sitemap: https://www.sharkingsinteriors.in/sitemap.xml

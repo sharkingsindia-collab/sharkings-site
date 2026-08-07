@@ -1,57 +1,97 @@
-import { useState, useEffect } from 'react';
+import { useRef, useEffect, useCallback } from 'react';
 
 export default function ReturnToHomeFAB() {
-  const [isVisible, setIsVisible] = useState(false);
-  const [scrollPercentage, setScrollPercentage] = useState(0);
-  const [isHovered, setIsHovered] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScroll = window.scrollY;
-      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-
-      // Show FAB after scrolling down past 350px
-      if (currentScroll > 350) {
-        setIsVisible(true);
-      } else {
-        setIsVisible(false);
-      }
-
-      // Calculate total page scroll percentage
-      if (maxScroll > 0) {
-        const percentage = Math.min(100, Math.max(0, (currentScroll / maxScroll) * 100));
-        setScrollPercentage(percentage);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  };
+  const containerRef = useRef(null);
+  const tooltipRef = useRef(null);
+  const progressCircleRef = useRef(null);
+  const rafRef = useRef(null);
+  const lastVisibleRef = useRef(false);
+  const lastPercentRef = useRef(-1);
+  const isHoveredRef = useRef(false);
 
   const radius = 22;
   const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (scrollPercentage / 100) * circumference;
+
+  const updateScroll = useCallback(() => {
+    const currentScroll = window.scrollY;
+    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+
+    // Visibility toggle
+    const shouldBeVisible = currentScroll > 350;
+    if (shouldBeVisible !== lastVisibleRef.current) {
+      lastVisibleRef.current = shouldBeVisible;
+      if (containerRef.current) {
+        if (shouldBeVisible) {
+          containerRef.current.classList.remove('opacity-0', 'translate-y-12', 'pointer-events-none');
+          containerRef.current.classList.add('opacity-100', 'translate-y-0');
+        } else {
+          containerRef.current.classList.remove('opacity-100', 'translate-y-0');
+          containerRef.current.classList.add('opacity-0', 'translate-y-12', 'pointer-events-none');
+        }
+      }
+    }
+
+    // Scroll progress ring
+    if (maxScroll > 0 && progressCircleRef.current) {
+      const percentage = Math.min(100, Math.max(0, (currentScroll / maxScroll) * 100));
+      const rounded = Math.round(percentage);
+      if (rounded !== lastPercentRef.current) {
+        lastPercentRef.current = rounded;
+        const offset = circumference - (percentage / 100) * circumference;
+        progressCircleRef.current.setAttribute('stroke-dashoffset', offset);
+      }
+    }
+  }, [circumference]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (rafRef.current) return;
+      rafRef.current = requestAnimationFrame(() => {
+        rafRef.current = null;
+        updateScroll();
+      });
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    updateScroll(); // initial
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, [updateScroll]);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleMouseEnter = () => {
+    isHoveredRef.current = true;
+    if (tooltipRef.current) {
+      tooltipRef.current.classList.remove('opacity-0', 'translate-x-2');
+      tooltipRef.current.classList.add('opacity-100', 'translate-x-0');
+    }
+  };
+
+  const handleMouseLeave = () => {
+    isHoveredRef.current = false;
+    if (tooltipRef.current) {
+      tooltipRef.current.classList.remove('opacity-100', 'translate-x-0');
+      tooltipRef.current.classList.add('opacity-0', 'translate-x-2');
+    }
+  };
 
   return (
     <div 
-      className={`fixed bottom-8 right-8 z-[100] transition-all duration-500 ease-out flex items-center gap-3 ${
-        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12 pointer-events-none'
-      }`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      ref={containerRef}
+      className="fixed bottom-8 right-8 z-[100] transition-all duration-500 ease-out flex items-center gap-3 opacity-0 translate-y-12 pointer-events-none"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       {/* Tooltip Badge on Hover */}
       <div 
-        className={`px-3 py-1.5 rounded-none bg-[#141210] border border-[#c5a059]/40 text-[#c5a059] font-sans text-[10px] font-bold tracking-widest uppercase shadow-xl transition-all duration-300 pointer-events-none whitespace-nowrap ${
-          isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-2'
-        }`}
+        ref={tooltipRef}
+        className="px-3 py-1.5 rounded-none bg-[#141210] border border-[#c5a059]/40 text-[#c5a059] font-sans text-[10px] font-bold tracking-widest uppercase shadow-xl transition-all duration-300 pointer-events-none whitespace-nowrap opacity-0 translate-x-2"
       >
         RETURN TO HOME
       </div>
@@ -73,13 +113,14 @@ export default function ReturnToHomeFAB() {
             strokeWidth="2.5"
           />
           <circle
+            ref={progressCircleRef}
             cx="26"
             cy="26"
             r={radius}
-            className="stroke-[#c5a059] fill-none transition-all duration-150"
+            className="stroke-[#c5a059] fill-none"
             strokeWidth="2.5"
             strokeDasharray={circumference}
-            strokeDashoffset={strokeDashoffset}
+            strokeDashoffset={circumference}
             strokeLinecap="round"
           />
         </svg>

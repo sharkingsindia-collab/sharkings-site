@@ -22,20 +22,30 @@ export default function App() {
 
       // Update Page SEO Meta Tags dynamically
       const metaDescription = document.querySelector('meta[name="description"]');
+      const metaKeywords = document.querySelector('meta[name="keywords"]');
       if (page === 'services') {
-        document.title = 'Our Services | Modular Kitchens, Turnkey Interiors & ACP Elevation - Sharkings';
+        document.title = 'Our Services | Best Modular Kitchen, Home Interior & Turnkey Projects in Madurai & Ramanathapuram - Sharkings';
         if (metaDescription) {
-          metaDescription.setAttribute('content', 'Explore full interior & exterior design services by Sharkings. Modular kitchens, turnkey projects, container architecture, false ceiling, and ACP elevation in Madurai & Ramanathapuram.');
+          metaDescription.setAttribute('content', 'Explore our full interior & exterior design services — modular kitchens, turnkey projects, container homes & cafes, false ceiling, wardrobe design, ACP elevation, salon interiors, office interiors, and aluminium partitions. Best interior designers in Madurai & Ramanathapuram (Ramnad), Tamil Nadu.');
+        }
+        if (metaKeywords) {
+          metaKeywords.setAttribute('content', 'Sharkings services, modular kitchen Madurai, turnkey interiors Madurai, container homes Madurai, false ceiling Madurai, ACP elevation Ramanathapuram, wardrobe design Madurai, salon interior Madurai, office interior Ramanathapuram, best interior services Tamil Nadu');
         }
       } else if (page === 'projects') {
-        document.title = 'Completed Projects Portfolio | Sharkings Interiors & Exteriors';
+        document.title = 'Completed Projects Portfolio | Luxury Salon, Office & Home Interior Projects - Sharkings Madurai & Ramanathapuram';
         if (metaDescription) {
-          metaDescription.setAttribute('content', 'View our portfolio of luxury residential, commercial salon, office, and modular kitchen interior design projects executed in Madurai and Ramanathapuram.');
+          metaDescription.setAttribute('content', 'View our completed interior design projects — luxury salons, offices, homes, and commercial spaces in Madurai and Ramanathapuram. See real project photos and results by Sharkings Interiors & Exteriors.');
+        }
+        if (metaKeywords) {
+          metaKeywords.setAttribute('content', 'Sharkings projects, interior design projects Madurai, salon interior Madurai, office interior Ramanathapuram, completed projects portfolio, interior design portfolio Tamil Nadu');
         }
       } else {
-        document.title = 'Sharkings Interiors & Exteriors | Best Interior Designers in Madurai & Ramanathapuram';
+        document.title = 'Sharkings Interiors & Exteriors | Best Interior Designers in Madurai & Ramanathapuram | Modular Kitchen & Turnkey Interiors';
         if (metaDescription) {
-          metaDescription.setAttribute('content', 'Sharkings Interiors & Exteriors is the premier interior design firm in Madurai & Ramanathapuram. Specializing in luxury modular kitchens, home interiors, commercial spaces, ACP elevation, and turnkey renovations since 2010.');
+          metaDescription.setAttribute('content', 'Sharkings Interiors & Exteriors — Best interior designers in Madurai & Ramanathapuram since 2010. We specialize in modular kitchens, luxury home interiors, office interiors, false ceiling work, wardrobe design, ACP elevation, container homes, and full turnkey interior projects across Tamil Nadu.');
+        }
+        if (metaKeywords) {
+          metaKeywords.setAttribute('content', 'Sharkings, Sharkings Interiors, Sharkings Interior, Sharkings Interior Design, Sharkings Madurai, Sharkings Ramanathapuram, Sharkings Ramnad, best interior designer in Madurai, best interior designer in Ramanathapuram, modular kitchen Madurai, home interior design Ramanathapuram, turnkey interiors Tamil Nadu');
         }
       }
     };

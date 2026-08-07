@@ -1,29 +1,60 @@
-import { useState, useEffect, useRef, memo } from 'react';
+import { useEffect, useRef, useCallback, memo } from 'react';
 import { useScrollReveal } from '../../hooks/useScrollReveal';
 import homeInteriorImg from '../../assets/home-interior.webp';
 
 function AboutUs({ onNavigate }) {
   useScrollReveal();
   const sectionRef = useRef(null);
-  const [parallaxOffset, setParallaxOffset] = useState(0);
+  const watermarkRef = useRef(null);
+  const leftColRef = useRef(null);
+  const rightColRef = useRef(null);
+  const imgRef = useRef(null);
+  const rafRef = useRef(null);
+  const lastOffsetRef = useRef(0);
+
+  const updateParallax = useCallback(() => {
+    if (!sectionRef.current) return;
+    const rect = sectionRef.current.getBoundingClientRect();
+    const windowHeight = window.innerHeight;
+
+    if (rect.top <= windowHeight && rect.bottom >= 0) {
+      const centerDistance = rect.top - (windowHeight / 2 - rect.height / 2);
+      const offset = centerDistance * 0.12;
+
+      if (Math.abs(offset - lastOffsetRef.current) < 0.5) return;
+      lastOffsetRef.current = offset;
+
+      if (watermarkRef.current) watermarkRef.current.style.transform = `translateY(${offset * 0.8}px)`;
+      if (leftColRef.current) leftColRef.current.style.transform = `translateY(${offset * -0.15}px)`;
+      if (rightColRef.current) rightColRef.current.style.transform = `translateY(${offset * 0.25}px)`;
+      if (imgRef.current) imgRef.current.style.transform = `scale(1.08) translateY(${offset * -0.12}px)`;
+    }
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
-      if (!sectionRef.current) return;
-      const rect = sectionRef.current.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
-
-      // Calculate relative scroll progress when section is in viewport
-      if (rect.top <= windowHeight && rect.bottom >= 0) {
-        const centerDistance = rect.top - (windowHeight / 2 - rect.height / 2);
-        setParallaxOffset(centerDistance * 0.12);
-      }
+      if (rafRef.current) return;
+      rafRef.current = requestAnimationFrame(() => {
+        rafRef.current = null;
+        updateParallax();
+      });
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    updateParallax();
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, [updateParallax]);
+
+  const smoothScrollTo = (selector) => {
+    const elem = document.querySelector(selector);
+    if (!elem) return;
+    const bodyTop = document.body.getBoundingClientRect().top;
+    const elemTop = elem.getBoundingClientRect().top;
+    window.scrollTo({ top: elemTop - bodyTop, behavior: 'smooth' });
+  };
 
   return (
     <section
@@ -33,8 +64,8 @@ function AboutUs({ onNavigate }) {
     >
       {/* Parallax Background Watermark */}
       <div
-        className="absolute font-display text-[16vw] text-[#710014]/[0.025] font-extralight select-none pointer-events-none z-0 left-0 top-1/4 whitespace-nowrap transition-transform duration-100 ease-out"
-        style={{ transform: `translateY(${parallaxOffset * 0.8}px)` }}
+        ref={watermarkRef}
+        className="absolute font-display text-[16vw] text-[#710014]/[0.025] font-extralight select-none pointer-events-none z-0 left-0 top-1/4 whitespace-nowrap"
       >
         EST. 2010 • SHARKINGS
       </div>
@@ -61,8 +92,8 @@ function AboutUs({ onNavigate }) {
 
           {/* LEFT COLUMN: Authentic Content */}
           <div
-            className="lg:col-span-7 space-y-6 reveal-3d-popup delay-100 transition-transform duration-200 ease-out"
-            style={{ transform: `translateY(${parallaxOffset * -0.15}px)` }}
+            ref={leftColRef}
+            className="lg:col-span-7 space-y-6 reveal-3d-popup delay-100"
           >
 
             <div className="space-y-4">
@@ -91,6 +122,10 @@ function AboutUs({ onNavigate }) {
             <div className="pt-2 flex flex-col sm:flex-row items-center gap-4">
               <a
                 href="#showrooms"
+                onClick={(e) => {
+                  e.preventDefault();
+                  smoothScrollTo('#showrooms');
+                }}
                 className="w-full sm:w-auto px-8 py-3.5 bg-[#710014] text-white text-xs font-sans font-extrabold tracking-widest uppercase hover:bg-[#580010] transition-all shadow-lg shadow-[#710014]/20 text-center cursor-pointer"
               >
                 Visit Our Studios
@@ -98,6 +133,10 @@ function AboutUs({ onNavigate }) {
 
               <a
                 href="#get-in-touch"
+                onClick={(e) => {
+                  e.preventDefault();
+                  smoothScrollTo('#get-in-touch');
+                }}
                 className="w-full sm:w-auto px-8 py-3.5 bg-white border border-black/15 text-luxury-charcoal text-xs font-sans font-bold tracking-widest uppercase hover:border-[#710014] hover:text-[#710014] transition-all text-center cursor-pointer"
               >
                 Contact Us
@@ -108,8 +147,8 @@ function AboutUs({ onNavigate }) {
 
           {/* RIGHT COLUMN: Clean Parallax Showcase Image */}
           <div
-            className="lg:col-span-5 relative reveal-3d-popup delay-200 transition-transform duration-200 ease-out"
-            style={{ transform: `translateY(${parallaxOffset * 0.25}px)` }}
+            ref={rightColRef}
+            className="lg:col-span-5 relative reveal-3d-popup delay-200"
           >
             <div className="relative rounded-3xl overflow-hidden shadow-[0_25px_70px_rgba(0,0,0,0.1)] border border-black/10 group">
 
@@ -118,8 +157,9 @@ function AboutUs({ onNavigate }) {
                 alt="Sharkings Full Service Living Interior"
                 loading="lazy"
                 decoding="async"
+                ref={imgRef}
                 className="w-full aspect-[4/5] object-cover group-hover:scale-105 transition-transform duration-700"
-                style={{ transform: `scale(1.08) translateY(${parallaxOffset * -0.12}px)` }}
+                style={{ transform: 'scale(1.08)' }}
               />
 
               {/* Gradient Overlay */}

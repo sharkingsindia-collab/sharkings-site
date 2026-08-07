@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, memo } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import slogo from '../assets/slogo.webp';
 
 function Navbar({ onNavigate }) {
