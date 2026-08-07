@@ -8,14 +8,17 @@ export default defineConfig({
   build: {
     // Enable better tree-shaking and minification
     target: 'es2020',
-    minify: 'esbuild',
     cssMinify: true,
     rollupOptions: {
       output: {
         // Split vendor chunks to improve caching
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom'],
-          'three-vendor': ['three'],
+        manualChunks(id) {
+          if (id.includes('node_modules/three')) {
+            return 'three-vendor';
+          }
+          if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
+            return 'react-vendor';
+          }
         }
       }
     },
