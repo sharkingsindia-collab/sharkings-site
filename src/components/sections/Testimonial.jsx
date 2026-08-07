@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, memo } from 'react';
 
 const TESTIMONIALS_DATA = [
   {
@@ -39,7 +39,7 @@ const getInitials = (name) => {
   return name.substring(0, 2).toUpperCase();
 };
 
-export default function Testimonial({ testimonialRef }) {
+function Testimonial({ testimonialRef }) {
   const [mobileActive, setMobileActive] = useState(0);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
@@ -263,3 +263,5 @@ export default function Testimonial({ testimonialRef }) {
     </section>
   );
 }
+
+export default memo(Testimonial);

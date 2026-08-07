@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import { useScrollReveal } from '../../hooks/useScrollReveal';
 import news1Img from '../../assets/news-1.webp';
 import modularKitchenImg from '../../assets/modular-kitchen.webp';
 
-export default function BeforeAfter() {
+function BeforeAfter() {
   useScrollReveal();
   const [sliderPos, setSliderPos] = useState(50); // percentage (0 - 100)
   const [isDragging, setIsDragging] = useState(false);
@@ -167,3 +167,5 @@ export default function BeforeAfter() {
     </section>
   );
 }
+
+export default memo(BeforeAfter);

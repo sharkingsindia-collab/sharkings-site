@@ -1,12 +1,9 @@
+import { memo } from 'react';
 import news1Img from '../../assets/news-1.webp';
 import news2Img from '../../assets/news-2.webp';
 import news3Img from '../../assets/news-3.webp';
 
-export default function WhyUs({ 
-  whyUsRef,
-  whyUsBgProgress = 1,
-  whyUsContentProgress = 1
-}) {
+function WhyUs({ whyUsRef }) {
   const steps = [
     {
       num: '01',
@@ -43,26 +40,15 @@ export default function WhyUs({
       id="why-us" 
       className="relative w-full min-h-screen flex flex-col justify-center py-12 lg:py-16 px-4 sm:px-8 lg:px-16 xl:px-24 bg-luxury-cream text-luxury-charcoal z-30 shadow-[0_-20px_50px_rgba(22,22,22,0.05)] overflow-hidden"
     >
-      {/* Smooth Parallax Watermark Typography */}
+      {/* Watermark Typography */}
       <div 
-        className="absolute font-display text-[14vw] text-luxury-charcoal/[0.025] font-extralight select-none pointer-events-none z-0 right-4 top-1/2 -translate-y-1/2 transition-transform duration-300 ease-out"
-        style={{
-          opacity: whyUsBgProgress,
-          transform: `translateY(${-50 + (1 - whyUsBgProgress) * 15}%)`,
-          willChange: 'transform, opacity'
-        }}
+        className="absolute font-display text-[14vw] text-luxury-charcoal/[0.025] font-extralight select-none pointer-events-none z-0 right-4 top-1/2 -translate-y-1/2"
       >
         SHARKINGS
       </div>
 
       <div 
         className="max-w-7xl mx-auto w-full my-auto space-y-6 sm:space-y-8 relative z-10"
-        style={{
-          opacity: Math.max(whyUsContentProgress, 0.85),
-          transform: `translateY(${(1 - Math.max(whyUsContentProgress, 0.85)) * 15}px)`,
-          transition: 'opacity 0.4s ease-out, transform 0.4s ease-out',
-          willChange: 'opacity, transform'
-        }}
       >
         
         {/* Section Header */}
@@ -160,3 +146,5 @@ export default function WhyUs({
     </section>
   );
 }
+
+export default memo(WhyUs);

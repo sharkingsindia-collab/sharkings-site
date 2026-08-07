@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { memo } from 'react';
 import slogo from '../../assets/slogo.webp';
 
-export default function Footer({ onNavigate }) {
+function Footer({ onNavigate }) {
   const smoothScrollToTarget = (targetSelector) => {
     const elem = document.querySelector(targetSelector);
     if (!elem) return;
@@ -15,20 +15,20 @@ export default function Footer({ onNavigate }) {
   };
 
   return (
-    <footer className="relative w-full bg-[#38000a] text-[#f2f1ed] border-t border-[#c5a059]/30 z-30 pt-16 pb-10">
+    <footer className="relative w-full bg-[#38000a] text-[#f2f1ed] border-t border-[#c5a059]/30 z-30 pt-8 sm:pt-12 pb-6 sm:pb-8">
       {/* Subtle Top Gold Glow */}
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#c5a059]/50 to-transparent" />
 
-      <div className="max-w-7xl mx-auto w-full px-6 md:px-16 lg:px-24 space-y-12">
+      <div className="max-w-7xl mx-auto w-full px-4 sm:px-8 md:px-16 lg:px-24 space-y-6 sm:space-y-10">
 
         {/* MAIN 3-COLUMN EDITORIAL GRID */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 items-start">
 
           {/* COLUMN 1: BRAND LOGO & CONTACT INFO (5 Cols) */}
-          <div className="md:col-span-5 space-y-5">
+          <div className="md:col-span-5 space-y-3 sm:space-y-5">
 
             {/* Minimal Brand Title */}
-            <div className="flex items-center gap-3.5">
+            <div className="flex items-center gap-2.5 sm:gap-3.5">
               <a
                 href="/"
                 onClick={(e) => {
@@ -38,30 +38,31 @@ export default function Footer({ onNavigate }) {
                   }
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
-                className="bg-[#faf9f6] px-3.5 py-2 rounded-xl border border-[#c5a059]/40 shadow-sm flex items-center justify-center group hover:scale-[1.02] transition-transform"
+                className="bg-[#faf9f6] px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl border border-[#c5a059]/40 shadow-sm flex items-center justify-center group hover:scale-[1.02] transition-transform"
               >
                 <img
                   src={slogo}
                   alt="Sharkings Interior Design"
-                  className="h-8 sm:h-10 w-auto object-contain mix-blend-multiply"
+                  className="h-7 sm:h-10 w-auto object-contain mix-blend-multiply"
                 />
               </a>
               <div>
-                <h4 className="font-display text-lg font-bold text-white tracking-wider uppercase leading-none">
-                  SHARKINGS INTERIORS & EXTERIORS
+                <h4 className="font-display text-sm sm:text-lg font-bold text-white tracking-wider uppercase leading-none">
+                  SHARKINGS INTERIORS &amp; EXTERIORS
                 </h4>
-                <span className="text-[9px] font-sans font-bold tracking-[0.25em] text-[#c5a059] uppercase block mt-1">
+                <span className="text-[8px] sm:text-[9px] font-sans font-bold tracking-[0.25em] text-[#c5a059] uppercase block mt-1">
                   FULL-SERVICE INTERIOR DESIGN FIRM
                 </span>
               </div>
             </div>
 
-            {/* Description */}
-            <p className="font-sans text-xs text-white/70 font-light leading-relaxed max-w-sm">
-              Since 2010, Sharkings Interiors & Exteriors is a full-service interior design firm in Madurai & Ramanathapuram, Sharkings interiors, specializing in both residential and commercial design. We will have the experience to ensure that the project runs smoothly and gives you the best possible results, whether you need a simple refresh of furniture and paint colors, or a comprehensive whole-house renovation.            </p>
+            {/* Description - hidden on small mobile for compactness */}
+            <p className="hidden sm:block font-sans text-xs text-white/70 font-light leading-relaxed max-w-sm">
+              Since 2010, Sharkings Interiors &amp; Exteriors is a full-service interior design firm in Madurai &amp; Ramanathapuram, specializing in both residential and commercial design.
+            </p>
 
             {/* Contact Details */}
-            <div className="space-y-2 font-sans text-xs pt-1">
+            <div className="space-y-1.5 sm:space-y-2 font-sans text-xs pt-1">
               <div className="flex items-center gap-2 text-white/80">
                 <span className="text-[#c5a059] font-bold">Phone:</span>
                 <a href="tel:+918098090204" className="text-[#c5a059] hover:text-white font-bold transition-colors">
@@ -130,7 +131,7 @@ export default function Footer({ onNavigate }) {
                     e.preventDefault();
                     smoothScrollToTarget('#interactive-studio');
                   }}
-                  className="hover:text-[#c5a059] transition-colors flex items-center gap-1.5"
+                  className="hover:text-[#c5a059] transition-colors hidden md:flex items-center gap-1.5"
                 >
                   <span className="text-[#c5a059]">›</span> 3D Studio
                 </a>
@@ -220,7 +221,7 @@ export default function Footer({ onNavigate }) {
         </div>
 
         {/* MINIMAL FOOTER SUB-BAR */}
-        <div className="border-t border-[#c5a059]/20 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 font-sans text-[11px] text-white/50 text-center sm:text-left">
+        <div className="border-t border-[#c5a059]/20 pt-4 sm:pt-6 flex flex-col sm:flex-row items-center justify-between gap-2 font-sans text-[10px] sm:text-[11px] text-white/50 text-center sm:text-left">
           <div>
             © {new Date().getFullYear()} Sharkings Interiors & Exteriors. All Rights Reserved.
           </div>
@@ -234,3 +235,5 @@ export default function Footer({ onNavigate }) {
     </footer>
   );
 }
+
+export default memo(Footer);

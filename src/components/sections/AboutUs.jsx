@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import { useScrollReveal } from '../../hooks/useScrollReveal';
 import homeInteriorImg from '../../assets/home-interior.webp';
 
-export default function AboutUs({ onNavigate }) {
+function AboutUs({ onNavigate }) {
   useScrollReveal();
   const sectionRef = useRef(null);
   const [parallaxOffset, setParallaxOffset] = useState(0);
@@ -151,3 +151,5 @@ export default function AboutUs({ onNavigate }) {
     </section>
   );
 }
+
+export default memo(AboutUs);

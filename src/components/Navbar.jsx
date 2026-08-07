@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, memo } from 'react';
 import slogo from '../assets/slogo.webp';
 
-export default function Navbar({ onNavigate }) {
+function Navbar({ onNavigate }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('hero');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -15,37 +15,56 @@ export default function Navbar({ onNavigate }) {
     return () => clearTimeout(timer);
   }, []);
 
+  const isScrolledRef = useRef(false);
+  const activeSectionRef = useRef('hero');
+
   useEffect(() => {
+    let ticking = false;
+
     const handleScroll = () => {
-      const scrollY = window.scrollY;
-      setIsScrolled(scrollY > 20);
+      if (ticking) return;
+      ticking = true;
 
-      const sections = [
-        { id: 'hero', selector: 'header, section:first-of-type' },
-        { id: 'about', selector: '#about' },
-        { id: 'why-us', selector: '#why-us' },
-        { id: 'services', selector: '#services' },
-        { id: 'interactive-studio', selector: '#interactive-studio' },
-        { id: 'projects', selector: '#projects' },
-        { id: 'testimonials', selector: '#testimonials' },
-        { id: 'showrooms', selector: '#showrooms' },
-        { id: 'get-in-touch', selector: '#get-in-touch' },
-      ];
+      requestAnimationFrame(() => {
+        ticking = false;
+        const scrollY = window.scrollY;
+        const nextScrolled = scrollY > 20;
 
-      const viewportMiddle = window.innerHeight * 0.35;
-      let currentActive = 'hero';
+        if (nextScrolled !== isScrolledRef.current) {
+          isScrolledRef.current = nextScrolled;
+          setIsScrolled(nextScrolled);
+        }
 
-      for (const section of sections) {
-        const elem = document.querySelector(section.selector);
-        if (elem) {
-          const rect = elem.getBoundingClientRect();
-          if (rect.top <= viewportMiddle && rect.bottom >= 0) {
-            currentActive = section.id;
+        const sections = [
+          { id: 'hero', selector: 'header, section:first-of-type' },
+          { id: 'about', selector: '#about' },
+          { id: 'why-us', selector: '#why-us' },
+          { id: 'services', selector: '#services' },
+          { id: 'interactive-studio', selector: '#interactive-studio' },
+          { id: 'projects', selector: '#projects' },
+          { id: 'testimonials', selector: '#testimonials' },
+          { id: 'showrooms', selector: '#showrooms' },
+          { id: 'get-in-touch', selector: '#get-in-touch' },
+        ];
+
+        const viewportMiddle = window.innerHeight * 0.35;
+        let currentActive = 'hero';
+
+        for (const section of sections) {
+          const elem = document.querySelector(section.selector);
+          if (elem) {
+            const rect = elem.getBoundingClientRect();
+            if (rect.top <= viewportMiddle && rect.bottom >= 0) {
+              currentActive = section.id;
+            }
           }
         }
-      }
 
-      setActiveSection(currentActive);
+        if (currentActive !== activeSectionRef.current) {
+          activeSectionRef.current = currentActive;
+          setActiveSection(currentActive);
+        }
+      });
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -250,14 +269,14 @@ export default function Navbar({ onNavigate }) {
         {/* Drawer Footer CTA & Location */}
         <div className="space-y-4 pt-6 border-t border-[#e5e0d3]">
           <a
-            href="#book-consultation"
+            href="#get-in-touch"
             onClick={(e) => {
               e.preventDefault();
-              smoothScrollTo('#book-consultation');
+              smoothScrollTo('#get-in-touch');
             }}
             className="w-full py-3.5 bg-[#710014] text-white font-sans text-xs uppercase tracking-widest font-bold flex items-center justify-center gap-2 group cursor-pointer hover:bg-[#580010] transition-colors shadow-md rounded"
           >
-            <span>Book Free Consultation</span>
+            <span>Contact Us</span>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
               <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
             </svg>
@@ -272,3 +291,5 @@ export default function Navbar({ onNavigate }) {
     </>
   );
 }
+
+export default memo(Navbar);

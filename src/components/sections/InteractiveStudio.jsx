@@ -78,7 +78,7 @@ export default function InteractiveStudio({
     const height = container.clientHeight || 480;
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color('#0f1117');
+    scene.background = new THREE.Color('#11141c');
 
     const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
 
@@ -86,7 +86,9 @@ export default function InteractiveStudio({
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.type = THREE.PCFShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.15;
 
     container.innerHTML = '';
     container.appendChild(renderer.domElement);
@@ -119,52 +121,63 @@ export default function InteractiveStudio({
     });
 
     const stainlessMat = new THREE.MeshStandardMaterial({
-      color: 0x4a4e54,
+      color: 0x5a606a,
       metalness: 0.75,
       roughness: 0.3
     });
 
     const glassMat = new THREE.MeshPhysicalMaterial({
-      color: 0x111625,
-      metalness: 0.1,
-      roughness: 0.1,
-      transmission: 0.6,
+      color: 0x8899aa,
+      metalness: 0.05,
+      roughness: 0.08,
+      transmission: 0.65,
       transparent: true,
-      opacity: 0.7
+      opacity: 0.6
     });
 
-    // Floor & Room Studio
+    // Floor & Room Studio — Polished slate tile studio floor
     const floorGeo = new THREE.BoxGeometry(9, 0.1, 9);
-    const floorMat = new THREE.MeshStandardMaterial({ color: 0x181a20, roughness: 0.7 });
+    const floorMat = new THREE.MeshStandardMaterial({ color: 0x242834, roughness: 0.5, metalness: 0.05 });
     const floor = new THREE.Mesh(floorGeo, floorMat);
     floor.position.y = -0.05;
     floor.receiveShadow = true;
     scene.add(floor);
 
-    // Back Wall
-    const wallMat = new THREE.MeshStandardMaterial({ color: 0x12141a, roughness: 0.9 });
+    // Floor tile grout lines
+    const groutMat = new THREE.MeshStandardMaterial({ color: 0x191c26, roughness: 0.8 });
+    for (let i = -4; i <= 4; i += 1.2) {
+      const lineH = new THREE.Mesh(new THREE.BoxGeometry(9, 0.012, 0.02), groutMat);
+      lineH.position.set(0, 0.005, i);
+      scene.add(lineH);
+      const lineV = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.012, 9), groutMat);
+      lineV.position.set(i, 0.005, 0);
+      scene.add(lineV);
+    }
+
+    // Back Wall — Architectural slate finish
+    const wallMat = new THREE.MeshStandardMaterial({ color: 0x2a2e3b, roughness: 0.8 });
     const wallBackGeo = new THREE.BoxGeometry(9, 5, 0.1);
     const wallBack = new THREE.Mesh(wallBackGeo, wallMat);
     wallBack.position.set(0, 2.45, -4.45);
     wallBack.receiveShadow = true;
     scene.add(wallBack);
 
-    // Side Wall
+    // Side Wall — Architectural slate finish
     const wallSideGeo = new THREE.BoxGeometry(0.1, 5, 9);
     const wallSide = new THREE.Mesh(wallSideGeo, wallMat);
     wallSide.position.set(-4.45, 2.45, 0);
     wallSide.receiveShadow = true;
     scene.add(wallSide);
 
-    // Backsplash Panel with Subtle Geometric Trim
+    // Backsplash Panel — Refined dark stone panel
     const backsplashGeo = new THREE.BoxGeometry(5.2, 1.1, 0.05);
-    const backsplashMat = new THREE.MeshStandardMaterial({ color: 0x222630, roughness: 0.4 });
+    const backsplashMat = new THREE.MeshStandardMaterial({ color: 0x343a49, roughness: 0.4, metalness: 0.08 });
     const backsplash = new THREE.Mesh(backsplashGeo, backsplashMat);
     backsplash.position.set(-0.5, 1.45, -4.38);
     scene.add(backsplash);
 
     // Tile grid lines on backsplash
-    const tileLineMat = new THREE.MeshBasicMaterial({ color: 0x343a47 });
+    const tileLineMat = new THREE.MeshBasicMaterial({ color: 0x262a36 });
     for (let i = -2; i <= 2; i += 0.8) {
       const lineGeo = new THREE.BoxGeometry(0.015, 1.1, 0.06);
       const line = new THREE.Mesh(lineGeo, tileLineMat);
@@ -459,21 +472,26 @@ export default function InteractiveStudio({
 
     tryLoadGltf(0);
 
-    // --- LIGHTING SETUP ---
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.45);
+    // --- LIGHTING SETUP (BALANCED LUXURY STUDIO) ---
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.05);
     scene.add(ambientLight);
 
-    const mainDirectionalLight = new THREE.DirectionalLight(0xffffff, 0.7);
-    mainDirectionalLight.position.set(5, 8, 4);
+    const mainDirectionalLight = new THREE.DirectionalLight(0xfff6eb, 1.4);
+    mainDirectionalLight.position.set(4, 9, 5);
     mainDirectionalLight.castShadow = true;
-    mainDirectionalLight.shadow.mapSize.width = 1024;
-    mainDirectionalLight.shadow.mapSize.height = 1024;
-    mainDirectionalLight.shadow.bias = -0.0005;
+    mainDirectionalLight.shadow.mapSize.width = 2048;
+    mainDirectionalLight.shadow.mapSize.height = 2048;
+    mainDirectionalLight.shadow.bias = -0.0004;
     scene.add(mainDirectionalLight);
 
+    // Cool Soft Fill Light for clear detail definition
+    const fillLight = new THREE.DirectionalLight(0xebf3ff, 0.7);
+    fillLight.position.set(-5, 5, 5);
+    scene.add(fillLight);
+
     // Warm Accent Spotlight on Island
-    const islandSpotlight = new THREE.SpotLight(0xfff3db, 2.5, 8, Math.PI / 4, 0.4);
-    islandSpotlight.position.set(-0.3, 4.0, -1.2);
+    const islandSpotlight = new THREE.SpotLight(0xffe2b8, 2.8, 9, Math.PI / 4, 0.35);
+    islandSpotlight.position.set(-0.3, 4.2, -1.2);
     islandSpotlight.target.position.set(-0.3, 0.8, -1.2);
     islandSpotlight.castShadow = true;
     scene.add(islandSpotlight);

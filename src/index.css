@@ -134,3 +134,81 @@ html {
 .delay-400 {
   transition-delay: 400ms;
 }
+
+/* ===== PERFORMANCE & RENDER OPTIMIZATIONS ===== */
+
+/* Enable browser content-visibility for offscreen sections */
+section:not(#hero) {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 800px;
+  contain: layout style paint;
+}
+
+/* Contain layout/paint for heavy structural elements */
+section, header, footer {
+  contain: layout style;
+}
+
+/* Use GPU compositing for animated elements */
+.animate-ken-burns,
+.animate-ambient-glow,
+.animate-scroll-bounce {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Prevent layout shift from parallax containers */
+.parallax-container {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Improve mobile scroll performance */
+@media (max-width: 768px) {
+  /* Disable expensive hover effects on mobile */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Reduce scrollbar size on mobile */
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  /* Disable heavy 3D transforms on mobile */
+  .perspective-card {
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* Lazy image loading optimization */
+img {
+  content-visibility: auto;
+}
+
+/* Reduce paint by using transform instead of top/left for absolute positioned items */
+.floating-element {
+  will-change: transform;
+}
+
+/* Hardware-accelerated compositing for Services Slider and sticky sections */
+#services .sticky {
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+.will-change-transform {
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+}
+
+/* Prevent mobile font size adjustment */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}

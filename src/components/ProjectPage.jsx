@@ -118,10 +118,16 @@ export default function ProjectPage({ onNavigate }) {
           
 
           <button
-            onClick={() => onNavigate('landing')}
+            onClick={() => {
+              onNavigate('landing');
+              setTimeout(() => {
+                const el = document.querySelector('#get-in-touch');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }, 300);
+            }}
             className="px-4 py-2 sm:px-5 sm:py-2.5 bg-[#710014] text-white text-[10px] font-sans font-bold tracking-wider uppercase hover:bg-[#580010] transition-colors cursor-pointer shadow-sm"
           >
-            CONSULTATION
+            CONTACT US
           </button>
 
         </div>

@@ -1,24 +1,13 @@
+import { memo } from 'react';
 import modularKitchenImg from '../../assets/modular-kitchen.webp';
 import acpelvationImg from '../../assets/ACP-elevation.webp';
 import falseCeilingImg from '../../assets/false-ceiling-work.webp';
 
-export default function ServicesSlider({ 
+function ServicesSlider({ 
   servicesRef, 
   scrollProgress, 
   onNavigate 
 }) {
-  const getSlideStyle = (idx) => {
-    const dist = (scrollProgress * 3) - idx;
-    const rotY = Math.min(Math.max(dist * -14, -14), 14);
-    const translateZ = Math.min(Math.abs(dist) * -120, 0);
-    const scale = 1 - Math.min(Math.abs(dist) * 0.06, 0.06);
-    return {
-      transform: `perspective(1200px) rotateY(${rotY}deg) translateZ(${translateZ}px) scale(${scale})`,
-      transition: 'transform 0.2s ease-out',
-      willChange: 'transform'
-    };
-  };
-
   return (
     <div 
       ref={servicesRef} 
@@ -32,17 +21,17 @@ export default function ServicesSlider({
         <div className="absolute w-[450px] h-[450px] bg-luxury-red/5 rounded-full blur-[130px] -left-20 top-20 pointer-events-none" />
         <div className="absolute w-[450px] h-[450px] bg-luxury-sage/4 rounded-full blur-[130px] -right-20 bottom-20 pointer-events-none" />
 
-        {/* Horizontal Slide Row */}
+        {/* Horizontal Slide Row - instant 1:1 scroll translation */}
         <div 
-          className="flex h-full transition-transform duration-200 ease-out will-change-transform"
+          className="flex h-full will-change-transform"
           style={{ 
-            transform: `translateX(-${scrollProgress * 300}vw)`,
+            transform: `translate3d(-${scrollProgress * 300}vw, 0, 0)`,
             width: '400vw'
           }}
         >
           
           {/* Slide 1: Modular Kitchen */}
-          <div style={getSlideStyle(0)} className="w-screen h-full flex items-center px-6 md:px-16 lg:px-24">
+          <div className="w-screen h-full flex items-center px-6 md:px-16 lg:px-24">
             <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
               
               {/* Text Description */}
@@ -66,7 +55,7 @@ export default function ServicesSlider({
                 <div className="pt-2">
                   <button 
                     onClick={() => onNavigate('services')}
-                    className="inline-flex items-center gap-2 font-sans text-[10px] tracking-wider text-luxury-sage font-medium uppercase hover:text-luxury-cream transition-colors group"
+                    className="inline-flex items-center gap-2 font-sans text-[10px] tracking-wider text-luxury-sage font-medium uppercase hover:text-luxury-cream transition-colors group cursor-pointer"
                   >
                     <span>Explore Kitchen Designs</span>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3 h-3 group-hover:translate-x-1 transition-transform">
@@ -79,18 +68,14 @@ export default function ServicesSlider({
               {/* Framed Visual Showcase */}
               <div className="lg:col-span-7 flex justify-center">
                 <div className="relative group w-full lg:w-auto rounded-2xl overflow-hidden shadow-2xl">
-                  <div className="absolute inset-0 bg-luxury-red/10 rounded-2xl blur-xl  transition-all duration-700 pointer-events-none z-10" />
+                  <div className="absolute inset-0 bg-luxury-red/10 rounded-2xl blur-xl pointer-events-none z-10" />
                   <div className="relative overflow-hidden w-full lg:w-[45vw] h-[35vh] lg:h-[60vh] rounded-2xl border border-luxury-cream/10">
                     <img 
                       src={modularKitchenImg} 
                       alt="Modern Modular Kitchen Design" 
                       loading="lazy"
                       decoding="async"
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-out scale-[1.05]"
-                      style={{
-                        transform: `translateX(${(scrollProgress - 0 / 3) * -70}px) scale(1.1)`,
-                        willChange: 'transform'
-                      }}
+                      className="absolute inset-0 w-full h-full object-cover scale-[1.05]"
                     />
                   </div>
                 </div>
@@ -98,8 +83,8 @@ export default function ServicesSlider({
             </div>
           </div>
 
-          {/* Slide 2: Bespoke Commercial */}
-          <div style={getSlideStyle(1)} className="w-screen h-full flex items-center px-6 md:px-16 lg:px-24 bg-[#141414]">
+          {/* Slide 2: ACP Elevation */}
+          <div className="w-screen h-full flex items-center px-6 md:px-16 lg:px-24 bg-[#141414]">
             <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
               
               {/* Text Description */}
@@ -117,12 +102,13 @@ export default function ServicesSlider({
                 <div className="w-16 h-[1px] bg-luxury-cream/15" />
                 
                 <p className="font-sans text-xs md:text-sm text-luxury-cream/60 leading-relaxed font-light">
-We design modern ACP (Aluminium Composite Panel) elevations to enhance the exterior of buildings. Our panels are durable, weather-resistant, and visually appealing. Customized colors, textures, and patterns are available to match the client’s style. We focus on quality installation and precise finishing. ACP elevation works add a premium look to any property.                </p>
+                  We design modern ACP (Aluminium Composite Panel) elevations to enhance the exterior of buildings. Our panels are durable, weather-resistant, and visually appealing. Customized colors, textures, and patterns are available to match the client's style. We focus on quality installation and precise finishing. ACP elevation works add a premium look to any property.
+                </p>
                 
                 <div className="pt-2">
                   <button 
                     onClick={() => onNavigate('services')}
-                    className="inline-flex items-center gap-2 font-sans text-[10px] tracking-wider text-luxury-sage font-medium uppercase hover:text-luxury-cream transition-colors group"
+                    className="inline-flex items-center gap-2 font-sans text-[10px] tracking-wider text-luxury-sage font-medium uppercase hover:text-luxury-cream transition-colors group cursor-pointer"
                   >
                     <span>Explore Service</span>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3 h-3 group-hover:translate-x-1 transition-transform">
@@ -135,18 +121,14 @@ We design modern ACP (Aluminium Composite Panel) elevations to enhance the exter
               {/* Framed Visual Showcase */}
               <div className="lg:col-span-7 flex justify-center">
                 <div className="relative group w-full lg:w-auto rounded-2xl overflow-hidden shadow-2xl">
-                  <div className="absolute inset-0 bg-luxury-red/10 rounded-2xl blur-xl  transition-all duration-700 pointer-events-none z-10" />
+                  <div className="absolute inset-0 bg-luxury-red/10 rounded-2xl blur-xl pointer-events-none z-10" />
                   <div className="relative overflow-hidden w-full lg:w-[45vw] h-[35vh] lg:h-[60vh] rounded-2xl border border-luxury-cream/10">
                     <img 
                       src={acpelvationImg} 
                       alt="ACP Elevation Design" 
                       loading="lazy"
                       decoding="async"
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-out scale-[1.05]"
-                      style={{
-                        transform: `translateX(${(scrollProgress - 0 / 3) * -70}px) scale(1.1)`,
-                        willChange: 'transform'
-                      }}
+                      className="absolute inset-0 w-full h-full object-cover scale-[1.05]"
                     />
                   </div>
                 </div>
@@ -154,8 +136,8 @@ We design modern ACP (Aluminium Composite Panel) elevations to enhance the exter
             </div>
           </div>
 
-          {/* Slide 3: Tailored Artifacts */}
-          <div style={getSlideStyle(2)} className="w-screen h-full flex items-center px-6 md:px-16 lg:px-24">
+          {/* Slide 3: False Ceiling */}
+          <div className="w-screen h-full flex items-center px-6 md:px-16 lg:px-24">
             <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
               
               {/* Text Description */}
@@ -173,12 +155,13 @@ We design modern ACP (Aluminium Composite Panel) elevations to enhance the exter
                 <div className="w-16 h-[1px] bg-luxury-cream/15" />
                 
                 <p className="font-sans text-xs md:text-sm text-luxury-cream/60 leading-relaxed font-light">
-We provide elegant false ceiling solutions that enhance the look and feel of interiors. Our services include gypsum and POP ceiling designs with integrated lighting. False ceilings conceal wiring and improve insulation. We offer modern patterns and durable finishes to suit any décor. Professional installation ensures lasting quality and aesthetics.                </p>
+                  We provide elegant false ceiling solutions that enhance the look and feel of interiors. Our services include gypsum and POP ceiling designs with integrated lighting. False ceilings conceal wiring and improve insulation. We offer modern patterns and durable finishes to suit any décor. Professional installation ensures lasting quality and aesthetics.
+                </p>
                 
                 <div className="pt-2">
                   <button 
                     onClick={() => onNavigate('services')}
-                    className="inline-flex items-center gap-2 font-sans text-[10px] tracking-wider text-luxury-sage font-medium uppercase hover:text-luxury-cream transition-colors group"
+                    className="inline-flex items-center gap-2 font-sans text-[10px] tracking-wider text-luxury-sage font-medium uppercase hover:text-luxury-cream transition-colors group cursor-pointer"
                   >
                     <span>Explore Service</span>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3 h-3 group-hover:translate-x-1 transition-transform">
@@ -191,18 +174,14 @@ We provide elegant false ceiling solutions that enhance the look and feel of int
               {/* Framed Visual Showcase */}
               <div className="lg:col-span-7 flex justify-center">
                 <div className="relative group w-full lg:w-auto rounded-2xl overflow-hidden shadow-2xl">
-                  <div className="absolute inset-0 bg-luxury-red/10 rounded-2xl blur-xl  transition-all duration-700 pointer-events-none z-10" />
+                  <div className="absolute inset-0 bg-luxury-red/10 rounded-2xl blur-xl pointer-events-none z-10" />
                   <div className="relative overflow-hidden w-full lg:w-[45vw] h-[35vh] lg:h-[60vh] rounded-2xl border border-luxury-cream/10">
                     <img 
                       src={falseCeilingImg} 
                       alt="False Ceiling Design" 
                       loading="lazy"
                       decoding="async"
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-out scale-[1.05]"
-                      style={{
-                        transform: `translateX(${(scrollProgress - 0 / 3) * -70}px) scale(1.1)`,
-                        willChange: 'transform'
-                      }}
+                      className="absolute inset-0 w-full h-full object-cover scale-[1.05]"
                     />
                   </div>
                 </div>
@@ -211,7 +190,7 @@ We provide elegant false ceiling solutions that enhance the look and feel of int
           </div>
 
           {/* Slide 4: View Catalog */}
-          <div style={getSlideStyle(3)} className="w-screen h-full flex items-center px-6 md:px-16 lg:px-24 bg-[#0e0e0e]">
+          <div className="w-screen h-full flex items-center px-6 md:px-16 lg:px-24 bg-[#0e0e0e]">
             <div className="max-w-4xl mx-auto w-full text-center space-y-8">
               <div className="flex justify-center items-center gap-3">
                 <span className="w-8 h-[1px] bg-luxury-sage" />
@@ -232,7 +211,7 @@ We provide elegant false ceiling solutions that enhance the look and feel of int
               <div className="pt-4">
                 <button 
                   onClick={() => onNavigate('services')}
-                  className="relative px-8 py-3.5 bg-luxury-cream text-luxury-charcoal font-sans text-xs uppercase tracking-widest font-semibold overflow-hidden group transition-all duration-300 shadow-[0_10px_30px_rgba(131,143,111,0.1)] hover:shadow-[0_10px_35px_rgba(131,143,111,0.2)]"
+                  className="relative px-8 py-3.5 bg-luxury-cream text-luxury-charcoal font-sans text-xs uppercase tracking-widest font-semibold overflow-hidden group transition-all duration-300 shadow-[0_10px_30px_rgba(131,143,111,0.1)] hover:shadow-[0_10px_35px_rgba(131,143,111,0.2)] cursor-pointer"
                 >
                   <span className="relative z-10 transition-colors duration-500 group-hover:text-luxury-cream">
                     Browse Services Catalog
@@ -248,7 +227,7 @@ We provide elegant false ceiling solutions that enhance the look and feel of int
         {/* Timeline Bar showing horizontal progress */}
         <div className="absolute bottom-8 left-6 md:left-16 right-6 md:right-16 h-[1px] bg-luxury-cream/10 z-30">
           <div 
-            className="h-full bg-luxury-sage transition-all duration-300 will-change-transform"
+            className="h-full bg-luxury-sage will-change-transform"
             style={{ width: `${scrollProgress * 100}%` }}
           />
         </div>
@@ -257,3 +236,5 @@ We provide elegant false ceiling solutions that enhance the look and feel of int
     </div>
   );
 }
+
+export default memo(ServicesSlider);

@@ -1,19 +1,20 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react';
 import Navbar from './Navbar';
 import Hero from './sections/Hero';
 import AboutUs from './sections/AboutUs';
 import WhyUs from './sections/WhyUs';
 import ServicesSlider from './sections/ServicesSlider';
 import CuratedAtelier from './sections/CuratedAtelier';
-import InteractiveStudio from './sections/InteractiveStudio';
 import BeforeAfter from './sections/BeforeAfter';
 import ProjectGlimpse from './sections/ProjectGlimpse';
 import Testimonial from './sections/Testimonial';
 import Showrooms from './sections/Showrooms';
-import BookConsultation from './sections/BookConsultation';
 import GetInTouch from './sections/GetInTouch';
 import Footer from './sections/Footer';
 import ReturnToHomeFAB from './sections/ReturnToHomeFAB';
+
+// Lazy load Three.js heavy section - only loads on desktop when visible
+const InteractiveStudio = lazy(() => import('./sections/InteractiveStudio'));
 
 let initialPreloadDone = false;
 
@@ -25,8 +26,6 @@ const LandingPage = ({ onNavigate }) => {
   const [isPaused, setIsPaused] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [scrollY, setScrollY] = useState(0);
-  const [whyUsBgProgress, setWhyUsBgProgress] = useState(0);
-  const [whyUsContentProgress, setWhyUsContentProgress] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isDesktop, setIsDesktop] = useState(true);
 
@@ -36,6 +35,7 @@ const LandingPage = ({ onNavigate }) => {
   const [kitchenLayout, setKitchenLayout] = useState('l-shaped');
   const [underCabinetLightOn, setUnderCabinetLightOn] = useState(true);
   const [studioAutoRotate, setStudioAutoRotate] = useState(false);
+  const [wallColorIdx, setWallColorIdx] = useState(0);
 
   // Curation tab state
   const [activeTabIdx, setActiveTabIdx] = useState(1);
@@ -45,12 +45,8 @@ const LandingPage = ({ onNavigate }) => {
   const servicesRef = useRef(null);
   const testimonialRef = useRef(null);
   const showroomRef = useRef(null);
-  const consultationRef = useRef(null);
   const getInTouchRef = useRef(null);
-  const [testimonialProgress, setTestimonialProgress] = useState(0);
-  const [showroomProgress, setShowroomProgress] = useState(0);
-  const [consultationProgress, setConsultationProgress] = useState(0);
-  const [getInTouchProgress, setGetInTouchProgress] = useState(0);
+  const scrollTickRef = useRef(false);
 
   // Monitor viewport size for responsive layout styling
   useEffect(() => {
@@ -118,115 +114,59 @@ const LandingPage = ({ onNavigate }) => {
     };
   }, [isPaused, loading]);
 
-  // Track window scroll for parallax effects, relative bounds, and services section pinning
+  // Track window scroll for parallax effects - throttled with rAF for high performance
   useEffect(() => {
+    let lastScrollProgress = -1;
+
     const handleScroll = () => {
-      // 1. Hero scroll position
-      const scrollPos = window.scrollY;
-      setScrollY(scrollPos);
+      if (scrollTickRef.current) return;
+      scrollTickRef.current = true;
+      requestAnimationFrame(() => {
+        scrollTickRef.current = false;
+        const scrollPos = window.scrollY;
 
-      // 2. Services section horizontal scroll progress calculation
-      if (servicesRef.current) {
-        const rect = servicesRef.current.getBoundingClientRect();
-        const sectionHeight = rect.height;
-        const viewportHeight = window.innerHeight;
-
-        const scrolled = -rect.top;
-        const totalScrollable = sectionHeight - viewportHeight;
-
-        if (scrolled >= 0 && scrolled <= totalScrollable) {
-          setScrollProgress(scrolled / totalScrollable);
-        } else if (scrolled < 0) {
-          setScrollProgress(0);
-        } else {
-          setScrollProgress(1);
+        // Only update scrollY while Hero parallax is visible (first 110% of viewport)
+        if (scrollPos <= window.innerHeight * 1.1) {
+          setScrollY(scrollPos);
         }
-      }
 
-      // 3. Why Us section 2-step scroll progress
-      if (whyUsRef.current) {
-        const rect = whyUsRef.current.getBoundingClientRect();
-        const sectionHeight = rect.height;
-        const viewportHeight = window.innerHeight;
+        if (servicesRef.current) {
+          const rect = servicesRef.current.getBoundingClientRect();
+          const sectionHeight = rect.height;
+          const viewportHeight = window.innerHeight;
+          const scrolled = -rect.top;
+          const totalScrollable = sectionHeight - viewportHeight;
 
-        // Step 1: Cream BG pops up as section top enters viewport (rect.top: viewportHeight -> 0)
-        const bgProg = Math.min(Math.max(0, (viewportHeight - rect.top) / viewportHeight), 1);
-        setWhyUsBgProgress(bgProg);
-
-        // Step 2: Every content pops up on next scroll inside pinned area (rect.top <= 0)
-        const scrolled = -rect.top;
-        const totalScrollable = sectionHeight - viewportHeight;
-        let contentProg = 0;
-        if (scrolled >= 0 && totalScrollable > 0) {
-          contentProg = Math.min(Math.max(0, scrolled / (totalScrollable * 0.5)), 1);
+          let newProgress = 0;
+          if (scrolled >= 0 && scrolled <= totalScrollable) {
+            newProgress = scrolled / totalScrollable;
+            if (newProgress !== lastScrollProgress) {
+              lastScrollProgress = newProgress;
+              setScrollProgress(newProgress);
+            }
+          } else if (scrolled > totalScrollable && lastScrollProgress !== 1) {
+            lastScrollProgress = 1;
+            setScrollProgress(1);
+          } else if (scrolled < 0 && lastScrollProgress !== 0) {
+            lastScrollProgress = 0;
+            setScrollProgress(0);
+          }
         }
-        setWhyUsContentProgress(contentProg);
-      }
-
-
-      // 4. Testimonial section relative scroll progress
-      if (testimonialRef.current) {
-        const rect = testimonialRef.current.getBoundingClientRect();
-        const sectionHeight = rect.height;
-        const viewportHeight = window.innerHeight;
-        const scrolled = -rect.top;
-        const totalScrollable = sectionHeight - viewportHeight;
-        if (scrolled >= 0 && scrolled <= totalScrollable) {
-          setTestimonialProgress(scrolled / totalScrollable);
-        } else if (scrolled < 0) {
-          setTestimonialProgress(0);
-        } else {
-          setTestimonialProgress(1);
-        }
-      }
-
-      // 5. Showroom section relative scroll progress
-      if (showroomRef.current) {
-        const rect = showroomRef.current.getBoundingClientRect();
-        const sectionHeight = rect.height;
-        const viewportHeight = window.innerHeight;
-        const scrolled = -rect.top + viewportHeight;
-        if (sectionHeight > 0) {
-          setShowroomProgress(Math.min(Math.max(0, scrolled / (sectionHeight + viewportHeight)), 1));
-        }
-      }
-
-      // 6. Consultation section relative scroll progress
-      if (consultationRef.current) {
-        const rect = consultationRef.current.getBoundingClientRect();
-        const sectionHeight = rect.height;
-        const viewportHeight = window.innerHeight;
-        const scrolled = -rect.top + viewportHeight;
-        if (sectionHeight > 0) {
-          setConsultationProgress(Math.min(Math.max(0, scrolled / (sectionHeight + viewportHeight)), 1));
-        }
-      }
-
-      // 7. Get In Touch section relative scroll progress
-      if (getInTouchRef.current) {
-        const rect = getInTouchRef.current.getBoundingClientRect();
-        const sectionHeight = rect.height;
-        const viewportHeight = window.innerHeight;
-        const scrolled = -rect.top;
-        if (sectionHeight > viewportHeight) {
-          setGetInTouchProgress(Math.min(Math.max(0, scrolled / (sectionHeight - viewportHeight)), 1));
-        } else {
-          setGetInTouchProgress(Math.min(Math.max(0, (-rect.top + viewportHeight) / (sectionHeight + viewportHeight)), 1));
-        }
-      }
+      });
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Handle mouse move for a very minor, subtle ambient shift (6px max) to maintain premium feel
-  const handleMouseMove = (e) => {
+  // Mouse move – only on desktop, subtle ambient shift
+  const handleMouseMove = useCallback((e) => {
+    if (!isDesktop) return;
     const { clientWidth, clientHeight } = e.currentTarget;
     const x = (e.clientX / clientWidth - 0.5) * 6;
     const y = (e.clientY / clientHeight - 0.5) * 6;
     setMousePos({ x, y });
-  };
+  }, [isDesktop]);
 
   const handlePrev = () => {
     setPrevActiveIndex(activeIndex);
@@ -278,11 +218,7 @@ const LandingPage = ({ onNavigate }) => {
         heroOpacity={heroOpacity}
       />
 
-      <WhyUs
-        whyUsRef={whyUsRef}
-        whyUsBgProgress={whyUsBgProgress}
-        whyUsContentProgress={whyUsContentProgress}
-      />
+      <WhyUs whyUsRef={whyUsRef} />
 
       <ServicesSlider
         servicesRef={servicesRef}
@@ -296,19 +232,26 @@ const LandingPage = ({ onNavigate }) => {
         onNavigate={onNavigate}
       />
 
-      <InteractiveStudio
-        cabinetFinishIdx={cabinetFinishIdx}
-        setCabinetFinishIdx={setCabinetFinishIdx}
-        countertopIdx={countertopIdx}
-        setCountertopIdx={setCountertopIdx}
-        kitchenLayout={kitchenLayout}
-        setKitchenLayout={setKitchenLayout}
-        underCabinetLightOn={underCabinetLightOn}
-        setUnderCabinetLightOn={setUnderCabinetLightOn}
-        studioAutoRotate={studioAutoRotate}
-        setStudioAutoRotate={setStudioAutoRotate}
-        loading={loading}
-      />
+      {/* 3D Studio hidden on mobile for performance, lazy-loaded on desktop */}
+      <div className="hidden md:block">
+        <Suspense fallback={<div className="w-full h-96 bg-[#0f1117] flex items-center justify-center"><span className="text-white/30 text-xs tracking-widest uppercase">Loading 3D Studio...</span></div>}>
+          <InteractiveStudio
+            cabinetFinishIdx={cabinetFinishIdx}
+            setCabinetFinishIdx={setCabinetFinishIdx}
+            countertopIdx={countertopIdx}
+            setCountertopIdx={setCountertopIdx}
+            kitchenLayout={kitchenLayout}
+            setKitchenLayout={setKitchenLayout}
+            underCabinetLightOn={underCabinetLightOn}
+            setUnderCabinetLightOn={setUnderCabinetLightOn}
+            studioAutoRotate={studioAutoRotate}
+            setStudioAutoRotate={setStudioAutoRotate}
+            wallColorIdx={wallColorIdx}
+            setWallColorIdx={setWallColorIdx}
+            loading={loading}
+          />
+        </Suspense>
+      </div>
 
       <BeforeAfter />
 
@@ -316,30 +259,11 @@ const LandingPage = ({ onNavigate }) => {
 
       <AboutUs onNavigate={onNavigate} />
 
-      <Testimonial
-        testimonialRef={testimonialRef}
-        testimonialProgress={testimonialProgress}
-        isDesktop={isDesktop}
-      />
+      <Testimonial testimonialRef={testimonialRef} />
 
-      <Showrooms
-        showroomRef={showroomRef}
-        scrollProgress={showroomProgress}
-        isDesktop={isDesktop}
-      />
+      <Showrooms showroomRef={showroomRef} isDesktop={isDesktop} />
 
-      <BookConsultation
-        consultationRef={consultationRef}
-        scrollProgress={consultationProgress}
-        isDesktop={isDesktop}
-        onNavigate={onNavigate}
-      />
-
-      <GetInTouch
-        getInTouchRef={getInTouchRef}
-        scrollProgress={getInTouchProgress}
-        isDesktop={isDesktop}
-      />
+      <GetInTouch getInTouchRef={getInTouchRef} isDesktop={isDesktop} />
 
       <Footer onNavigate={onNavigate} />
 

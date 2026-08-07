@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import { useScrollReveal } from '../../hooks/useScrollReveal';
 
 const SHOWROOMS_DATA = [
@@ -72,7 +72,7 @@ const SHOWROOMS_DATA = [
   }
 ];
 
-export default function Showrooms({ showroomRef, scrollProgress = 0, isDesktop = true }) {
+function Showrooms({ showroomRef, scrollProgress = 0, isDesktop = true }) {
   useScrollReveal();
   const [activeLocationIdx, setActiveLocationIdx] = useState(0);
   const [activeMediaType, setActiveMediaType] = useState('map'); // 'map' or 'gallery'
@@ -294,15 +294,17 @@ export default function Showrooms({ showroomRef, scrollProgress = 0, isDesktop =
 
                 <button
                   onClick={() => {
-                    setSelectedBookingLocation(currentLocation.id);
-                    setBookingModalOpen(true);
+                    const contactSection = document.querySelector('#get-in-touch');
+                    if (contactSection) {
+                      contactSection.scrollIntoView({ behavior: 'smooth' });
+                    }
                   }}
                   className="w-full sm:w-1/2 px-6 py-3.5 rounded-none bg-[#710014] text-white text-xs font-sans font-extrabold tracking-widest uppercase hover:bg-[#580010] transition-all text-center flex items-center justify-center gap-2 shadow-lg shadow-[#710014]/20 cursor-pointer"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
                     <path fillRule="evenodd" d="M1.5 4.5a3 3 0 0 1 3-3h1.372c.86 0 1.61.586 1.819 1.42l1.105 4.423a1.875 1.875 0 0 1-.694 1.955l-1.293.97c.135.252.286.505.452.757.946 1.433 2.164 2.651 3.597 3.597.252.166.505.317.757.452l.97-1.293a1.875 1.875 0 0 1 1.955-.694l4.423 1.105c.834.209 1.42.959 1.42 1.82V19.5a3 3 0 0 1-3 3h-2.25C8.552 22.5 1.5 15.448 1.5 6.75V4.5Z" clipRule="evenodd" />
                   </svg>
-                  <span>BOOK A TOUR</span>
+                  <span>Contact Us</span>
                 </button>
 
               </div>
@@ -525,3 +527,5 @@ export default function Showrooms({ showroomRef, scrollProgress = 0, isDesktop =
     </section>
   );
 }
+
+export default memo(Showrooms);

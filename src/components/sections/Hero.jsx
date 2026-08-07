@@ -1,4 +1,5 @@
 
+import { memo } from 'react';
 import slogo from '../../assets/slogo.webp';
 
 const localSlides = [
@@ -37,7 +38,7 @@ const localSlides = [
   }
 ];
 
-export default function Hero({
+function Hero({
   onNavigate,
   loading,
   progress,
@@ -204,11 +205,10 @@ export default function Hero({
                       src={slide.image}
                       alt={slide.alt || "Sharkings Interior - Bespoke Luxury Interior Design"}
                       decoding="async"
-                      fetchpriority={idx === 0 ? "high" : "low"}
+                      fetchPriority={idx === 0 ? "high" : "low"}
                       className="w-full h-full object-cover"
                       style={{
-                        transform: `translate(${mousePos.x * -0.2}px, calc(${mousePos.y * -0.2}px + ${heroBgY}px))`,
-                        transition: 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)'
+                        transform: `translate3d(${mousePos.x * -0.2}px, calc(${mousePos.y * -0.2}px + ${heroBgY}px), 0)`
                       }}
                     />
                   </div>
@@ -274,15 +274,15 @@ export default function Hero({
                         </a>
 
                         <a
-                          href="#book-consultation"
+                          href="#get-in-touch"
                           onClick={(e) => {
                             e.preventDefault();
-                            smoothScrollToTarget('#book-consultation');
+                            smoothScrollToTarget('#get-in-touch');
                           }}
                           className="relative px-6 sm:px-8 py-3.5 text-luxury-cream border border-luxury-cream/20 hover:border-luxury-cream font-sans text-xs uppercase tracking-widest font-medium overflow-hidden group transition-all duration-300 cursor-pointer text-center"
                         >
                           <span className="relative z-10">
-                            Book Free Consultation
+                            Contact Us
                           </span>
                         </a>
                       </div>
@@ -385,3 +385,5 @@ export default function Hero({
     </>
   );
 }
+
+export default memo(Hero);

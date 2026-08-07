@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import { useScrollReveal } from '../../hooks/useScrollReveal';
 
 // Project Assets from Billionaires & FacetoFace (referencing ProjectPage.jsx)
@@ -277,7 +277,7 @@ function ProjectCard({ project, onClick, cardStyle, isActive }) {
   );
 }
 
-export default function ProjectGlimpse({ onNavigate }) {
+function ProjectGlimpse({ onNavigate }) {
   useScrollReveal();
   const [activeCategory, setActiveCategory] = useState('RESIDENTIAL');
   const [isScanning, setIsScanning] = useState(false);
@@ -635,3 +635,5 @@ export default function ProjectGlimpse({ onNavigate }) {
     </>
   );
 }
+
+export default memo(ProjectGlimpse);

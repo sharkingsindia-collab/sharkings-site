@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import { useScrollReveal } from '../../hooks/useScrollReveal';
 import homeInteriorImg from '../../assets/home-interior.webp';
 import modularKitchenImg from '../../assets/modular-kitchen.webp';
@@ -72,7 +72,7 @@ const localAtelierServices = [
   }
 ];
 
-export default function CuratedAtelier({ 
+function CuratedAtelier({ 
   activeTabIdx, 
   setActiveTabIdx, 
   onNavigate 
@@ -271,3 +271,5 @@ export default function CuratedAtelier({
     </section>
   );
 }
+
+export default memo(CuratedAtelier);

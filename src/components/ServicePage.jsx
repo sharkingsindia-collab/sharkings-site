@@ -220,10 +220,16 @@ export default function ServicePage({ onNavigate }) {
           </div>
 
           <button
-            onClick={() => onNavigate('landing')}
+            onClick={() => {
+              onNavigate('landing');
+              setTimeout(() => {
+                const el = document.querySelector('#get-in-touch');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }, 300);
+            }}
             className="px-4 py-2 sm:px-5 sm:py-2.5 bg-[#710014] text-white text-[10px] font-sans font-bold tracking-wider uppercase hover:bg-[#580010] transition-colors cursor-pointer shadow-sm"
           >
-            CONSULTATION
+            CONTACT US
           </button>
 
         </div>
@@ -361,10 +367,16 @@ export default function ServicePage({ onNavigate }) {
                 {/* Action CTA Buttons */}
                 <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
                   <button
-                    onClick={() => onNavigate('landing')}
+                    onClick={() => {
+                      onNavigate('landing');
+                      setTimeout(() => {
+                        const el = document.querySelector('#get-in-touch');
+                        if (el) el.scrollIntoView({ behavior: 'smooth' });
+                      }, 300);
+                    }}
                     className="w-full sm:w-1/2 py-3 px-6 bg-[#710014] text-white text-xs font-sans font-bold tracking-widest uppercase hover:bg-[#580010] transition-all shadow-md cursor-pointer text-center rounded-none"
                   >
-                    BOOK VIP CONSULTATION
+                    CONTACT US
                   </button>
 
                   <a

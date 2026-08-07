@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, memo } from 'react';
 import { useScrollReveal } from '../../hooks/useScrollReveal';
 import { sendContactEmail } from '../../utils/emailService';
 
@@ -25,7 +25,7 @@ const FAQ_ITEMS = [
   }
 ];
 
-export default function GetInTouch({ getInTouchRef, scrollProgress, isDesktop }) {
+function GetInTouch({ getInTouchRef, isDesktop }) {
   useScrollReveal();
   const cardRef = useRef(null);
   const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
@@ -370,3 +370,5 @@ export default function GetInTouch({ getInTouchRef, scrollProgress, isDesktop })
     </section>
   );
 }
+
+export default memo(GetInTouch);
