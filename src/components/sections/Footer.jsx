@@ -220,6 +220,36 @@ function Footer({ onNavigate }) {
 
         </div>
 
+        {/* SEO POPULAR SEARCH DIRECTORY */}
+        <div className="border-t border-[#c5a059]/20 pt-6 space-y-3 font-sans text-[11px] text-white/60">
+          <div className="flex items-center justify-between cursor-pointer group" onClick={() => {
+            const el = document.getElementById('footer-seo-keywords');
+            if (el) el.classList.toggle('hidden');
+          }}>
+            <h5 className="font-display text-[11px] font-bold text-[#c5a059] tracking-[0.2em] uppercase flex items-center gap-2">
+              <span>Popular Interior Searches — Madurai & Ramanathapuram (Ramnad)</span>
+            </h5>
+            <span className="text-[10px] text-[#c5a059] group-hover:underline">Toggle Keyword Directory ▾</span>
+          </div>
+
+          <div id="footer-seo-keywords" className="space-y-3 pt-2 text-white/50 text-[10px] leading-relaxed hidden">
+            <div>
+              <strong className="text-[#c5a059] block mb-1">MADURAI INTERIOR SERVICES & LOCALITIES:</strong>
+              Best Interior Designers in Madurai • Top 10 Interior Designers in Madurai • Modular Kitchen Designers in Madurai • Living Room Interior Design Madurai • Bedroom Interior Design Madurai • False Ceiling Contractors Madurai • Wardrobe Design Madurai • ACP Elevation Madurai • Container Homes Madurai • Salon Interior Design Madurai • Office Interior Design Madurai • Turnkey Interior Designers Madurai • Interior Design Cost in Madurai • Budget Interior Designers Madurai • Villapuram Interior Designer • Anna Nagar Madurai Interior Designer • KK Nagar Madurai Interior Designer • SS Colony Interior Designer • Bypass Road Madurai • Kalavasal • Tallakulam • Pudur • Melur • Tirumangalam • Usilampatti • Theni • Dindigul • Sivagangai • Virudhunagar.
+            </div>
+
+            <div>
+              <strong className="text-[#c5a059] block mb-1">RAMANATHAPURAM (RAMNAD) INTERIOR SERVICES & LOCALITIES:</strong>
+              Best Interior Designers in Ramanathapuram • Top Interior Designers in Ramnad • Modular Kitchen Ramanathapuram • Coastal Wardrobe Design Ramnad • Moisture Resistant Furniture Ramnad • False Ceiling Ramanathapuram • Subbaiah Nagar Ramnad • Ram Nagar Ramanathapuram • Kenikarai Ramnad • Rameswaram Interior Designer • Paramakudi Interior Designer • Kilakarai Interior Designer • Devipattinam • Mudukulathur • Kamuthi • Thiruvadanai • Sayalgudi • Mandapam • Erwadi • Rameswaram Road Ramnad.
+            </div>
+
+            <div>
+              <strong className="text-[#c5a059] block mb-1">INTERIOR & EXTERIOR SPECIALIZATIONS:</strong>
+              Acrylic Modular Kitchen • Marine Plywood Cabinets • Hettich & Blum Fitting • Sliding Wardrobe • Lacquered Glass Wardrobe • Gypsum False Ceiling • Profile Light Ceiling • Container Cafe Design • Commercial Office Partition • Aluminium & Glass Partition • ACP Sheet Cladding • Front Elevation Design • 3D Interior Spatial Walkthrough • Full House Renovation • 2BHK / 3BHK Interior Cost Estimate.
+            </div>
+          </div>
+        </div>
+
         {/* MINIMAL FOOTER SUB-BAR */}
         <div className="border-t border-[#c5a059]/20 pt-4 sm:pt-6 flex flex-col sm:flex-row items-center justify-between gap-2 font-sans text-[10px] sm:text-[11px] text-white/50 text-center sm:text-left">
           <div>
