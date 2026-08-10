@@ -1,11 +1,9 @@
-import React, { useState, useEffect, useRef, memo } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 
 const TESTIMONIALS_DATA = [
   {
     id: 1,
-    name: 'Jai Krihna',
-    // role: 'Homeowner',
-    // location: 'Anna Nagar, Madurai',
+    name: 'Jai Krishna',
     quote: 'Sharkings, one of the best interiors in Tamilnadu. Works are highly professional and the design and concepts are just amazing... As the result we could get outstanding interior design. Both my house and office interior and exterior done by sharkings...one word.. Thanks man🙏... I would strongly recommend Sharkings for your interior and exterior 😊',
     rating: 5,
     tag: 'Interior Design'
@@ -13,8 +11,6 @@ const TESTIMONIALS_DATA = [
   {
     id: 2,
     name: 'Abdul Kalam',
-    // role: 'Architect',
-    // location: 'Ramanathapuram',
     quote: 'One of the best and professional working in Interior and Exterior in Tamilnadu. And also doing a lots of Container Projects.',
     rating: 4,
     tag: 'Interior Design'
@@ -22,8 +18,6 @@ const TESTIMONIALS_DATA = [
   {
     id: 3,
     name: 'Sarbu Deen',
-    // role: 'Restaurant Owner',
-    // location: 'KK Nagar, Madurai',
     quote: 'Absolutely loved Sharking!!!!! The process was simple and the designers understood my vision and made it a reality. Communication was amazing. I’m now in the shopping stage and can’t wait until it’s all done.Thanks Mr.Sharukhan.',
     rating: 5,
     tag: 'Interior Design'
@@ -55,16 +49,16 @@ function Testimonial({ testimonialRef }) {
   }, [isPaused]);
 
   // Touch Swipe Handlers for mobile
-  const handleTouchStart = (e) => {
+  const handleTouchStart = useCallback((e) => {
     setIsPaused(true);
     setTouchStart(e.targetTouches[0].clientX);
-  };
+  }, []);
 
-  const handleTouchMove = (e) => {
+  const handleTouchMove = useCallback((e) => {
     setTouchEnd(e.targetTouches[0].clientX);
-  };
+  }, []);
 
-  const handleTouchEnd = () => {
+  const handleTouchEnd = useCallback(() => {
     if (!touchStart || !touchEnd) return;
     const distance = touchStart - touchEnd;
     const isLeftSwipe = distance > 40;
@@ -80,7 +74,15 @@ function Testimonial({ testimonialRef }) {
     setTouchStart(0);
     setTouchEnd(0);
     setIsPaused(false);
-  };
+  }, [touchStart, touchEnd]);
+
+  const prevSlide = useCallback(() => {
+    setMobileActive((prev) => (prev - 1 + TESTIMONIALS_DATA.length) % TESTIMONIALS_DATA.length);
+  }, []);
+
+  const nextSlide = useCallback(() => {
+    setMobileActive((prev) => (prev + 1) % TESTIMONIALS_DATA.length);
+  }, []);
 
   return (
     <section
@@ -101,7 +103,8 @@ function Testimonial({ testimonialRef }) {
           </div>
 
           <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-light text-luxury-cream tracking-wide">
-            Loved by Our Clients          </h2>
+            Loved by Our Clients
+          </h2>
           <p className="font-sans text-xs sm:text-sm text-luxury-cream/60 leading-relaxed font-light">
             Real feedback from families and business owners across Madurai & Ramanathapuram.
           </p>
@@ -144,9 +147,6 @@ function Testimonial({ testimonialRef }) {
                   <h3 className="font-display text-sm font-light text-luxury-cream group-hover:text-[#c5a059] transition-colors">
                     {client.name}
                   </h3>
-                  <p className="font-sans text-[10px] text-luxury-sage font-medium tracking-wide">
-                    {client.role} • {client.location}
-                  </p>
                 </div>
               </div>
             </div>
@@ -164,8 +164,8 @@ function Testimonial({ testimonialRef }) {
             onTouchEnd={handleTouchEnd}
           >
             <div
-              className="flex transition-transform duration-500 ease-out"
-              style={{ transform: `translateX(-${mobileActive * 100}%)` }}
+              className="flex transition-transform duration-300 ease-out transform-gpu"
+              style={{ transform: `translate3d(-${mobileActive * 100}%, 0, 0)` }}
             >
               {TESTIMONIALS_DATA.map((client) => (
                 <div
@@ -201,9 +201,6 @@ function Testimonial({ testimonialRef }) {
                         <h3 className="font-display text-sm font-light text-luxury-cream">
                           {client.name}
                         </h3>
-                        <p className="font-sans text-[10px] text-luxury-sage font-medium tracking-wide">
-                          {client.role} • {client.location}
-                        </p>
                       </div>
                     </div>
                   </div>
@@ -217,9 +214,9 @@ function Testimonial({ testimonialRef }) {
 
             {/* Prev Button */}
             <button
-              onClick={() => setMobileActive((prev) => (prev - 1 + TESTIMONIALS_DATA.length) % TESTIMONIALS_DATA.length)}
+              onClick={prevSlide}
               aria-label="Previous Slide"
-              className="p-2 rounded-full border border-white/10 text-luxury-cream/70 hover:text-luxury-cream hover:border-[#c5a059] focus:outline-none"
+              className="p-2 rounded-full border border-white/10 text-luxury-cream/70 hover:text-luxury-cream hover:border-[#c5a059] focus:outline-none touch-manipulation"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
@@ -233,7 +230,7 @@ function Testimonial({ testimonialRef }) {
                   key={idx}
                   onClick={() => setMobileActive(idx)}
                   aria-label={`Go to slide ${idx + 1}`}
-                  className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${mobileActive === idx
+                  className={`h-2 rounded-full transition-all duration-300 cursor-pointer touch-manipulation ${mobileActive === idx
                     ? 'w-7 bg-[#c5a059]'
                     : 'w-2 bg-white/20'
                     }`}
@@ -243,9 +240,9 @@ function Testimonial({ testimonialRef }) {
 
             {/* Next Button */}
             <button
-              onClick={() => setMobileActive((prev) => (prev + 1) % TESTIMONIALS_DATA.length)}
+              onClick={nextSlide}
               aria-label="Next Slide"
-              className="p-2 rounded-full border border-white/10 text-luxury-cream/70 hover:text-luxury-cream hover:border-[#c5a059] focus:outline-none"
+              className="p-2 rounded-full border border-white/10 text-luxury-cream/70 hover:text-luxury-cream hover:border-[#c5a059] focus:outline-none touch-manipulation"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />

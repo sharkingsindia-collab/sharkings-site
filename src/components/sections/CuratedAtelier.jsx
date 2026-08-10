@@ -1,11 +1,11 @@
-import { useState, useEffect, useRef, memo } from 'react';
+import { useCallback, memo } from 'react';
 import { useScrollReveal } from '../../hooks/useScrollReveal';
 import homeInteriorImg from '../../assets/home-interior.webp';
 import modularKitchenImg from '../../assets/modular-kitchen.webp';
 import officeInteriorImg from '../../assets/office-interior.webp';
 import turnkeyImg from '../../assets/turnkey.webp';
 
-const localAtelierServices = [
+const ATELIER_SERVICES = [
   {
     id: 'residential',
     label: 'RESIDENTIAL HOMES',
@@ -77,29 +77,24 @@ function CuratedAtelier({
   setActiveTabIdx, 
   onNavigate 
 }) {
-  const [scrollProgress, setScrollProgress] = useState(0.5);
-  const sectionRef = useRef(null);
   useScrollReveal();
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!sectionRef.current) return;
-      const rect = sectionRef.current.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
-      const totalDist = rect.height + viewportHeight;
-      const scrolled = viewportHeight - rect.top;
+  const handlePrevTab = useCallback(() => {
+    setActiveTabIdx((prev) => (prev - 1 + ATELIER_SERVICES.length) % ATELIER_SERVICES.length);
+  }, [setActiveTabIdx]);
 
-      const prog = Math.min(Math.max(0, scrolled / totalDist), 1);
-      setScrollProgress(prog);
-    };
+  const handleNextTab = useCallback(() => {
+    setActiveTabIdx((prev) => (prev + 1) % ATELIER_SERVICES.length);
+  }, [setActiveTabIdx]);
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  const handleNavigateServices = useCallback(() => {
+    onNavigate && onNavigate('services');
+  }, [onNavigate]);
+
+  const activeService = ATELIER_SERVICES[activeTabIdx] || ATELIER_SERVICES[0];
 
   return (
-    <section ref={sectionRef} className="relative z-30 bg-[#fbf9f6] text-luxury-charcoal py-20 px-6 md:px-16 lg:px-24 border-t border-black/5 overflow-hidden">
+    <section id="curated-atelier" className="relative z-30 bg-[#fbf9f6] text-luxury-charcoal py-20 px-6 md:px-16 lg:px-24 border-t border-black/5 overflow-hidden">
       {/* Background Watermark */}
       <div className="absolute font-display text-[16vw] text-[#710014]/[0.02] font-extralight select-none pointer-events-none z-0 left-0 top-1/3 whitespace-nowrap">
         CURATED ARCHITECTURE
@@ -131,41 +126,45 @@ function CuratedAtelier({
           {/* Top Burgundy Accent Bar */}
           <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-[#710014] to-transparent z-30" />
           
-          {/* Left Side: Visual Showcase (5 cols) */}
+          {/* Left Side: Visual Showcase */}
           <div className="lg:col-span-5 relative bg-luxury-charcoal overflow-hidden aspect-[16/10] lg:aspect-auto w-full lg:h-full min-h-0">
             
             {/* Active Tab Image Panel */}
             <div className="absolute inset-0 w-full h-full">
-              {localAtelierServices.map((tab, idx) => (
+              {ATELIER_SERVICES.map((tab, idx) => (
                 <div 
                   key={tab.id}
-                  className={`absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out ${
+                  className={`absolute inset-0 w-full h-full transition-opacity duration-200 ease-out ${
                     idx === activeTabIdx ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
                   }`}
                 >
                   <img 
                     src={tab.image} 
                     alt={tab.title}
-                    className="w-full h-full object-cover opacity-90 transition-transform duration-[1200ms] ease-out hover:scale-105"
+                    width="600"
+                    height="400"
+                    loading="lazy"
+                    decoding="async"
+                    className="w-full h-full object-cover opacity-90 transition-transform duration-300 ease-out hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30 z-20 pointer-events-none" />
                 </div>
               ))}
             </div>
 
-            {/* Tag Capsule (Top Left) */}
+            {/* Tag Capsule */}
             <div className="absolute top-4 left-4 lg:top-6 lg:left-6 z-30">
               <div className="bg-black/80 backdrop-blur-md border border-white/10 px-3.5 py-1.5 rounded-none">
                 <span className="font-sans text-[8px] lg:text-[9px] font-bold tracking-[0.25em] text-[#c5a059] uppercase">
-                  ✦ {localAtelierServices[activeTabIdx].tag}
+                  ✦ {activeService.tag}
                 </span>
               </div>
             </div>
 
-            {/* Chapter Display (Bottom Left) */}
+            {/* Chapter Display */}
             <div className="absolute bottom-4 left-4 lg:bottom-6 lg:left-6 z-30 space-y-0.5">
               <div className="font-display text-3xl lg:text-5xl font-extralight text-[#c5a059] leading-none">
-                {localAtelierServices[activeTabIdx].chapter}
+                {activeService.chapter}
               </div>
               <div className="font-sans text-[7px] lg:text-[8px] font-bold tracking-[0.4em] text-white/50 uppercase">
                 FEATURED SERVICE
@@ -174,16 +173,16 @@ function CuratedAtelier({
 
           </div>
 
-          {/* Right Side: Tab Controls & Content details (7 cols) */}
+          {/* Right Side: Tab Controls & Content details */}
           <div className="lg:col-span-7 p-5 md:p-10 lg:p-12 flex flex-col justify-between space-y-6 lg:space-y-8">
             
             {/* Tab Selector Buttons */}
             <div className="flex items-center gap-2 pb-4 lg:pb-6 border-b border-black/5 overflow-x-auto scrollbar-none whitespace-nowrap flex-nowrap -mx-2 px-2">
-              {localAtelierServices.map((tab, idx) => (
+              {ATELIER_SERVICES.map((tab, idx) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTabIdx(idx)}
-                  className={`px-4 py-2 rounded-none font-sans text-[9px] lg:text-[10px] font-bold tracking-widest uppercase transition-all duration-300 flex-shrink-0 ${
+                  className={`px-4 py-2 rounded-none font-sans text-[9px] lg:text-[10px] font-bold tracking-widest uppercase transition-all duration-200 flex-shrink-0 touch-manipulation ${
                     idx === activeTabIdx 
                       ? 'bg-[#710014] text-white shadow-md' 
                       : 'bg-transparent text-luxury-charcoal/50 border border-luxury-charcoal/10 hover:border-[#710014] hover:text-[#710014]'
@@ -198,19 +197,19 @@ function CuratedAtelier({
             <div className="space-y-4 lg:space-y-5 flex-grow flex flex-col justify-center">
               
               <div className="font-sans text-[9px] lg:text-[10px] font-bold tracking-[0.3em] text-luxury-sage uppercase">
-                {localAtelierServices[activeTabIdx].concept}
+                {activeService.concept}
               </div>
 
               <h3 className="font-display text-xl lg:text-3xl font-light text-luxury-charcoal tracking-wide uppercase">
-                {localAtelierServices[activeTabIdx].title}
+                {activeService.title}
               </h3>
 
               <p className="font-sans text-xs lg:text-sm text-luxury-charcoal/75 leading-relaxed font-light">
-                {localAtelierServices[activeTabIdx].description}
+                {activeService.description}
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2.5 pt-2">
-                {localAtelierServices[activeTabIdx].features.map((feature, fIdx) => (
+                {activeService.features.map((feature, fIdx) => (
                   <div key={fIdx} className="flex items-center gap-2.5">
                     <div className="w-4 h-4 rounded-full bg-luxury-sage/10 flex items-center justify-center flex-shrink-0">
                       <svg className="w-2.5 h-2.5 text-luxury-sage" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
@@ -231,16 +230,18 @@ function CuratedAtelier({
               
               <div className="flex items-center gap-2 flex-shrink-0">
                 <button 
-                  onClick={() => setActiveTabIdx((prev) => (prev - 1 + localAtelierServices.length) % localAtelierServices.length)}
-                  className="w-9 h-9 rounded-full border border-luxury-charcoal/10 flex items-center justify-center text-luxury-charcoal/55 hover:text-luxury-charcoal hover:border-luxury-charcoal hover:bg-luxury-charcoal/5 transition-all duration-300"
+                  onClick={handlePrevTab}
+                  aria-label="Previous Service Tab"
+                  className="w-9 h-9 rounded-full border border-luxury-charcoal/10 flex items-center justify-center text-luxury-charcoal/55 hover:text-luxury-charcoal hover:border-luxury-charcoal hover:bg-luxury-charcoal/5 transition-all duration-200 touch-manipulation"
                 >
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
                   </svg>
                 </button>
                 <button 
-                  onClick={() => setActiveTabIdx((prev) => (prev + 1) % localAtelierServices.length)}
-                  className="w-9 h-9 rounded-full border border-luxury-charcoal/10 flex items-center justify-center text-luxury-charcoal/55 hover:text-luxury-charcoal hover:border-luxury-charcoal hover:bg-luxury-charcoal/5 transition-all duration-300"
+                  onClick={handleNextTab}
+                  aria-label="Next Service Tab"
+                  className="w-9 h-9 rounded-full border border-luxury-charcoal/10 flex items-center justify-center text-luxury-charcoal/55 hover:text-luxury-charcoal hover:border-luxury-charcoal hover:bg-luxury-charcoal/5 transition-all duration-200 touch-manipulation"
                 >
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
@@ -249,8 +250,8 @@ function CuratedAtelier({
               </div>
 
               <button 
-                onClick={() => onNavigate('services')}
-                className="relative px-5 py-2.5 bg-luxury-charcoal text-white font-sans text-[9px] lg:text-[10px] uppercase tracking-widest font-semibold overflow-hidden group transition-all duration-300 shadow-[0_5px_15px_rgba(22,22,22,0.1)] flex-shrink"
+                onClick={handleNavigateServices}
+                className="relative px-5 py-2.5 bg-luxury-charcoal text-white font-sans text-[9px] lg:text-[10px] uppercase tracking-widest font-semibold overflow-hidden group transition-all duration-300 shadow-[0_5px_15px_rgba(22,22,22,0.1)] flex-shrink touch-manipulation"
               >
                 <span className="relative z-10 flex items-center gap-1.5">
                   <span className="hidden sm:inline">Explore All Services</span>
@@ -273,3 +274,4 @@ function CuratedAtelier({
 }
 
 export default memo(CuratedAtelier);
+

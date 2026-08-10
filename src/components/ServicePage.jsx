@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 
 import turnkeyImg from '../assets/turnkey.webp';
@@ -125,56 +125,32 @@ const SERVICES_CATALOG = [
   }
 ];
 
-export default function ServicePage({ onNavigate }) {
+function ServicePage({ onNavigate }) {
   useScrollReveal();
   const [selectedServiceIdx, setSelectedServiceIdx] = useState(0);
-  const [activeCategoryFilter] = useState('ALL');
-  const [isDesktop, setIsDesktop] = useState(true);
-  const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
-  const cardRef = useRef(null);
-  const stageRef = useRef(null);
 
-  const filteredServices = activeCategoryFilter === 'ALL'
-    ? SERVICES_CATALOG
-    : SERVICES_CATALOG.filter(s => s.categoryGroup === activeCategoryFilter);
+  const activeService = useMemo(
+    () => SERVICES_CATALOG[selectedServiceIdx] || SERVICES_CATALOG[0],
+    [selectedServiceIdx]
+  );
 
-  const activeService = SERVICES_CATALOG[selectedServiceIdx] || SERVICES_CATALOG[0];
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsDesktop(window.innerWidth >= 1024);
-    };
-    window.addEventListener('resize', handleResize);
-    handleResize();
-    return () => window.removeEventListener('resize', handleResize);
+  const selectService = useCallback((globalIdx) => {
+    setSelectedServiceIdx(globalIdx);
+    if (window.innerWidth < 1024) {
+      const stageEl = document.querySelector('#service-stage-target');
+      if (stageEl) {
+        stageEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
   }, []);
 
-  const selectService = (globalIdx) => {
-    setSelectedServiceIdx(globalIdx);
-    if (window.innerWidth < 1024 && stageRef.current) {
-      stageRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
-
-  const handleMouseMove = (e) => {
-    if (!isDesktop || !cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const xc = rect.width / 2;
-    const yc = rect.height / 2;
-    const dx = (x - xc) / xc;
-    const dy = (y - yc) / yc;
-
-    setMouseOffset({
-      x: dx * 3,
-      y: -dy * 3
-    });
-  };
-
-  const handleMouseLeave = () => {
-    setMouseOffset({ x: 0, y: 0 });
-  };
+  const handleContactNavigate = useCallback(() => {
+    onNavigate('landing');
+    setTimeout(() => {
+      const el = document.querySelector('#get-in-touch');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }, 300);
+  }, [onNavigate]);
 
   return (
     <div className="min-h-screen bg-[#f9f8f4] text-[#1a1a1a] font-sans selection:bg-[#710014] selection:text-white relative overflow-x-hidden">
@@ -197,7 +173,7 @@ export default function ServicePage({ onNavigate }) {
           
           <button 
             onClick={() => onNavigate('landing')}
-            className="flex items-center gap-2 font-sans text-xs font-bold tracking-[0.2em] text-[#1a1a1a] hover:text-[#710014] transition-colors uppercase cursor-pointer focus:outline-none group"
+            className="flex items-center gap-2 font-sans text-xs font-bold tracking-[0.2em] text-[#1a1a1a] hover:text-[#710014] transition-colors uppercase cursor-pointer focus:outline-none group touch-manipulation"
           >
             <svg 
               xmlns="http://www.w3.org/2000/svg" 
@@ -220,14 +196,8 @@ export default function ServicePage({ onNavigate }) {
           </div>
 
           <button
-            onClick={() => {
-              onNavigate('landing');
-              setTimeout(() => {
-                const el = document.querySelector('#get-in-touch');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
-              }, 300);
-            }}
-            className="px-4 py-2 sm:px-5 sm:py-2.5 bg-[#710014] text-white text-[10px] font-sans font-bold tracking-wider uppercase hover:bg-[#580010] transition-colors cursor-pointer shadow-sm"
+            onClick={handleContactNavigate}
+            className="px-4 py-2 sm:px-5 sm:py-2.5 bg-[#710014] text-white text-[10px] font-sans font-bold tracking-wider uppercase hover:bg-[#580010] transition-colors cursor-pointer shadow-sm touch-manipulation"
           >
             CONTACT US
           </button>
@@ -256,18 +226,17 @@ export default function ServicePage({ onNavigate }) {
         {/* MOBILE INSTANT SELECTOR BAR (< lg) */}
         <section className="lg:hidden space-y-3 bg-white border border-[#e5e0d3] p-4 rounded-2xl shadow-sm">
           <div className="flex items-center justify-between font-sans text-xs font-bold text-[#710014]">
-            <span className="uppercase tracking-wider">Tap Service to Inspect ({filteredServices.length})</span>
+            <span className="uppercase tracking-wider">Tap Service to Inspect ({SERVICES_CATALOG.length})</span>
           </div>
 
           <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
-            {filteredServices.map((service) => {
-              const globalIdx = SERVICES_CATALOG.findIndex(s => s.id === service.id);
-              const isSelected = selectedServiceIdx === globalIdx;
+            {SERVICES_CATALOG.map((service, idx) => {
+              const isSelected = selectedServiceIdx === idx;
               return (
                 <button
                   key={service.id}
-                  onClick={() => selectService(globalIdx)}
-                  className={`px-3.5 py-2 rounded-lg text-xs font-sans whitespace-nowrap transition-all cursor-pointer ${
+                  onClick={() => selectService(idx)}
+                  className={`px-3.5 py-2 rounded-lg text-xs font-sans whitespace-nowrap transition-all cursor-pointer touch-manipulation ${
                     isSelected
                       ? 'bg-[#710014] text-white font-bold shadow-sm'
                       : 'bg-[#f6f4ee] text-[#333333] hover:bg-[#e5e0d3]'
@@ -292,21 +261,20 @@ export default function ServicePage({ onNavigate }) {
             </div>
 
             <div className="space-y-1 max-h-[500px] overflow-y-auto pr-2 scrollbar-thin">
-              {filteredServices.map((service) => {
-                const globalIdx = SERVICES_CATALOG.findIndex(s => s.id === service.id);
-                const isSelected = selectedServiceIdx === globalIdx;
+              {SERVICES_CATALOG.map((service, idx) => {
+                const isSelected = selectedServiceIdx === idx;
                 return (
                   <button
                     key={service.id}
-                    onClick={() => selectService(globalIdx)}
-                    className={`w-full text-left py-3 px-4 transition-all duration-300 flex items-center justify-between group cursor-pointer border-b border-[#f0ece1] last:border-0 ${
+                    onClick={() => selectService(idx)}
+                    className={`w-full text-left py-3 px-4 transition-all duration-200 flex items-center justify-between group cursor-pointer border-b border-[#f0ece1] last:border-0 touch-manipulation ${
                       isSelected
                         ? 'bg-[#710014]/5 text-[#710014] font-bold border-l-4 border-l-[#710014] pl-5'
                         : 'text-[#333333] hover:bg-[#f6f4ee] hover:text-[#710014]'
                     }`}
                   >
                     <span className="font-sans text-xs tracking-wide">{service.title}</span>
-                    <span className={`text-xs transition-transform duration-300 ${isSelected ? 'translate-x-1 font-bold' : 'opacity-40 group-hover:opacity-100 group-hover:translate-x-1'}`}>
+                    <span className={`text-xs transition-transform duration-200 ${isSelected ? 'translate-x-1 font-bold' : 'opacity-40 group-hover:opacity-100 group-hover:translate-x-1'}`}>
                       →
                     </span>
                   </button>
@@ -316,17 +284,8 @@ export default function ServicePage({ onNavigate }) {
           </div>
 
           {/* RIGHT COLUMN / MOBILE ACTIVE STAGE: Active Card Showcase Stage (7 Cols) */}
-          <div ref={stageRef} className="lg:col-span-7 lg:sticky lg:top-24 scroll-mt-24">
-            <div
-              ref={cardRef}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-              style={{
-                transform: isDesktop ? `perspective(1200px) rotateY(${mouseOffset.x}deg) rotateX(${mouseOffset.y}deg)` : 'none',
-                transition: 'transform 0.15s ease-out'
-              }}
-              className="w-full bg-white border border-[#e5e0d3] rounded-3xl shadow-xl relative overflow-hidden flex flex-col"
-            >
+          <div id="service-stage-target" className="lg:col-span-7 lg:sticky lg:top-24 scroll-mt-24">
+            <div className="w-full bg-white border border-[#e5e0d3] rounded-3xl shadow-xl relative overflow-hidden flex flex-col">
               {/* Top Red Line */}
               <div className="absolute top-0 left-0 right-0 h-[3px] bg-[#710014] z-30" />
 
@@ -335,7 +294,11 @@ export default function ServicePage({ onNavigate }) {
                 <img
                   src={activeService.image}
                   alt={activeService.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  width="800"
+                  height="500"
+                  loading="lazy"
+                  decoding="async"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
 
                 {/* Badge Overlay Top Left */}
@@ -367,21 +330,15 @@ export default function ServicePage({ onNavigate }) {
                 {/* Action CTA Buttons */}
                 <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
                   <button
-                    onClick={() => {
-                      onNavigate('landing');
-                      setTimeout(() => {
-                        const el = document.querySelector('#get-in-touch');
-                        if (el) el.scrollIntoView({ behavior: 'smooth' });
-                      }, 300);
-                    }}
-                    className="w-full sm:w-1/2 py-3 px-6 bg-[#710014] text-white text-xs font-sans font-bold tracking-widest uppercase hover:bg-[#580010] transition-all shadow-md cursor-pointer text-center rounded-none"
+                    onClick={handleContactNavigate}
+                    className="w-full sm:w-1/2 py-3 px-6 bg-[#710014] text-white text-xs font-sans font-bold tracking-widest uppercase hover:bg-[#580010] transition-all shadow-md cursor-pointer text-center rounded-none touch-manipulation"
                   >
                     CONTACT US
                   </button>
 
                   <a
                     href="tel:+918098090204"
-                    className="w-full sm:w-1/2 py-3 px-6 bg-white border border-[#710014] text-[#710014] text-xs font-sans font-bold tracking-widest uppercase hover:bg-[#710014] hover:text-white transition-all cursor-pointer text-center rounded-none flex items-center justify-center gap-2"
+                    className="w-full sm:w-1/2 py-3 px-6 bg-white border border-[#710014] text-[#710014] text-xs font-sans font-bold tracking-widest uppercase hover:bg-[#710014] hover:text-white transition-all cursor-pointer text-center rounded-none flex items-center justify-center gap-2 touch-manipulation"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-[#710014]">
                       <path fillRule="evenodd" d="M1.5 4.5a3 3 0 0 1 3-3h1.372c.86 0 1.61.586 1.819 1.42l1.105 4.423a1.875 1.875 0 0 1-.694 1.955l-1.293.97c.135.252.286.505.452.757.946 1.433 2.164 2.651 3.597 3.597.252.166.505.317.757.452l.97-1.293a1.875 1.875 0 0 1 1.955-.694l4.423 1.105c.834.209 1.42.959 1.42 1.82V19.5a3 3 0 0 1-3 3h-2.25C8.552 22.5 1.5 15.448 1.5 6.75V4.5Z" clipRule="evenodd" />
@@ -416,3 +373,5 @@ export default function ServicePage({ onNavigate }) {
     </div>
   );
 }
+
+export default memo(ServicePage);

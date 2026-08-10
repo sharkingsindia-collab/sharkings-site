@@ -11,27 +11,37 @@ function AboutUs({ onNavigate }) {
   const imgRef = useRef(null);
   const rafRef = useRef(null);
   const lastOffsetRef = useRef(0);
+  const sectionOffsetRef = useRef(0);
+
+  // Cache element offset on mount & resize — 0 DOM property reads inside scroll loop
+  const updateDimensions = useCallback(() => {
+    if (sectionRef.current) {
+      sectionOffsetRef.current = sectionRef.current.offsetTop;
+    }
+  }, []);
 
   const updateParallax = useCallback(() => {
-    if (!sectionRef.current) return;
-    const rect = sectionRef.current.getBoundingClientRect();
+    const scrollY = window.scrollY;
     const windowHeight = window.innerHeight;
+    const sectionTop = sectionOffsetRef.current;
+    const scrolled = scrollY - sectionTop;
 
-    if (rect.top <= windowHeight && rect.bottom >= 0) {
-      const centerDistance = rect.top - (windowHeight / 2 - rect.height / 2);
-      const offset = centerDistance * 0.12;
+    if (scrolled >= -windowHeight && scrolled <= windowHeight) {
+      const offset = scrolled * 0.08;
 
-      if (Math.abs(offset - lastOffsetRef.current) < 0.5) return;
+      if (Math.abs(offset - lastOffsetRef.current) < 0.2) return;
       lastOffsetRef.current = offset;
 
-      if (watermarkRef.current) watermarkRef.current.style.transform = `translateY(${offset * 0.8}px)`;
-      if (leftColRef.current) leftColRef.current.style.transform = `translateY(${offset * -0.15}px)`;
-      if (rightColRef.current) rightColRef.current.style.transform = `translateY(${offset * 0.25}px)`;
-      if (imgRef.current) imgRef.current.style.transform = `scale(1.08) translateY(${offset * -0.12}px)`;
+      if (watermarkRef.current) watermarkRef.current.style.transform = `translate3d(0, ${offset * 0.6}px, 0)`;
+      if (leftColRef.current) leftColRef.current.style.transform = `translate3d(0, ${offset * -0.1}px, 0)`;
+      if (rightColRef.current) rightColRef.current.style.transform = `translate3d(0, ${offset * 0.15}px, 0)`;
+      if (imgRef.current) imgRef.current.style.transform = `scale(1.08) translate3d(0, ${offset * -0.08}px, 0)`;
     }
   }, []);
 
   useEffect(() => {
+    updateDimensions();
+
     const handleScroll = () => {
       if (rafRef.current) return;
       rafRef.current = requestAnimationFrame(() => {
@@ -40,21 +50,29 @@ function AboutUs({ onNavigate }) {
       });
     };
 
+    const handleResize = () => {
+      updateDimensions();
+      updateParallax();
+    };
+
     window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleResize, { passive: true });
     updateParallax();
+
     return () => {
       window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleResize);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, [updateParallax]);
+  }, [updateDimensions, updateParallax]);
 
-  const smoothScrollTo = (selector) => {
+  // Native reflow-free smooth scroll
+  const smoothScrollTo = useCallback((selector) => {
     const elem = document.querySelector(selector);
-    if (!elem) return;
-    const bodyTop = document.body.getBoundingClientRect().top;
-    const elemTop = elem.getBoundingClientRect().top;
-    window.scrollTo({ top: elemTop - bodyTop, behavior: 'smooth' });
-  };
+    if (elem) {
+      elem.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, []);
 
   return (
     <section
@@ -65,7 +83,7 @@ function AboutUs({ onNavigate }) {
       {/* Parallax Background Watermark */}
       <div
         ref={watermarkRef}
-        className="absolute font-display text-[16vw] text-[#710014]/[0.025] font-extralight select-none pointer-events-none z-0 left-0 top-1/4 whitespace-nowrap"
+        className="absolute font-display text-[16vw] text-[#710014]/[0.025] font-extralight select-none pointer-events-none z-0 left-0 top-1/4 whitespace-nowrap will-change-transform"
       >
         EST. 2010 • SHARKINGS
       </div>
@@ -93,7 +111,7 @@ function AboutUs({ onNavigate }) {
           {/* LEFT COLUMN: Authentic Content */}
           <div
             ref={leftColRef}
-            className="lg:col-span-7 space-y-6 reveal-3d-popup delay-100"
+            className="lg:col-span-7 space-y-6 reveal-3d-popup delay-100 will-change-transform"
           >
 
             <div className="space-y-4">
@@ -126,7 +144,7 @@ function AboutUs({ onNavigate }) {
                   e.preventDefault();
                   smoothScrollTo('#showrooms');
                 }}
-                className="w-full sm:w-auto px-8 py-3.5 bg-[#710014] text-white text-xs font-sans font-extrabold tracking-widest uppercase hover:bg-[#580010] transition-all shadow-lg shadow-[#710014]/20 text-center cursor-pointer"
+                className="w-full sm:w-auto px-8 py-3.5 bg-[#710014] text-white text-xs font-sans font-extrabold tracking-widest uppercase hover:bg-[#580010] transition-all shadow-lg shadow-[#710014]/20 text-center cursor-pointer touch-manipulation"
               >
                 Visit Our Studios
               </a>
@@ -137,7 +155,7 @@ function AboutUs({ onNavigate }) {
                   e.preventDefault();
                   smoothScrollTo('#get-in-touch');
                 }}
-                className="w-full sm:w-auto px-8 py-3.5 bg-white border border-black/15 text-luxury-charcoal text-xs font-sans font-bold tracking-widest uppercase hover:border-[#710014] hover:text-[#710014] transition-all text-center cursor-pointer"
+                className="w-full sm:w-auto px-8 py-3.5 bg-white border border-black/15 text-luxury-charcoal text-xs font-sans font-bold tracking-widest uppercase hover:border-[#710014] hover:text-[#710014] transition-all text-center cursor-pointer touch-manipulation"
               >
                 Contact Us
               </a>
@@ -148,32 +166,34 @@ function AboutUs({ onNavigate }) {
           {/* RIGHT COLUMN: Clean Parallax Showcase Image */}
           <div
             ref={rightColRef}
-            className="lg:col-span-5 relative reveal-3d-popup delay-200"
+            className="lg:col-span-5 relative reveal-3d-popup delay-200 will-change-transform"
           >
             <div className="relative rounded-3xl overflow-hidden shadow-[0_25px_70px_rgba(0,0,0,0.1)] border border-black/10 group">
 
               <img
                 src={homeInteriorImg}
                 alt="Sharkings Full Service Living Interior"
+                width="600"
+                height="750"
                 loading="lazy"
                 decoding="async"
                 ref={imgRef}
-                className="w-full aspect-[4/5] object-cover group-hover:scale-105 transition-transform duration-700"
+                className="w-full aspect-[4/5] object-cover group-hover:scale-105 transition-transform duration-700 will-change-transform"
                 style={{ transform: 'scale(1.08)' }}
               />
 
               {/* Gradient Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent pointer-events-none" />
 
               {/* Floating Top Badge */}
-              <div className="absolute top-5 left-5 z-10">
+              <div className="absolute top-5 left-5 z-10 pointer-events-none">
                 <span className="bg-black/75 backdrop-blur-md text-[#c5a059] border border-[#c5a059]/30 px-3.5 py-1.5 rounded-lg text-[9px] font-sans font-bold tracking-[0.2em] uppercase shadow-lg">
                   ✦ SINCE 2010
                 </span>
               </div>
 
               {/* Floating Bottom Info Box */}
-              <div className="absolute bottom-5 left-5 right-5 p-4 rounded-xl bg-white/95 backdrop-blur-md border border-black/10 text-luxury-charcoal shadow-xl space-y-0.5">
+              <div className="absolute bottom-5 left-5 right-5 p-4 rounded-xl bg-white/95 backdrop-blur-md border border-black/10 text-luxury-charcoal shadow-xl space-y-0.5 pointer-events-none">
                 <span className="text-[9px] font-sans font-bold tracking-widest text-[#710014] uppercase block">
                   RESIDENTIAL & COMMERCIAL DESIGN
                 </span>
@@ -193,3 +213,4 @@ function AboutUs({ onNavigate }) {
 }
 
 export default memo(AboutUs);
+

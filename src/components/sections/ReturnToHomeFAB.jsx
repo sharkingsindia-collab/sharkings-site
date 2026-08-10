@@ -1,6 +1,6 @@
-import { useRef, useEffect, useCallback } from 'react';
+import { useRef, useEffect, useCallback, memo } from 'react';
 
-export default function ReturnToHomeFAB() {
+function ReturnToHomeFAB() {
   const containerRef = useRef(null);
   const tooltipRef = useRef(null);
   const progressCircleRef = useRef(null);
@@ -61,25 +61,25 @@ export default function ReturnToHomeFAB() {
     };
   }, [updateScroll]);
 
-  const scrollToTop = () => {
+  const scrollToTop = useCallback(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  }, []);
 
-  const handleMouseEnter = () => {
+  const handleMouseEnter = useCallback(() => {
     isHoveredRef.current = true;
     if (tooltipRef.current) {
       tooltipRef.current.classList.remove('opacity-0', 'translate-x-2');
       tooltipRef.current.classList.add('opacity-100', 'translate-x-0');
     }
-  };
+  }, []);
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = useCallback(() => {
     isHoveredRef.current = false;
     if (tooltipRef.current) {
       tooltipRef.current.classList.remove('opacity-100', 'translate-x-0');
       tooltipRef.current.classList.add('opacity-0', 'translate-x-2');
     }
-  };
+  }, []);
 
   return (
     <div 
@@ -101,7 +101,7 @@ export default function ReturnToHomeFAB() {
         type="button"
         onClick={scrollToTop}
         aria-label="Return to Home Section"
-        className="relative w-14 h-14 rounded-full bg-[#710014] border border-[#c5a059]/40 text-white shadow-[0_10px_30px_rgba(113,0,20,0.5)] flex items-center justify-center cursor-pointer group hover:scale-110 transition-transform duration-300"
+        className="relative w-14 h-14 rounded-full bg-[#710014] border border-[#c5a059]/40 text-white shadow-[0_10px_30px_rgba(113,0,20,0.5)] flex items-center justify-center cursor-pointer group hover:scale-110 transition-transform duration-300 touch-manipulation"
       >
         {/* SVG Circular Scroll Progress Ring */}
         <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none" viewBox="0 0 52 52">
@@ -140,3 +140,5 @@ export default function ReturnToHomeFAB() {
     </div>
   );
 }
+
+export default memo(ReturnToHomeFAB);

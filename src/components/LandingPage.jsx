@@ -24,7 +24,6 @@ const LandingPage = ({ onNavigate }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [prevActiveIndex, setPrevActiveIndex] = useState(null);
   const [isPaused, setIsPaused] = useState(false);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
   const [isDesktop, setIsDesktop] = useState(true);
 
@@ -46,17 +45,24 @@ const LandingPage = ({ onNavigate }) => {
   const showroomRef = useRef(null);
   const getInTouchRef = useRef(null);
 
-  // Monitor viewport size for responsive layout styling
+  // Monitor viewport size for responsive layout styling (debounced)
   useEffect(() => {
+    let resizeTimer = null;
     const handleResize = () => {
-      setIsDesktop(window.innerWidth >= 1024);
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        setIsDesktop(window.innerWidth >= 1024);
+      }, 200);
     };
     window.addEventListener('resize', handleResize);
     handleResize(); // Trigger once on mount
-    return () => window.removeEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(resizeTimer);
+    };
   }, []);
 
-  // Preloading images in JS (All 6 key visual assets)
+  // Preloading key visual assets for initial hero viewport — instant reveal
   useEffect(() => {
     if (initialPreloadDone) {
       setLoading(false);
@@ -64,38 +70,43 @@ const LandingPage = ({ onNavigate }) => {
       return;
     }
 
-    let loadedCount = 0;
-    const imageUrls = [
-      '/images/slide-living.png',
-      '/images/slide-dining.png',
-      '/images/slide-bedroom.png',
-      '/images/service-residential.png',
-      '/images/service-commercial.png',
-      '/images/service-furniture.png'
-    ];
+    let isDone = false;
 
-    imageUrls.forEach((url) => {
-      const img = new Image();
-      img.src = url;
+    const finishPreload = () => {
+      if (isDone) return;
+      isDone = true;
+      initialPreloadDone = true;
+      setProgress(100);
+      setLoading(false);
+    };
 
-      const handleLoad = () => {
-        loadedCount++;
-        const percent = Math.round((loadedCount / imageUrls.length) * 100);
-        setProgress(percent);
-        if (loadedCount === imageUrls.length) {
-          setTimeout(() => {
-            initialPreloadDone = true;
-            setLoading(false);
-          }, 800);
-        }
-      };
+    // Safety fallback timeout: max 1.2s wait time on low-end networks
+    const timeoutId = setTimeout(finishPreload, 1200);
 
-      img.onload = handleLoad;
-      img.onerror = handleLoad;
-    });
+    // Preload primary hero slide image
+    const mainHeroImg = new Image();
+    mainHeroImg.src = '/images/slide-living.png';
+
+    const handleMainLoad = () => {
+      clearTimeout(timeoutId);
+      finishPreload();
+    };
+
+    mainHeroImg.onload = handleMainLoad;
+    mainHeroImg.onerror = handleMainLoad;
+
+    // Asynchronously cache secondary slides in background without blocking initial paint
+    setTimeout(() => {
+      ['/images/slide-dining.png', '/images/slide-bedroom.png'].forEach(url => {
+        const img = new Image();
+        img.src = url;
+      });
+    }, 400);
+
+    return () => clearTimeout(timeoutId);
   }, []);
 
-  // Auto slide interval
+  // Auto slide interval (fast 3.5s rotation)
   useEffect(() => {
     if (loading) return;
 
@@ -105,39 +116,34 @@ const LandingPage = ({ onNavigate }) => {
           setPrevActiveIndex(prev);
           return (prev + 1) % 3; // 3 slides total
         });
-      }, 6000);
+      }, 3500);
     }
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
   }, [isPaused, loading]);
 
+  const handlePrev = useCallback(() => {
+    setActiveIndex((prev) => {
+      setPrevActiveIndex(prev);
+      return (prev - 1 + 3) % 3;
+    });
+  }, []);
 
+  const handleNext = useCallback(() => {
+    setActiveIndex((prev) => {
+      setPrevActiveIndex(prev);
+      return (prev + 1) % 3;
+    });
+  }, []);
 
-  // Mouse move – only on desktop, subtle ambient shift
-  const handleMouseMove = useCallback((e) => {
-    if (!isDesktop) return;
-    const { clientWidth, clientHeight } = e.currentTarget;
-    const x = (e.clientX / clientWidth - 0.5) * 6;
-    const y = (e.clientY / clientHeight - 0.5) * 6;
-    setMousePos({ x, y });
-  }, [isDesktop]);
-
-  const handlePrev = () => {
-    setPrevActiveIndex(activeIndex);
-    setActiveIndex((prev) => (prev - 1 + 3) % 3);
-  };
-
-  const handleNext = () => {
-    setPrevActiveIndex(activeIndex);
-    setActiveIndex((prev) => (prev + 1) % 3);
-  };
-
-  const selectSlide = (index) => {
-    if (index === activeIndex) return;
-    setPrevActiveIndex(activeIndex);
-    setActiveIndex(index);
-  };
+  const selectSlide = useCallback((index) => {
+    setActiveIndex((prev) => {
+      if (index === prev) return prev;
+      setPrevActiveIndex(prev);
+      return index;
+    });
+  }, []);
 
   return (
     <div className="relative w-full bg-luxury-charcoal text-luxury-cream">
@@ -149,8 +155,6 @@ const LandingPage = ({ onNavigate }) => {
         progress={progress}
         activeIndex={activeIndex}
         prevActiveIndex={prevActiveIndex}
-        mousePos={mousePos}
-        handleMouseMove={handleMouseMove}
         handlePrev={handlePrev}
         handleNext={handleNext}
         selectSlide={selectSlide}
@@ -169,26 +173,28 @@ const LandingPage = ({ onNavigate }) => {
         onNavigate={onNavigate}
       />
 
-      {/* 3D Studio hidden on mobile for performance, lazy-loaded on desktop */}
-      <div className="hidden md:block">
-        <Suspense fallback={<div className="w-full h-96 bg-[#0f1117] flex items-center justify-center"><span className="text-white/30 text-xs tracking-widest uppercase">Loading 3D Studio...</span></div>}>
-          <InteractiveStudio
-            cabinetFinishIdx={cabinetFinishIdx}
-            setCabinetFinishIdx={setCabinetFinishIdx}
-            countertopIdx={countertopIdx}
-            setCountertopIdx={setCountertopIdx}
-            kitchenLayout={kitchenLayout}
-            setKitchenLayout={setKitchenLayout}
-            underCabinetLightOn={underCabinetLightOn}
-            setUnderCabinetLightOn={setUnderCabinetLightOn}
-            studioAutoRotate={studioAutoRotate}
-            setStudioAutoRotate={setStudioAutoRotate}
-            wallColorIdx={wallColorIdx}
-            setWallColorIdx={setWallColorIdx}
-            loading={loading}
-          />
-        </Suspense>
-      </div>
+      {/* 3D Studio completely isolated from mobile devices for zero WebGL overhead */}
+      {isDesktop && (
+        <div className="hidden md:block">
+          <Suspense fallback={<div className="w-full h-96 bg-[#0f1117] flex items-center justify-center"><span className="text-white/30 text-xs tracking-widest uppercase">Loading 3D Studio...</span></div>}>
+            <InteractiveStudio
+              cabinetFinishIdx={cabinetFinishIdx}
+              setCabinetFinishIdx={setCabinetFinishIdx}
+              countertopIdx={countertopIdx}
+              setCountertopIdx={setCountertopIdx}
+              kitchenLayout={kitchenLayout}
+              setKitchenLayout={setKitchenLayout}
+              underCabinetLightOn={underCabinetLightOn}
+              setUnderCabinetLightOn={setUnderCabinetLightOn}
+              studioAutoRotate={studioAutoRotate}
+              setStudioAutoRotate={setStudioAutoRotate}
+              wallColorIdx={wallColorIdx}
+              setWallColorIdx={setWallColorIdx}
+              loading={loading}
+            />
+          </Suspense>
+        </div>
+      )}
 
       <BeforeAfter />
 

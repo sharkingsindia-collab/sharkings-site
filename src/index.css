@@ -85,6 +85,7 @@ html {
   body {
     @apply bg-luxury-charcoal text-luxury-cream font-sans antialiased selection:bg-luxury-red selection:text-luxury-cream overflow-x-hidden;
     -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
   }
 }
 
@@ -111,7 +112,6 @@ html {
   opacity: 1;
   transform: perspective(1200px) translateY(0px) rotateX(0deg) scale(1);
   transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: opacity, transform;
 }
 
 .reveal-3d-popup.active {
@@ -144,8 +144,8 @@ section:not(#hero):not(#services) {
   contain-intrinsic-size: 1px 800px;
 }
 
-/* Contain layout/paint for heavy structural elements */
-section, header, footer {
+/* Contain layout/paint for heavy structural elements — excluding services (sticky) */
+section:not(#services), header, footer {
   contain: layout style;
 }
 
@@ -164,11 +164,28 @@ section, header, footer {
   transform: translateZ(0);
 }
 
-/* Improve mobile scroll performance */
+/* Improve mobile scroll performance & low-end GPU fallback */
 @media (max-width: 768px) {
   /* Disable expensive hover effects on mobile */
   * {
     -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Fallback heavy backdrop blurs to crisp solid backgrounds on budget mobile GPUs */
+  .backdrop-blur-xl,
+  .backdrop-blur-3xl,
+  .backdrop-blur-md,
+  .backdrop-blur-2xl,
+  .backdrop-blur {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background-color: rgba(250, 249, 246, 0.96) !important;
+  }
+
+  /* Disable expensive continuous spin/pulse loops on mobile */
+  .animate-spin,
+  .animate-pulse {
+    animation: none !important;
   }
 
   /* Reduce scrollbar size on mobile */
@@ -180,6 +197,17 @@ section, header, footer {
   .perspective-card {
     transform: none !important;
     transition: none !important;
+  }
+}
+
+/* Reduced motion preference support for low-spec accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+    will-change: auto !important;
   }
 }
 

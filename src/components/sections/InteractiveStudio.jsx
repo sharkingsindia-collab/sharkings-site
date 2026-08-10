@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback, memo } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { useScrollReveal } from '../../hooks/useScrollReveal';
@@ -24,7 +24,7 @@ const KITCHEN_LAYOUTS = [
   { id: 'minimalist', label: 'Linear Wall' }
 ];
 
-export default function InteractiveStudio({
+function InteractiveStudio({
   cabinetFinishIdx = 0,
   setCabinetFinishIdx = () => { },
   countertopIdx = 0,
@@ -42,12 +42,31 @@ export default function InteractiveStudio({
   const yawRef = useRef(Math.PI / 4.2);
   const pitchRef = useRef(Math.PI / 7);
 
-  const [tiltStyle, setTiltStyle] = useState({});
-  const [modelSource, setModelSource] = useState('procedural'); // 'procedural' or 'gltf'
+  // Persistent Three.js scene refs — survive across config changes
+  const sceneRef = useRef(null);
+  const rendererRef = useRef(null);
+  const cameraRef = useRef(null);
+  const animationFrameIdRef = useRef(null);
+
+  // Mutable material/group refs for in-place updates
+  const cabinetMatRef = useRef(null);
+  const countertopMatRef = useRef(null);
+  const ledStripMatRef = useRef(null);
+  const ledSpotLightRef = useRef(null);
+  const lExtensionGroupRef = useRef(null);
+  const islandGroupRef = useRef(null);
+  const modelSourceRef = useRef('procedural');
+
+  // Auto-rotate ref (avoid dependency in animation loop)
+  const autoRotateRef = useRef(studioAutoRotate);
+
   const [gltfLoadStatus, setGltfLoadStatus] = useState(null);
 
-  const handleCardMouseMove = (e) => {
-    const card = e.currentTarget;
+  // Tilt effect using ref-based DOM manipulation — no setState
+  const tiltCardRef = useRef(null);
+  const handleCardMouseMove = useCallback((e) => {
+    const card = tiltCardRef.current;
+    if (!card) return;
     const rect = card.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -55,23 +74,29 @@ export default function InteractiveStudio({
     const yc = rect.height / 2;
     const rotX = ((yc - y) / yc) * 2.5;
     const rotY = ((x - xc) / xc) * 2.5;
-    setTiltStyle({
-      transform: `perspective(1000px) rotateX(${rotX}deg) rotateY(${rotY}deg)`,
-      transition: 'transform 0.1s ease-out',
-      willChange: 'transform'
-    });
-  };
+    card.style.transform = `perspective(1000px) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+    card.style.transition = 'transform 0.1s ease-out';
+  }, []);
 
-  const handleCardMouseLeave = () => {
-    setTiltStyle({
-      transform: `perspective(1000px) rotateX(0deg) rotateY(0deg)`,
-      transition: 'transform 0.5s ease-out',
-      willChange: 'transform'
-    });
-  };
+  const handleCardMouseLeave = useCallback(() => {
+    const card = tiltCardRef.current;
+    if (!card) return;
+    card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg)`;
+    card.style.transition = 'transform 0.5s ease-out';
+  }, []);
 
+  // Keep auto-rotate ref in sync
+  useEffect(() => {
+    autoRotateRef.current = studioAutoRotate;
+  }, [studioAutoRotate]);
+
+  // ==========================================
+  // EFFECT 1: One-time scene initialization
+  // ==========================================
   useEffect(() => {
     if (loading || !studioCanvasRef.current) return;
+    // If scene already exists, skip initialization
+    if (sceneRef.current) return;
 
     const container = studioCanvasRef.current;
     const width = container.clientWidth;
@@ -79,16 +104,20 @@ export default function InteractiveStudio({
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color('#11141c');
+    sceneRef.current = scene;
 
     const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
+    cameraRef.current = camera;
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    // Cap pixel ratio to 1.5 for performance on high-DPI screens
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.15;
+    rendererRef.current = renderer;
 
     container.innerHTML = '';
     container.appendChild(renderer.domElement);
@@ -100,6 +129,7 @@ export default function InteractiveStudio({
       roughness: cabinetConfig.roughness,
       metalness: cabinetConfig.metalness
     });
+    cabinetMatRef.current = cabinetMat;
 
     const countertopConfig = COUNTERTOP_STONES[countertopIdx] || COUNTERTOP_STONES[0];
     const countertopMat = new THREE.MeshStandardMaterial({
@@ -107,17 +137,12 @@ export default function InteractiveStudio({
       roughness: countertopConfig.roughness,
       metalness: 0.1
     });
+    countertopMatRef.current = countertopMat;
 
     const brassMat = new THREE.MeshStandardMaterial({
       color: 0xd4af37,
       metalness: 0.88,
       roughness: 0.2
-    });
-
-    const chromeMat = new THREE.MeshStandardMaterial({
-      color: 0xe0e0e0,
-      metalness: 0.92,
-      roughness: 0.15
     });
 
     const stainlessMat = new THREE.MeshStandardMaterial({
@@ -135,7 +160,7 @@ export default function InteractiveStudio({
       opacity: 0.6
     });
 
-    // Floor & Room Studio — Polished slate tile studio floor
+    // Floor & Room Studio
     const floorGeo = new THREE.BoxGeometry(9, 0.1, 9);
     const floorMat = new THREE.MeshStandardMaterial({ color: 0x242834, roughness: 0.5, metalness: 0.05 });
     const floor = new THREE.Mesh(floorGeo, floorMat);
@@ -154,7 +179,7 @@ export default function InteractiveStudio({
       scene.add(lineV);
     }
 
-    // Back Wall — Architectural slate finish
+    // Back Wall
     const wallMat = new THREE.MeshStandardMaterial({ color: 0x2a2e3b, roughness: 0.8 });
     const wallBackGeo = new THREE.BoxGeometry(9, 5, 0.1);
     const wallBack = new THREE.Mesh(wallBackGeo, wallMat);
@@ -162,14 +187,14 @@ export default function InteractiveStudio({
     wallBack.receiveShadow = true;
     scene.add(wallBack);
 
-    // Side Wall — Architectural slate finish
+    // Side Wall
     const wallSideGeo = new THREE.BoxGeometry(0.1, 5, 9);
     const wallSide = new THREE.Mesh(wallSideGeo, wallMat);
     wallSide.position.set(-4.45, 2.45, 0);
     wallSide.receiveShadow = true;
     scene.add(wallSide);
 
-    // Backsplash Panel — Refined dark stone panel
+    // Backsplash Panel
     const backsplashGeo = new THREE.BoxGeometry(5.2, 1.1, 0.05);
     const backsplashMat = new THREE.MeshStandardMaterial({ color: 0x343a49, roughness: 0.4, metalness: 0.08 });
     const backsplash = new THREE.Mesh(backsplashGeo, backsplashMat);
@@ -189,7 +214,7 @@ export default function InteractiveStudio({
     const kitchenGroup = new THREE.Group();
     scene.add(kitchenGroup);
 
-    // 1. BASE CABINETS (MAIN LINE RUN)
+    // 1. BASE CABINETS
     const baseCabinetGeo = new THREE.BoxGeometry(3.6, 0.82, 0.7);
     const baseCabinet = new THREE.Mesh(baseCabinetGeo, cabinetMat);
     baseCabinet.position.set(-0.5, 0.41, -3.9);
@@ -209,15 +234,12 @@ export default function InteractiveStudio({
     const doorWidth = 3.6 / doorCount;
     for (let i = 0; i < doorCount; i++) {
       const doorX = -0.5 - 1.8 + doorWidth / 2 + i * doorWidth;
-
-      // Door seam line
       const seamGeo = new THREE.BoxGeometry(0.01, 0.78, 0.71);
       const seamMat = new THREE.MeshStandardMaterial({ color: 0x0f1116 });
       const seam = new THREE.Mesh(seamGeo, seamMat);
       seam.position.set(doorX + doorWidth / 2 - 0.005, 0.42, -3.9);
       kitchenGroup.add(seam);
 
-      // Handle bar
       const handleGeo = new THREE.CylinderGeometry(0.012, 0.012, 0.22, 12);
       const handle = new THREE.Mesh(handleGeo, brassMat);
       handle.position.set(doorX, 0.68, -3.53);
@@ -226,7 +248,7 @@ export default function InteractiveStudio({
       kitchenGroup.add(handle);
     }
 
-    // 2. MAIN COUNTERTOP (MARBLE/GRANITE)
+    // 2. MAIN COUNTERTOP
     const mainCounterGeo = new THREE.BoxGeometry(3.68, 0.06, 0.76);
     const mainCounter = new THREE.Mesh(mainCounterGeo, countertopMat);
     mainCounter.position.set(-0.5, 0.85, -3.9);
@@ -247,7 +269,6 @@ export default function InteractiveStudio({
     sinkInner.position.set(-1.4, 0.8, -3.9);
     kitchenGroup.add(sinkInner);
 
-    // Faucet Base & Curved Spout
     const faucetBaseGeo = new THREE.CylinderGeometry(0.025, 0.03, 0.1, 16);
     const faucetBase = new THREE.Mesh(faucetBaseGeo, brassMat);
     faucetBase.position.set(-1.4, 0.93, -4.15);
@@ -259,14 +280,13 @@ export default function InteractiveStudio({
     faucetSpout.position.set(-1.4, 1.05, -4.03);
     kitchenGroup.add(faucetSpout);
 
-    // 4. COOKTOP / HOB (BLACK GLASS)
+    // 4. COOKTOP / HOB
     const cooktopGeo = new THREE.BoxGeometry(0.8, 0.015, 0.52);
     const cooktopMat = new THREE.MeshStandardMaterial({ color: 0x08090b, roughness: 0.1, metalness: 0.8 });
     const cooktop = new THREE.Mesh(cooktopGeo, cooktopMat);
     cooktop.position.set(0.6, 0.888, -3.9);
     kitchenGroup.add(cooktop);
 
-    // Burner Rings
     const burnerGeo = new THREE.RingGeometry(0.05, 0.09, 24);
     const burnerMat = new THREE.MeshBasicMaterial({ color: 0xc4a46a, side: THREE.DoubleSide });
     const burnerOffsets = [
@@ -295,7 +315,6 @@ export default function InteractiveStudio({
     hoodDuct.castShadow = true;
     kitchenGroup.add(hoodDuct);
 
-    // Glass Canopy Trim on Hood
     const canopyGeo = new THREE.BoxGeometry(0.95, 0.02, 0.55);
     const canopy = new THREE.Mesh(canopyGeo, glassMat);
     canopy.position.set(0.6, 2.0, -3.9);
@@ -310,12 +329,10 @@ export default function InteractiveStudio({
     wallCabLeft.receiveShadow = true;
     wallCabinetGroup.add(wallCabLeft);
 
-    // Glass inserts for aesthetic contrast
     const glassInsertGeo = new THREE.BoxGeometry(0.6, 0.7, 0.02);
     const glassInsert = new THREE.Mesh(glassInsertGeo, glassMat);
     glassInsert.position.set(-1.5, 2.45, -4.04);
     wallCabinetGroup.add(glassInsert);
-
     kitchenGroup.add(wallCabinetGroup);
 
     // 7. UNDER-CABINET LED STRIP LIGHTING
@@ -326,6 +343,7 @@ export default function InteractiveStudio({
     const ledStrip = new THREE.Mesh(ledStripGeo, ledStripMat);
     ledStrip.position.set(-1.5, 1.99, -4.1);
     kitchenGroup.add(ledStrip);
+    ledStripMatRef.current = ledStripMat;
 
     const ledSpotLight = new THREE.PointLight(
       0xffeaad,
@@ -334,8 +352,9 @@ export default function InteractiveStudio({
     );
     ledSpotLight.position.set(-1.5, 1.95, -4.0);
     kitchenGroup.add(ledSpotLight);
+    ledSpotLightRef.current = ledSpotLight;
 
-    // 8. L-SHAPED EXTENSION RUN (FOR L-SHAPED LAYOUT)
+    // 8. L-SHAPED EXTENSION RUN
     const lExtensionGroup = new THREE.Group();
     const lBaseGeo = new THREE.BoxGeometry(0.7, 0.82, 2.2);
     const lBase = new THREE.Mesh(lBaseGeo, cabinetMat);
@@ -350,14 +369,14 @@ export default function InteractiveStudio({
     lCounter.castShadow = true;
     lCounter.receiveShadow = true;
     lExtensionGroup.add(lCounter);
-
     kitchenGroup.add(lExtensionGroup);
+    lExtensionGroupRef.current = lExtensionGroup;
 
     // 9. KITCHEN ISLAND & BAR STOOLS GROUP
     const islandGroup = new THREE.Group();
     scene.add(islandGroup);
+    islandGroupRef.current = islandGroup;
 
-    // Island Cabinet Body
     const islandBaseGeo = new THREE.BoxGeometry(2.2, 0.85, 0.95);
     const islandBase = new THREE.Mesh(islandBaseGeo, cabinetMat);
     islandBase.position.set(-0.3, 0.425, -1.2);
@@ -365,7 +384,6 @@ export default function InteractiveStudio({
     islandBase.receiveShadow = true;
     islandGroup.add(islandBase);
 
-    // Overhanging Waterfall Marble Countertop
     const islandTopGeo = new THREE.BoxGeometry(2.35, 0.06, 1.15);
     const islandTop = new THREE.Mesh(islandTopGeo, countertopMat);
     islandTop.position.set(-0.3, 0.88, -1.2);
@@ -373,7 +391,6 @@ export default function InteractiveStudio({
     islandTop.receiveShadow = true;
     islandGroup.add(islandTop);
 
-    // Waterfall side slab
     const waterfallGeo = new THREE.BoxGeometry(0.06, 0.88, 1.15);
     const waterfall = new THREE.Mesh(waterfallGeo, countertopMat);
     waterfall.position.set(0.84, 0.44, -1.2);
@@ -381,7 +398,7 @@ export default function InteractiveStudio({
     waterfall.receiveShadow = true;
     islandGroup.add(waterfall);
 
-    // Designer Bar Stools (2 units)
+    // Designer Bar Stools
     const stoolPositions = [
       { x: -0.8, z: -0.3 },
       { x: 0.2, z: -0.3 }
@@ -389,8 +406,6 @@ export default function InteractiveStudio({
 
     stoolPositions.forEach((sp) => {
       const stoolGroup = new THREE.Group();
-
-      // Seat Cushion
       const cushionGeo = new THREE.CylinderGeometry(0.22, 0.22, 0.06, 24);
       const cushionMat = new THREE.MeshStandardMaterial({ color: 0x2b2e36, roughness: 0.8 });
       const cushion = new THREE.Mesh(cushionGeo, cushionMat);
@@ -398,7 +413,6 @@ export default function InteractiveStudio({
       cushion.castShadow = true;
       stoolGroup.add(cushion);
 
-      // Stool Legs (Metallic brass)
       const stoolLegGeo = new THREE.CylinderGeometry(0.015, 0.01, 0.62, 12);
       for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 2) {
         const leg = new THREE.Mesh(stoolLegGeo, brassMat);
@@ -409,7 +423,6 @@ export default function InteractiveStudio({
         stoolGroup.add(leg);
       }
 
-      // Footrest ring
       const ringGeo = new THREE.TorusGeometry(0.15, 0.008, 12, 24);
       const ring = new THREE.Mesh(ringGeo, brassMat);
       ring.rotation.x = Math.PI / 2;
@@ -421,27 +434,24 @@ export default function InteractiveStudio({
     });
 
     // --- GLTF CUSTOM MODEL LOADER FALLBACK ---
-    // Attempt to load converted GLB model from public folder if user converted their .skp file
     const loader = new GLTFLoader();
     const tryGltfPaths = ['/web-kitchen.glb', '/web modular kitchen file.glb'];
 
     const tryLoadGltf = (index) => {
       if (index >= tryGltfPaths.length) {
-        setModelSource('procedural');
+        modelSourceRef.current = 'procedural';
         setGltfLoadStatus('Procedural 3D Model Active');
         return;
       }
       loader.load(
         tryGltfPaths[index],
         (gltf) => {
-          // Hide procedural kitchen, show GLTF scene
           kitchenGroup.visible = false;
           islandGroup.visible = false;
 
           const gltfScene = gltf.scene;
           gltfScene.name = 'userGltfKitchen';
 
-          // Auto center and scale GLTF model
           const box = new THREE.Box3().setFromObject(gltfScene);
           const size = box.getSize(new THREE.Vector3());
           const maxDim = Math.max(size.x, size.y, size.z);
@@ -459,12 +469,11 @@ export default function InteractiveStudio({
           });
 
           scene.add(gltfScene);
-          setModelSource('gltf');
+          modelSourceRef.current = 'gltf';
           setGltfLoadStatus(`Loaded GLB: ${tryGltfPaths[index].replace('/', '')}`);
         },
         undefined,
         () => {
-          // If current path fails, try next path
           tryLoadGltf(index + 1);
         }
       );
@@ -472,24 +481,23 @@ export default function InteractiveStudio({
 
     tryLoadGltf(0);
 
-    // --- LIGHTING SETUP (BALANCED LUXURY STUDIO) ---
+    // --- LIGHTING SETUP ---
     const ambientLight = new THREE.AmbientLight(0xffffff, 1.05);
     scene.add(ambientLight);
 
     const mainDirectionalLight = new THREE.DirectionalLight(0xfff6eb, 1.4);
     mainDirectionalLight.position.set(4, 9, 5);
     mainDirectionalLight.castShadow = true;
-    mainDirectionalLight.shadow.mapSize.width = 2048;
-    mainDirectionalLight.shadow.mapSize.height = 2048;
+    // Reduced shadow map from 2048 → 1024 for mid-range GPU performance
+    mainDirectionalLight.shadow.mapSize.width = 1024;
+    mainDirectionalLight.shadow.mapSize.height = 1024;
     mainDirectionalLight.shadow.bias = -0.0004;
     scene.add(mainDirectionalLight);
 
-    // Cool Soft Fill Light for clear detail definition
     const fillLight = new THREE.DirectionalLight(0xebf3ff, 0.7);
     fillLight.position.set(-5, 5, 5);
     scene.add(fillLight);
 
-    // Warm Accent Spotlight on Island
     const islandSpotlight = new THREE.SpotLight(0xffe2b8, 2.8, 9, Math.PI / 4, 0.35);
     islandSpotlight.position.set(-0.3, 4.2, -1.2);
     islandSpotlight.target.position.set(-0.3, 0.8, -1.2);
@@ -497,30 +505,14 @@ export default function InteractiveStudio({
     scene.add(islandSpotlight);
     scene.add(islandSpotlight.target);
 
-    // --- KITCHEN LAYOUT TRANSFORM TARGETS ---
-    const layoutTargets = {
-      lExtension: { visible: true, x: 0 },
-      island: { visible: true, x: -0.3, z: -1.2 }
-    };
-
-    if (kitchenLayout === 'l-shaped') {
-      layoutTargets.lExtension.visible = true;
-      layoutTargets.island.visible = true;
-      layoutTargets.island.x = -0.3;
-      layoutTargets.island.z = -1.2;
-    } else if (kitchenLayout === 'parallel') {
-      layoutTargets.lExtension.visible = false;
-      layoutTargets.island.visible = true;
-      layoutTargets.island.x = -0.5;
-      layoutTargets.island.z = -2.3;
-    } else if (kitchenLayout === 'minimalist') {
-      layoutTargets.lExtension.visible = false;
-      layoutTargets.island.visible = false;
+    // --- Apply initial layout ---
+    lExtensionGroup.visible = kitchenLayout === 'l-shaped';
+    islandGroup.visible = kitchenLayout !== 'minimalist';
+    if (kitchenLayout === 'parallel') {
+      islandGroup.position.set(-0.5, 0, -2.3);
+    } else {
+      islandGroup.position.set(-0.3, 0, -1.2);
     }
-
-    lExtensionGroup.visible = layoutTargets.lExtension.visible;
-    islandGroup.visible = modelSource === 'gltf' ? false : layoutTargets.island.visible;
-    islandGroup.position.set(layoutTargets.island.x, 0, layoutTargets.island.z);
 
     // --- ORBIT & CAMERA INTERACTION ---
     const radius = 7.5;
@@ -538,10 +530,8 @@ export default function InteractiveStudio({
       if (!isDragging) return;
       const deltaX = e.clientX - prevMouseX;
       const deltaY = e.clientY - prevMouseY;
-
       yawRef.current -= deltaX * 0.006;
       pitchRef.current = Math.max(-0.1, Math.min(Math.PI / 2.6, pitchRef.current + deltaY * 0.006));
-
       prevMouseX = e.clientX;
       prevMouseY = e.clientY;
     };
@@ -568,11 +558,10 @@ export default function InteractiveStudio({
     window.addEventListener('pointermove', handlePointerMove);
     window.addEventListener('pointerup', handlePointerUp);
 
-    let animationFrameId;
     const animate = () => {
-      animationFrameId = requestAnimationFrame(animate);
+      animationFrameIdRef.current = requestAnimationFrame(animate);
 
-      if (studioAutoRotate && !isDragging) {
+      if (autoRotateRef.current && !isDragging) {
         yawRef.current += 0.0025;
       }
 
@@ -597,15 +586,73 @@ export default function InteractiveStudio({
     window.addEventListener('resize', handleResize);
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
+      cancelAnimationFrame(animationFrameIdRef.current);
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('scroll', handleScroll);
       container.removeEventListener('pointerdown', handlePointerDown);
       window.removeEventListener('pointermove', handlePointerMove);
       window.removeEventListener('pointerup', handlePointerUp);
       renderer.dispose();
+      sceneRef.current = null;
+      rendererRef.current = null;
     };
-  }, [cabinetFinishIdx, countertopIdx, kitchenLayout, underCabinetLightOn, studioAutoRotate, loading]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading]);
+
+  // ==========================================
+  // EFFECT 2: In-place material updates (NO scene rebuild)
+  // ==========================================
+  useEffect(() => {
+    if (!cabinetMatRef.current) return;
+    const config = CABINET_FINISHES[cabinetFinishIdx] || CABINET_FINISHES[0];
+    cabinetMatRef.current.color.set(config.value);
+    cabinetMatRef.current.roughness = config.roughness;
+    cabinetMatRef.current.metalness = config.metalness;
+    cabinetMatRef.current.needsUpdate = true;
+  }, [cabinetFinishIdx]);
+
+  useEffect(() => {
+    if (!countertopMatRef.current) return;
+    const config = COUNTERTOP_STONES[countertopIdx] || COUNTERTOP_STONES[0];
+    countertopMatRef.current.color.set(config.value);
+    countertopMatRef.current.roughness = config.roughness;
+    countertopMatRef.current.needsUpdate = true;
+  }, [countertopIdx]);
+
+  // ==========================================
+  // EFFECT 3: In-place LED toggle (NO scene rebuild)
+  // ==========================================
+  useEffect(() => {
+    if (ledStripMatRef.current) {
+      ledStripMatRef.current.color.set(underCabinetLightOn ? 0xffeaad : 0x333333);
+      ledStripMatRef.current.needsUpdate = true;
+    }
+    if (ledSpotLightRef.current) {
+      ledSpotLightRef.current.intensity = underCabinetLightOn ? 3.5 : 0;
+    }
+  }, [underCabinetLightOn]);
+
+  // ==========================================
+  // EFFECT 4: In-place layout switch (NO scene rebuild)
+  // ==========================================
+  useEffect(() => {
+    const lExt = lExtensionGroupRef.current;
+    const island = islandGroupRef.current;
+    if (!lExt || !island) return;
+
+    if (kitchenLayout === 'l-shaped') {
+      lExt.visible = true;
+      island.visible = modelSourceRef.current !== 'gltf';
+      island.position.set(-0.3, 0, -1.2);
+    } else if (kitchenLayout === 'parallel') {
+      lExt.visible = false;
+      island.visible = modelSourceRef.current !== 'gltf';
+      island.position.set(-0.5, 0, -2.3);
+    } else if (kitchenLayout === 'minimalist') {
+      lExt.visible = false;
+      island.visible = false;
+    }
+  }, [kitchenLayout]);
 
   return (
     <section id="interactive-studio" className="relative z-30 bg-[#0b0d13] text-luxury-cream py-24 px-6 md:px-16 lg:px-24 border-t border-white/5">
@@ -632,7 +679,7 @@ export default function InteractiveStudio({
           {gltfLoadStatus && (
             <div className="pt-2">
               <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-sans text-white/70">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                 {gltfLoadStatus}
               </span>
             </div>
@@ -641,10 +688,11 @@ export default function InteractiveStudio({
 
         {/* Studio Panel Card */}
         <div
+          ref={tiltCardRef}
           onMouseMove={handleCardMouseMove}
           onMouseLeave={handleCardMouseLeave}
-          style={tiltStyle}
-          className="bg-[#141722] border border-white/10 rounded-[24px] p-4 md:p-6 lg:p-8 shadow-[0_40px_80px_rgba(0,0,0,0.5)] grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch transition-transform duration-100 ease-out"
+          className="bg-[#141722] border border-white/10 rounded-[24px] p-4 md:p-6 lg:p-8 shadow-[0_40px_80px_rgba(0,0,0,0.5)] grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch"
+          style={{ willChange: 'transform' }}
         >
 
           {/* Left Column: 3D Canvas (8 cols) */}
@@ -653,7 +701,7 @@ export default function InteractiveStudio({
 
             <div className="absolute top-4 left-4 z-10 pointer-events-none">
               <div className="bg-black/70 backdrop-blur-md border border-white/10 px-3.5 py-1.5 rounded-full flex items-center gap-2">
-                <span className="w-1.5 h-1.5 bg-[#838f6f] rounded-full animate-ping" />
+                <span className="w-1.5 h-1.5 bg-[#838f6f] rounded-full" />
                 <span className="font-sans text-[9px] font-semibold tracking-wider text-white/90">
                   Drag to Orbit 3D Kitchen
                 </span>
@@ -668,7 +716,7 @@ export default function InteractiveStudio({
                   : 'bg-black/70 text-white/50 border-white/10 hover:border-white/30 hover:text-white'
                   }`}
               >
-                <span className={`w-2 h-2 rounded-full ${underCabinetLightOn ? 'bg-amber-400 animate-pulse' : 'bg-red-500'}`} />
+                <span className={`w-2 h-2 rounded-full ${underCabinetLightOn ? 'bg-amber-400' : 'bg-red-500'}`} />
                 <span>LED Strip: {underCabinetLightOn ? 'ON' : 'OFF'}</span>
               </button>
             </div>
@@ -802,3 +850,5 @@ export default function InteractiveStudio({
     </section>
   );
 }
+
+export default memo(InteractiveStudio);

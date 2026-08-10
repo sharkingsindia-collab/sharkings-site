@@ -1,75 +1,112 @@
-import { useState, useEffect, useRef, memo } from 'react';
+import { useState, useEffect, useRef, useCallback, memo } from 'react';
 import slogo from '../assets/slogo.webp';
 
+const NAV_ITEMS = [
+  { label: 'About Us', href: '#about', id: 'about' },
+  { label: 'Why Us', href: '#why-us', id: 'why-us' },
+  { label: 'Services', href: '#/services', isPage: true, pageTarget: 'services', id: 'services' },
+  { label: '3D Studio', href: '#interactive-studio', id: 'interactive-studio' },
+  { label: 'Projects', href: '#/projects', isPage: true, pageTarget: 'projects', id: 'projects' },
+  { label: 'Showrooms', href: '#showrooms', id: 'showrooms' },
+  { label: 'Reviews', href: '#testimonials', id: 'testimonials' }
+];
+
+const SECTIONS = [
+  { id: 'hero', selector: '#hero', navId: 'hero' },
+  { id: 'why-us', selector: '#why-us', navId: 'why-us' },
+  { id: 'services', selector: '#services', navId: 'services' },
+  { id: 'curated-atelier', selector: '#curated-atelier', navId: 'services' },
+  { id: 'interactive-studio', selector: '#interactive-studio', navId: 'interactive-studio' },
+  { id: 'transformation', selector: '#transformation', navId: 'services' },
+  { id: 'projects', selector: '#projects', navId: 'projects' },
+  { id: 'about', selector: '#about', navId: 'about' },
+  { id: 'testimonials', selector: '#testimonials', navId: 'testimonials' },
+  { id: 'showrooms', selector: '#showrooms', navId: 'showrooms' },
+  { id: 'get-in-touch', selector: '#get-in-touch', navId: 'get-in-touch' }
+];
+
 function Navbar({ onNavigate }) {
-  const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('hero');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
-  useEffect(() => {
-    // Trigger smooth entrance animation on landing page load
-    const timer = setTimeout(() => {
-      setIsVisible(true);
-    }, 200);
-    return () => clearTimeout(timer);
-  }, []);
-
-  const isScrolledRef = useRef(false);
   const activeSectionRef = useRef('hero');
 
+  // Trigger entrance animation on initial frame without artificial timeout delay
   useEffect(() => {
-    let ticking = false;
+    const handle = requestAnimationFrame(() => setIsVisible(true));
+    return () => cancelAnimationFrame(handle);
+  }, []);
 
-    const handleScroll = () => {
-      if (ticking) return;
-      ticking = true;
+  // IntersectionObserver for efficient active section tracking without main-thread scroll reflows
+  useEffect(() => {
+    const sectionElements = SECTIONS.map(s => ({
+      id: s.id,
+      navId: s.navId,
+      elem: document.querySelector(s.selector)
+    })).filter(s => s.elem !== null);
 
-      requestAnimationFrame(() => {
-        ticking = false;
-        const scrollY = window.scrollY;
-        const nextScrolled = scrollY > 20;
+    if (sectionElements.length === 0) return;
 
-        if (nextScrolled !== isScrolledRef.current) {
-          isScrolledRef.current = nextScrolled;
-          setIsScrolled(nextScrolled);
+    const visibleMap = new Map();
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const targetId = entry.target.getAttribute('data-nav-section-id');
+        if (targetId) {
+          if (entry.isIntersecting) {
+            visibleMap.set(targetId, entry.intersectionRatio);
+          } else {
+            visibleMap.delete(targetId);
+          }
         }
+      });
 
-        const sections = [
-          { id: 'hero', selector: 'header, section:first-of-type' },
-          { id: 'about', selector: '#about' },
-          { id: 'why-us', selector: '#why-us' },
-          { id: 'services', selector: '#services' },
-          { id: 'interactive-studio', selector: '#interactive-studio' },
-          { id: 'projects', selector: '#projects' },
-          { id: 'testimonials', selector: '#testimonials' },
-          { id: 'showrooms', selector: '#showrooms' },
-          { id: 'get-in-touch', selector: '#get-in-touch' },
-        ];
-
-        const viewportMiddle = window.innerHeight * 0.35;
-        let currentActive = 'hero';
-
-        for (const section of sections) {
-          const elem = document.querySelector(section.selector);
-          if (elem) {
-            const rect = elem.getBoundingClientRect();
-            if (rect.top <= viewportMiddle && rect.bottom >= 0) {
-              currentActive = section.id;
+      if (visibleMap.size > 0) {
+        let bestNavId = 'hero';
+        let maxRatio = -1;
+        for (const s of SECTIONS) {
+          if (visibleMap.has(s.id)) {
+            const ratio = visibleMap.get(s.id);
+            if (ratio > maxRatio) {
+              maxRatio = ratio;
+              bestNavId = s.navId;
             }
           }
         }
-
-        if (currentActive !== activeSectionRef.current) {
-          activeSectionRef.current = currentActive;
-          setActiveSection(currentActive);
+        if (activeSectionRef.current !== bestNavId) {
+          activeSectionRef.current = bestNavId;
+          setActiveSection(bestNavId);
         }
-      });
-    };
+      } else {
+        // Fallback when scrolling rapidly or between section margins
+        let minDistance = Infinity;
+        let closestNavId = activeSectionRef.current;
+        sectionElements.forEach(s => {
+          const rect = s.elem.getBoundingClientRect();
+          const dist = Math.abs(rect.top);
+          if (dist < minDistance) {
+            minDistance = dist;
+            closestNavId = s.navId;
+          }
+        });
+        if (closestNavId && activeSectionRef.current !== closestNavId) {
+          activeSectionRef.current = closestNavId;
+          setActiveSection(closestNavId);
+        }
+      }
+    }, {
+      root: null,
+      rootMargin: '-10% 0px -25% 0px',
+      threshold: [0, 0.2, 0.5, 0.8]
+    });
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
+    sectionElements.forEach(s => {
+      s.elem.setAttribute('data-nav-section-id', s.id);
+      observer.observe(s.elem);
+    });
+
+    return () => observer.disconnect();
   }, []);
 
   // Lock body scroll when mobile menu drawer is open
@@ -84,45 +121,44 @@ function Navbar({ onNavigate }) {
     };
   }, [mobileMenuOpen]);
 
-  const smoothScrollTo = (targetSelector) => {
+  const smoothScrollTo = useCallback((targetSelector) => {
     setMobileMenuOpen(false);
     const elem = document.querySelector(targetSelector);
     if (!elem) return;
-    const bodyTop = document.body.getBoundingClientRect().top;
-    const elemTop = elem.getBoundingClientRect().top;
-    const targetY = elemTop - bodyTop;
-    window.scrollTo({
-      top: targetY,
-      behavior: 'smooth'
-    });
-  };
+    elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, []);
 
-  const navItems = [
-    { label: 'About Us', href: '#about', id: 'about' },
-    { label: 'Why Us', href: '#why-us', id: 'why-us' },
-    { label: 'Services', href: '#/services', isPage: true, pageTarget: 'services', id: 'services' },
-    { label: '3D Studio', href: '#interactive-studio', id: 'interactive-studio' },
-    { label: 'Projects', href: '#/projects', isPage: true, pageTarget: 'projects', id: 'projects' },
-    { label: 'Showrooms', href: '#showrooms', id: 'showrooms' },
-    { label: 'Reviews', href: '#testimonials', id: 'testimonials' }
-  ];
+  const handleLogoClick = useCallback((e) => {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
+  const handleContactClick = useCallback((e) => {
+    e.preventDefault();
+    smoothScrollTo('#get-in-touch');
+  }, [smoothScrollTo]);
+
+  const toggleMobileMenu = useCallback(() => {
+    setMobileMenuOpen(prev => !prev);
+  }, []);
+
+  const closeMobileMenu = useCallback(() => {
+    setMobileMenuOpen(false);
+  }, []);
 
   return (
     <>
       <header
-        className={`w-full absolute z-50 py-3 sm:py-4 px-4 sm:px-8 bg-transparent transition-all duration-[1000ms] cubic-bezier(0.16,1,0.3,1) ${
+        className={`w-full absolute z-50 py-3 sm:py-4 px-4 sm:px-8 bg-transparent transition-[transform,opacity] duration-[1000ms] cubic-bezier(0.16,1,0.3,1) transform-gpu ${
           isVisible ? 'translate-y-0 opacity-100' : '-translate-y-12 opacity-0'
         }`}
       >
-        <div className="max-w-6xl mx-auto rounded-xl bg-[#faf9f6]/85 backdrop-blur-xl border border-[#e5e0d3]/80 shadow-[0_10px_35px_-10px_rgba(0,0,0,0.08)] ring-1 ring-white/60 px-5 sm:px-7 py-2 sm:py-2.5 flex items-center justify-between transition-all duration-300">
+        <div className="max-w-6xl mx-auto rounded-xl bg-[#faf9f6]/92 backdrop-blur-md border border-[#e5e0d3]/80 shadow-[0_10px_35px_-10px_rgba(0,0,0,0.08)] ring-1 ring-white/60 px-5 sm:px-7 py-2 sm:py-2.5 flex items-center justify-between transition-all duration-300">
           
           {/* Minimalist Blended Logo (slogo.webp only) */}
           <a
             href="/"
-            onClick={(e) => {
-              e.preventDefault();
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
+            onClick={handleLogoClick}
             className={`group flex items-center focus:outline-none transition-all duration-700 ease-out ${
               isVisible ? 'translate-y-0 opacity-100' : '-translate-y-3 opacity-0'
             }`}
@@ -131,13 +167,18 @@ function Navbar({ onNavigate }) {
             <img
               src={slogo}
               alt="Sharkings Interiors & Exteriors"
+              width="160"
+              height="40"
+              loading="eager"
+              decoding="async"
+              fetchpriority="high"
               className="h-7 sm:h-8 md:h-10 w-auto object-contain transition-all duration-300 opacity-90 group-hover:opacity-100 group-hover:scale-[1.03] mix-blend-multiply"
             />
           </a>
 
           {/* Desktop Navigation Links with Staggered Entrance */}
           <nav className="hidden lg:flex items-center gap-8">
-            {navItems.map((item, idx) => {
+            {NAV_ITEMS.map((item, idx) => {
               const isActive = activeSection === item.id;
 
               return (
@@ -174,12 +215,9 @@ function Navbar({ onNavigate }) {
           <div className="flex items-center gap-3">
             <a
               href="#get-in-touch"
-              onClick={(e) => {
-                e.preventDefault();
-                smoothScrollTo('#get-in-touch');
-              }}
+              onClick={handleContactClick}
               style={{ transitionDelay: '900ms' }}
-              className={`px-4.5 py-2 sm:px-5 sm:py-2 rounded bg-[#710014] text-white font-sans text-[10px] font-bold uppercase tracking-[0.22em] shadow-md hover:bg-[#580010] hover:shadow-lg hover:shadow-[#710014]/30 hover:scale-[1.02] transition-all duration-700 ease-out ${
+              className={`px-4.5 py-2 sm:px-5 sm:py-2 rounded bg-[#710014] text-white font-sans text-[10px] font-bold uppercase tracking-[0.22em] shadow-md hover:bg-[#580010] hover:shadow-lg hover:shadow-[#710014]/30 hover:scale-[1.02] transition-all duration-700 ease-out touch-manipulation ${
                 isVisible ? 'translate-y-0 opacity-100 scale-100' : '-translate-y-3 opacity-0 scale-95'
               }`}
             >
@@ -188,9 +226,9 @@ function Navbar({ onNavigate }) {
 
             {/* Hamburger Button (Mobile / Tablet) */}
             <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              onClick={toggleMobileMenu}
               aria-label="Toggle Navigation Menu"
-              className="lg:hidden p-1.5 rounded-lg text-[#1a1a1a] hover:bg-black/5 transition-colors focus:outline-none"
+              className="lg:hidden p-1.5 rounded-lg text-[#1a1a1a] hover:bg-black/5 transition-colors focus:outline-none touch-manipulation"
             >
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 {mobileMenuOpen ? (
@@ -207,7 +245,7 @@ function Navbar({ onNavigate }) {
 
       {/* Full Screen Mobile Drawer Menu Overlay */}
       <div
-        className={`fixed inset-0 z-[100] bg-white/98 backdrop-blur-3xl flex flex-col justify-between p-6 sm:p-10 pt-8 transition-all duration-500 ease-in-out lg:hidden ${
+        className={`fixed inset-0 z-[100] bg-white/98 backdrop-blur-3xl flex flex-col justify-between p-6 sm:p-10 pt-8 transition-all duration-500 ease-in-out lg:hidden transform-gpu ${
           mobileMenuOpen ? 'opacity-100 pointer-events-auto translate-y-0' : 'opacity-0 pointer-events-none -translate-y-6'
         }`}
       >
@@ -217,6 +255,10 @@ function Navbar({ onNavigate }) {
             <img
               src={slogo}
               alt="Sharkings Interiors & Exteriors"
+              width="128"
+              height="32"
+              loading="eager"
+              decoding="async"
               className="h-8 w-auto object-contain mix-blend-multiply"
             />
             <span className="font-display text-lg tracking-[0.25em] text-[#1a1a1a]">
@@ -225,9 +267,9 @@ function Navbar({ onNavigate }) {
           </div>
 
           <button
-            onClick={() => setMobileMenuOpen(false)}
+            onClick={closeMobileMenu}
             aria-label="Close Navigation Menu"
-            className="p-2 rounded-full bg-[#f9f8f4] text-[#1a1a1a] border border-[#e5e0d3] hover:bg-[#710014] hover:text-white transition-all cursor-pointer focus:outline-none flex items-center justify-center"
+            className="p-2 rounded-full bg-[#f9f8f4] text-[#1a1a1a] border border-[#e5e0d3] hover:bg-[#710014] hover:text-white transition-all cursor-pointer focus:outline-none flex items-center justify-center touch-manipulation"
           >
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -237,7 +279,7 @@ function Navbar({ onNavigate }) {
 
         {/* Drawer Menu Nav Links */}
         <nav className="flex flex-col space-y-6 my-auto">
-          {navItems.map((item, idx) => {
+          {NAV_ITEMS.map((item, idx) => {
             const isActive = activeSection === item.id;
 
             return (
@@ -247,7 +289,7 @@ function Navbar({ onNavigate }) {
                 onClick={(e) => {
                   e.preventDefault();
                   if (item.isPage) {
-                    setMobileMenuOpen(false);
+                    closeMobileMenu();
                     onNavigate && onNavigate(item.pageTarget);
                   } else {
                     smoothScrollTo(item.href);
@@ -270,11 +312,8 @@ function Navbar({ onNavigate }) {
         <div className="space-y-4 pt-6 border-t border-[#e5e0d3]">
           <a
             href="#get-in-touch"
-            onClick={(e) => {
-              e.preventDefault();
-              smoothScrollTo('#get-in-touch');
-            }}
-            className="w-full py-3.5 bg-[#710014] text-white font-sans text-xs uppercase tracking-widest font-bold flex items-center justify-center gap-2 group cursor-pointer hover:bg-[#580010] transition-colors shadow-md rounded"
+            onClick={handleContactClick}
+            className="w-full py-3.5 bg-[#710014] text-white font-sans text-xs uppercase tracking-widest font-bold flex items-center justify-center gap-2 group cursor-pointer hover:bg-[#580010] transition-colors shadow-md rounded touch-manipulation"
           >
             <span>Contact Us</span>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
@@ -293,3 +332,4 @@ function Navbar({ onNavigate }) {
 }
 
 export default memo(Navbar);
+

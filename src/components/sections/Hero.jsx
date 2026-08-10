@@ -11,7 +11,6 @@ const localSlides = [
     description: 'We design beautiful luxury homes and custom living spaces. From initial idea to final setup, Sharkings Interior creates modern, comfortable, and elegant home interiors.',
     accent: 'text-luxury-red',
     borderAccent: 'border-luxury-red',
-    glowColor: 'rgba(113, 0, 20, 0.12)',
     accentHex: '#710014'
   },
   {
@@ -22,7 +21,6 @@ const localSlides = [
     description: 'Transform your dining room with custom furniture, warm lighting, and stylish decor. Built for family meals and welcoming your guests.',
     accent: 'text-luxury-sage',
     borderAccent: 'border-luxury-sage',
-    glowColor: 'rgba(131, 143, 111, 0.12)',
     accentHex: '#838F6F'
   },
   {
@@ -33,7 +31,6 @@ const localSlides = [
     description: 'Create your dream master bedroom with custom wall paneling, soft ambient lighting, and luxury seating designed for pure relaxation.',
     accent: 'text-luxury-red',
     borderAccent: 'border-luxury-red',
-    glowColor: 'rgba(113, 0, 20, 0.12)',
     accentHex: '#710014'
   }
 ];
@@ -43,81 +40,30 @@ function Hero({
   loading,
   progress,
   activeIndex,
-  prevActiveIndex,
-  mousePos,
-  handleMouseMove,
   handlePrev,
   handleNext,
   selectSlide
 }) {
-  // Refs for scroll-driven DOM elements (no React re-renders)
-  const heroOuterRef = useRef(null);
   const heroInnerRef = useRef(null);
-  const navControlsRef = useRef(null);
-  const indicatorsRef = useRef(null);
-  const scrollIndicatorRef = useRef(null);
-  const slideImgRefs = useRef([]);
-  const slideTextRefs = useRef([]);
   const rafRef = useRef(null);
   const lastScrollRef = useRef(-1);
 
-  // Direct DOM scroll handler — zero re-renders
+  // Pure GPU composited scroll parallax — zero layout reflows
   const updateParallax = useCallback(() => {
     const scrollPos = window.scrollY;
     const vh = window.innerHeight;
 
-    // Only compute while hero is visible
     if (scrollPos > vh * 1.1) return;
-
-    // Skip if scroll position hasn't changed meaningfully
     if (Math.abs(scrollPos - lastScrollRef.current) < 0.5) return;
     lastScrollRef.current = scrollPos;
 
-    // Parallax values
     const opacity = Math.max(0, 1 - scrollPos / (vh * 0.7));
     const textY = scrollPos * 0.2;
-    const bgY = scrollPos * 0.35;
 
-    // Frame reveal values
-    const frameProgress = Math.min(scrollPos / vh, 1);
-    const scale = 1 - frameProgress * 0.08;
-    const radius = frameProgress * 24;
-    const padding = frameProgress * 16;
-
-    // Apply outer container padding
-    if (heroOuterRef.current) {
-      heroOuterRef.current.style.padding = `${padding}px`;
-    }
-
-    // Apply inner container scale + borderRadius
     if (heroInnerRef.current) {
-      heroInnerRef.current.style.borderRadius = `${radius}px`;
-      heroInnerRef.current.style.transform = `scale(${scale})`;
+      heroInnerRef.current.style.opacity = opacity;
+      heroInnerRef.current.style.transform = `translate3d(0, ${textY}px, 0)`;
     }
-
-    // Apply slide image parallax
-    slideImgRefs.current.forEach((img) => {
-      if (img) {
-        // Keep existing mouse offset by reading current mouse values
-        img.dataset.bgY = bgY;
-      }
-    });
-
-    // Apply text overlay translateY + opacity
-    slideTextRefs.current.forEach((el) => {
-      if (el) {
-        el.style.transform = `translateY(${textY}px)`;
-        // Only apply opacity to the active slide's text (handled via data attribute)
-        if (el.dataset.active === 'true') {
-          el.style.opacity = opacity;
-        }
-      }
-    });
-
-    // Apply opacity to nav controls, indicators, scroll indicator
-    if (navControlsRef.current) navControlsRef.current.style.opacity = opacity;
-    if (indicatorsRef.current) indicatorsRef.current.style.opacity = opacity;
-    if (scrollIndicatorRef.current) scrollIndicatorRef.current.style.opacity = opacity;
   }, []);
 
   useEffect(() => {
@@ -130,7 +76,7 @@ function Hero({
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    updateParallax(); // initial
+    updateParallax();
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
@@ -138,75 +84,46 @@ function Hero({
     };
   }, [updateParallax]);
 
-  // Update active state data attributes when activeIndex changes
-  useEffect(() => {
-    slideTextRefs.current.forEach((el, idx) => {
-      if (el) {
-        el.dataset.active = idx === activeIndex ? 'true' : 'false';
-        if (idx !== activeIndex) {
-          el.style.opacity = 0;
-        }
-      }
-    });
-    // Re-run parallax to apply correct opacity to new active slide
-    updateParallax();
-  }, [activeIndex, updateParallax]);
-
-  const smoothScrollToTarget = (targetSelector) => {
+  const smoothScrollToTarget = useCallback((targetSelector) => {
     const elem = document.querySelector(targetSelector);
     if (!elem) return;
-    const bodyTop = document.body.getBoundingClientRect().top;
-    const elemTop = elem.getBoundingClientRect().top;
-    const targetY = elemTop - bodyTop;
-    window.scrollTo({
-      top: targetY,
-      behavior: 'smooth'
-    });
-  };
+    elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, []);
 
   return (
     <>
-      {/* Cinematic Kinetic Split-Curtain Preloader */}
-      <div className="fixed inset-0 z-[999] pointer-events-none overflow-hidden">
+      {/* Kinetic Split-Curtain Preloader */}
+      <div className={`fixed inset-0 z-[999] pointer-events-none overflow-hidden transition-opacity duration-300 ${
+        loading ? 'opacity-100' : 'opacity-0 pointer-events-none'
+      }`}>
         
-        {/* Top Motorized Shutter Door Panel (Luxury Charcoal Base) */}
+        {/* Top Shutter Panel */}
         <div
-          className={`absolute top-0 left-0 right-0 h-1/2 bg-luxury-charcoal border-b border-luxury-sage/30 shadow-2xl transition-transform duration-1000 ease-[cubic-bezier(0.77,0,0.175,1)] ${
+          className={`absolute top-0 left-0 right-0 h-1/2 bg-luxury-charcoal border-b border-luxury-sage/30 shadow-2xl transition-transform duration-350 ease-out transform-gpu ${
             loading ? 'translate-y-0' : '-translate-y-full'
           }`}
         >
           <div className="absolute inset-0 bg-gradient-to-b from-luxury-red/15 via-transparent to-transparent pointer-events-none" />
         </div>
 
-        {/* Bottom Motorized Shutter Door Panel (Luxury Charcoal Base) */}
+        {/* Bottom Shutter Panel */}
         <div
-          className={`absolute bottom-0 left-0 right-0 h-1/2 bg-luxury-charcoal border-t border-luxury-sage/30 shadow-2xl transition-transform duration-1000 ease-[cubic-bezier(0.77,0,0.175,1)] ${
+          className={`absolute bottom-0 left-0 right-0 h-1/2 bg-luxury-charcoal border-t border-luxury-sage/30 shadow-2xl transition-transform duration-350 ease-out transform-gpu ${
             loading ? 'translate-y-0' : 'translate-y-full'
           }`}
         >
           <div className="absolute inset-0 bg-gradient-to-t from-luxury-sage/10 via-transparent to-transparent pointer-events-none" />
         </div>
 
-        {/* Central Kinetic Assembly */}
+        {/* Central Preloader Assembly */}
         <div
-          className={`fixed inset-0 z-[1000] flex flex-col items-center justify-center transition-all duration-700 ease-out px-4 ${
-            loading ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-90 pointer-events-none'
+          className={`fixed inset-0 z-[1000] flex flex-col items-center justify-center transition-opacity duration-250 ease-out px-4 ${
+            loading ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
           }`}
         >
-          {/* Ambient Lighting Halos (Brand Palette) */}
-          <div className="absolute w-[360px] h-[360px] bg-luxury-red/15 rounded-full blur-[100px] pointer-events-none animate-pulse" />
-          <div className="absolute w-[280px] h-[280px] bg-luxury-sage/15 rounded-full blur-[80px] pointer-events-none" />
-
-          {/* Kinetic Double-Ring System */}
-          <div className="relative w-56 h-56 sm:w-64 sm:h-64 flex items-center justify-center">
+          {/* Central Progress Ring */}
+          <div className="relative w-48 h-48 sm:w-56 sm:h-56 flex items-center justify-center">
             
-            {/* Outer Counter-Spinning Dashed Ring (Luxury Sage) */}
-            <div className="absolute inset-0 rounded-full border border-dashed border-luxury-sage/40 animate-[spin_16s_linear_infinite]" />
-
-            {/* Inner Counter-Spinning Dotted Ring (Luxury Red) */}
-            <div className="absolute inset-3 rounded-full border-2 border-dotted border-luxury-red/50 animate-[spin_10s_linear_infinite_reverse]" />
-
-            {/* Real-time SVG Circular Progress Arc (Luxury Sage) */}
             <svg
               className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none"
               viewBox="0 0 200 200"
@@ -214,29 +131,40 @@ function Hero({
               <circle
                 cx="100"
                 cy="100"
-                r="96"
-                className="stroke-luxury-sage fill-none transition-all duration-300 ease-out drop-shadow-[0_0_10px_rgba(131,143,111,0.5)]"
-                strokeWidth="2.5"
-                strokeDasharray={2 * Math.PI * 96}
-                strokeDashoffset={(2 * Math.PI * 96) - (progress / 100) * (2 * Math.PI * 96)}
+                r="90"
+                className="stroke-luxury-sage/20 fill-none"
+                strokeWidth="2"
+              />
+              <circle
+                cx="100"
+                cy="100"
+                r="90"
+                className="stroke-luxury-sage fill-none transition-all duration-200 ease-out"
+                strokeWidth="3"
+                strokeDasharray={2 * Math.PI * 90}
+                strokeDashoffset={(2 * Math.PI * 90) - (progress / 100) * (2 * Math.PI * 90)}
                 strokeLinecap="round"
               />
             </svg>
 
-            {/* Central Circular Medallion (Luxury Cream Base + slogo) */}
-            <div className="w-36 h-36 sm:w-44 sm:h-44 rounded-full bg-luxury-cream border-2 border-luxury-sage/60 shadow-[0_0_45px_rgba(0,0,0,0.8)] flex items-center justify-center p-5 z-10 transition-transform duration-500 hover:scale-105">
+            {/* Central Brand Medallion */}
+            <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-luxury-cream border border-luxury-sage/60 shadow-xl flex items-center justify-center p-4 z-10">
               <img
                 src={slogo}
                 alt="Sharkings Interior"
-                className="h-18 sm:h-22 w-auto object-contain mix-blend-multiply"
+                width="140"
+                height="40"
+                loading="eager"
+                decoding="async"
+                className="h-14 sm:h-18 w-auto object-contain mix-blend-multiply"
               />
             </div>
 
           </div>
 
-          {/* Dynamic Status Typography & High-Tech Counter */}
-          <div className="flex flex-col items-center space-y-2 text-center pt-6">
-            <span className="font-serif text-[10px] sm:text-xs tracking-[0.45em] text-luxury-sage ">
+          {/* Status Typography */}
+          <div className="flex flex-col items-center space-y-2 text-center pt-5">
+            <span className="font-serif text-[10px] sm:text-xs tracking-[0.45em] text-luxury-sage uppercase">
               {progress < 35
                 ? 'LOADING HOME PORTFOLIO'
                 : progress < 75
@@ -245,35 +173,23 @@ function Hero({
                 ? 'SETTING UP LUXURY SPACES'
                 : 'SHARKINGS INTERIORS & EXTERIORS'}
             </span>
-
           </div>
 
         </div>
       </div>
 
       {/* HERO SECTION CONTAINER */}
-      <div
-        ref={heroOuterRef}
+      <section
+        id="hero"
         className="relative w-full h-screen min-h-[640px] bg-luxury-charcoal z-10 overflow-hidden"
-        onMouseMove={handleMouseMove}
       >
         <div
           ref={heroInnerRef}
-          className="relative w-full h-full overflow-hidden bg-luxury-charcoal shadow-2xl"
-          style={{
-            willChange: 'transform, border-radius'
-          }}
+          className="relative w-full h-full overflow-hidden bg-luxury-charcoal shadow-2xl transform-gpu"
+          style={{ willChange: 'transform, opacity' }}
         >
-          {/* Dynamic Background Glows */}
-          <div
-            className="absolute w-[500px] h-[500px] rounded-full blur-[150px] pointer-events-none transition-all duration-1000 animate-ambient-glow"
-            style={{
-              backgroundColor: localSlides[activeIndex].glowColor,
-              left: `calc(15% + ${mousePos.x}px)`,
-              top: `calc(20% + ${mousePos.y}px)`,
-              zIndex: 1
-            }}
-          />
+          {/* Subtle Ambient Radial Glow */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(113,0,20,0.18),transparent_70%)] pointer-events-none z-1" />
 
           {/* Sliding Images */}
           <div className="absolute inset-0 w-full h-full z-0">
@@ -283,42 +199,34 @@ function Hero({
               return (
                 <div
                   key={idx}
-                  className={`absolute inset-0 w-full h-full transition-opacity duration-[1500ms] ease-in-out ${isActive ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'
-                    }`}
+                  className={`absolute inset-0 w-full h-full transition-opacity duration-200 ease-out ${
+                    isActive ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'
+                  }`}
                 >
                   <div className="absolute inset-0 bg-gradient-to-t from-luxury-charcoal/80 via-transparent to-black/20 z-20 pointer-events-none" />
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_60%,rgba(22,22,22,0.4)_95%)] z-20 pointer-events-none" />
 
-                  <div
-                    className={`w-full h-full overflow-hidden ${(idx === activeIndex || idx === prevActiveIndex) ? 'animate-ken-burns' : ''
-                      }`}
-                  >
+                  <div className="w-full h-full overflow-hidden">
                     <img
-                      ref={(el) => { slideImgRefs.current[idx] = el; }}
                       src={slide.image}
                       alt={slide.alt || "Sharkings Interior - Bespoke Luxury Interior Design"}
+                      loading={idx === 0 ? "eager" : "lazy"}
                       decoding="async"
-                      fetchPriority={idx === 0 ? "high" : "low"}
-                      className="w-full h-full object-cover"
-                      style={{
-                        transform: `translate3d(${mousePos.x * -0.2}px, ${mousePos.y * -0.2}px, 0)`
-                      }}
+                      fetchpriority={idx === 0 ? "high" : "low"}
+                      className={`w-full h-full object-cover transition-transform duration-300 ease-out ${
+                        isActive ? 'scale-105' : 'scale-100'
+                      }`}
                     />
                   </div>
 
                   <div
-                    ref={(el) => { slideTextRefs.current[idx] = el; }}
-                    data-active={isActive ? 'true' : 'false'}
                     className="absolute inset-0 flex flex-col justify-center px-6 sm:px-12 lg:px-24 pt-24 sm:pt-28 lg:pt-32 pb-16 sm:pb-20 lg:pb-24 z-30"
-                    style={{
-                      opacity: isActive ? 1 : 0
-                    }}
                   >
                     <div className="max-w-2xl lg:max-w-3xl space-y-4 sm:space-y-6">
 
                       <div
-                        className={`transition-all duration-[1000ms] cubic-bezier(0.16, 1, 0.3, 1) ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-[10px]'
-                          }`}
+                        className={`transition-all duration-150 ease-out ${
+                          isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'
+                        }`}
                         style={{ transitionDelay: '0ms' }}
                       >
                         <div className="flex items-center gap-3">
@@ -330,25 +238,28 @@ function Hero({
                       </div>
 
                       <h1
-                        className={`font-display text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extralight leading-[1.1] text-luxury-cream transition-all duration-[1000ms] cubic-bezier(0.16, 1, 0.3, 1) ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-[10px]'
-                          }`}
-                        style={{ transitionDelay: '150ms' }}
+                        className={`font-display text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extralight leading-[1.1] text-luxury-cream transition-all duration-150 ease-out ${
+                          isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'
+                        }`}
+                        style={{ transitionDelay: '0ms' }}
                       >
                         {slide.title}
                       </h1>
 
                       <p
-                        className={`font-sans text-xs sm:text-sm text-luxury-cream/80 max-w-xl leading-relaxed font-light tracking-wide transition-all duration-[1000ms] cubic-bezier(0.16, 1, 0.3, 1) ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-[10px]'
-                          }`}
-                        style={{ transitionDelay: '300ms' }}
+                        className={`font-sans text-xs sm:text-sm text-luxury-cream/80 max-w-xl leading-relaxed font-light tracking-wide transition-all duration-150 ease-out ${
+                          isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'
+                        }`}
+                        style={{ transitionDelay: '0ms' }}
                       >
                         {slide.description}
                       </p>
 
                       <div
-                        className={`flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-4 sm:pt-6 transition-all duration-[1000ms] cubic-bezier(0.16, 1, 0.3, 1) ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-[10px]'
-                          }`}
-                        style={{ transitionDelay: '450ms' }}
+                        className={`flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-4 sm:pt-6 transition-all duration-150 ease-out ${
+                          isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'
+                        }`}
+                        style={{ transitionDelay: '0ms' }}
                       >
                         <a
                           href="#/projects"
@@ -356,15 +267,15 @@ function Hero({
                             e.preventDefault();
                             onNavigate && onNavigate('projects');
                           }}
-                          className="relative px-6 sm:px-8 py-3.5 bg-luxury-cream text-luxury-charcoal font-sans text-xs uppercase tracking-widest font-semibold overflow-hidden group transition-all duration-300 cursor-pointer text-center"
+                          className="relative px-6 sm:px-8 py-3.5 bg-luxury-cream text-luxury-charcoal font-sans text-xs uppercase tracking-widest font-semibold overflow-hidden group transition-all duration-300 cursor-pointer text-center touch-manipulation"
                           style={{
                             boxShadow: isActive ? `0 10px 30px -15px ${slide.accentHex}` : 'none'
                           }}
                         >
-                          <span className="relative z-10 transition-colors duration-500 group-hover:text-luxury-cream">
+                          <span className="relative z-10 transition-colors duration-300 group-hover:text-luxury-cream">
                             View Our Projects
                           </span>
-                          <span className="absolute inset-0 bg-luxury-red -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out" />
+                          <span className="absolute inset-0 bg-luxury-red -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out" />
                         </a>
 
                         <a
@@ -373,7 +284,7 @@ function Hero({
                             e.preventDefault();
                             smoothScrollToTarget('#get-in-touch');
                           }}
-                          className="relative px-6 sm:px-8 py-3.5 text-luxury-cream border border-luxury-cream/20 hover:border-luxury-cream font-sans text-xs uppercase tracking-widest font-medium overflow-hidden group transition-all duration-300 cursor-pointer text-center"
+                          className="relative px-6 sm:px-8 py-3.5 text-luxury-cream border border-luxury-cream/20 hover:border-luxury-cream font-sans text-xs uppercase tracking-widest font-medium overflow-hidden group transition-all duration-300 cursor-pointer text-center touch-manipulation"
                         >
                           <span className="relative z-10">
                             Contact Us
@@ -390,13 +301,12 @@ function Hero({
 
           {/* Navigation Controls */}
           <div
-            ref={navControlsRef}
             className="absolute bottom-8 sm:bottom-10 right-6 sm:right-12 lg:right-24 z-30 flex items-center gap-4 transition-opacity duration-300"
           >
             <button
               onClick={handlePrev}
               aria-label="Previous Slide"
-              className="w-12 h-12 rounded-none border border-luxury-cream/10 flex items-center justify-center text-luxury-cream/70 hover:text-luxury-cream hover:border-luxury-cream hover:bg-luxury-cream/5 transition-all duration-300 group cursor-pointer"
+              className="w-12 h-12 rounded-none border border-luxury-cream/10 flex items-center justify-center text-luxury-cream/70 hover:text-luxury-cream hover:border-luxury-cream hover:bg-luxury-cream/5 transition-all duration-200 group cursor-pointer touch-manipulation"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -419,7 +329,7 @@ function Hero({
             <button
               onClick={handleNext}
               aria-label="Next Slide"
-              className="w-12 h-12 rounded-none border border-luxury-cream/10 flex items-center justify-center text-luxury-cream/70 hover:text-luxury-cream hover:border-luxury-cream hover:bg-luxury-cream/5 transition-all duration-300 group cursor-pointer"
+              className="w-12 h-12 rounded-none border border-luxury-cream/10 flex items-center justify-center text-luxury-cream/70 hover:text-luxury-cream hover:border-luxury-cream hover:bg-luxury-cream/5 transition-all duration-200 group cursor-pointer touch-manipulation"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -434,19 +344,19 @@ function Hero({
             </button>
           </div>
 
-          {/* Indicators */}
+          {/* Slide Indicators */}
           <div
-            ref={indicatorsRef}
             className="hidden md:flex absolute bottom-8 sm:bottom-10 left-6 sm:left-12 lg:left-24 z-30 items-center gap-6 transition-opacity duration-300"
           >
             {localSlides.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => selectSlide(idx)}
-                className="group py-4 flex flex-col items-start focus:outline-none cursor-pointer"
+                className="group py-4 flex flex-col items-start focus:outline-none cursor-pointer touch-manipulation"
               >
-                <span className={`font-sans text-[9px] tracking-widest transition-all duration-300 ${idx === activeIndex ? 'text-luxury-cream font-bold opacity-100' : 'text-luxury-cream/40 opacity-70 group-hover:text-luxury-cream/80'
-                  }`}>
+                <span className={`font-sans text-[9px] tracking-widest transition-all duration-200 ${
+                  idx === activeIndex ? 'text-luxury-cream font-bold opacity-100' : 'text-luxury-cream/40 opacity-70 group-hover:text-luxury-cream/80'
+                }`}>
                   0{idx + 1}
                 </span>
                 <div className="w-16 md:w-24 h-[1px] bg-luxury-cream/20 mt-1 relative overflow-hidden">
@@ -463,7 +373,6 @@ function Hero({
 
           {/* Scroll Down Indicator */}
           <div
-            ref={scrollIndicatorRef}
             className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 hidden lg:flex flex-col items-center gap-2 transition-opacity duration-300"
           >
             <span className="font-sans text-[9px] tracking-[0.3em] uppercase text-luxury-cream/30">
@@ -475,9 +384,10 @@ function Hero({
           </div>
 
         </div>
-      </div>
+      </section>
     </>
   );
 }
 
 export default memo(Hero);
+

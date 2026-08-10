@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef, memo } from 'react';
+import { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { useScrollReveal } from '../../hooks/useScrollReveal';
 
-// Project Assets from Billionaires & FacetoFace (referencing ProjectPage.jsx)
+// Project Assets from Billionaires & FacetoFace
 import b1 from '../../assets/Billionaires/sharking1.webp';
 import b2 from '../../assets/Billionaires/sharking2.webp';
 import b3 from '../../assets/Billionaires/sharking3.webp';
@@ -173,13 +173,14 @@ const PROJECTS_DATA = [
   }
 ];
 
-function ProjectCard({ project, onClick, cardStyle, isActive }) {
-  const [tiltStyle, setTiltStyle] = useState({});
-  const [imgStyle, setImgStyle] = useState({});
+const ProjectCard = memo(function ProjectCard({ project, onClick, cardStyle, isActive }) {
+  const cardRef = useRef(null);
+  const imgRef = useRef(null);
 
-  const handleMouseMove = (e) => {
-    if (!isActive) return; // Only tilt the active focused center card
-    const card = e.currentTarget;
+  // Direct DOM tilt mutation (Zero React re-renders on mousemove)
+  const handleMouseMove = useCallback((e) => {
+    if (!isActive || !cardRef.current || !imgRef.current) return;
+    const card = cardRef.current;
     const rect = card.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -188,94 +189,100 @@ function ProjectCard({ project, onClick, cardStyle, isActive }) {
     const rotX = ((yc - y) / yc) * 3;
     const rotY = ((x - xc) / xc) * 3;
 
-    setTiltStyle({
-      transform: `${cardStyle.transform} rotateX(${rotX}deg) rotateY(${rotY}deg)`,
-      transition: 'transform 0.1s ease-out',
-      willChange: 'transform'
-    });
+    card.style.transform = `${cardStyle.transform} rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+    card.style.transition = 'transform 0.1s ease-out';
+    card.style.willChange = 'transform';
 
-    const transX = ((x - xc) / xc) * -8;
-    const transY = ((yc - y) / yc) * -8;
-    setImgStyle({
-      transform: `scale(1.12) translate(${transX}px, ${transY}px)`,
-      transition: 'transform 0.1s ease-out',
-      willChange: 'transform'
-    });
-  };
+    const transX = ((x - xc) / xc) * -6;
+    const transY = ((yc - y) / yc) * -6;
+    imgRef.current.style.transform = `scale(1.08) translate(${transX}px, ${transY}px)`;
+    imgRef.current.style.transition = 'transform 0.1s ease-out';
+  }, [isActive, cardStyle.transform]);
 
-  const handleMouseLeave = () => {
-    setTiltStyle({});
-    setImgStyle({
-      transform: `scale(1.05) translate(0px, 0px)`,
-      transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
-      willChange: 'transform'
-    });
-  };
+  const handleMouseLeave = useCallback(() => {
+    if (cardRef.current) {
+      cardRef.current.style.transform = cardStyle.transform;
+      cardRef.current.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+    }
+    if (imgRef.current) {
+      imgRef.current.style.transform = 'scale(1.03) translate(0px, 0px)';
+      imgRef.current.style.transition = 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+    }
+  }, [cardStyle.transform]);
 
   return (
     <div
+      ref={cardRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       onClick={onClick}
-      style={{
-        ...cardStyle,
-        ...tiltStyle
-      }}
-      className={`absolute w-[265px] md:w-[350px] aspect-[3/4] bg-[#121622] rounded-3xl border overflow-hidden shadow-2xl transition-all duration-500 cubic-bezier(0.16, 1, 0.3, 1) cursor-pointer select-none group [transform-style:preserve-3d] ${isActive
-          ? 'border-[#c5a059]/40 ring-1 ring-[#c5a059]/20 shadow-[#c5a059]/5'
-          : 'border-white/10 hover:border-white/20'
+      style={cardStyle}
+      className={`absolute w-[250px] sm:w-[300px] md:w-[340px] aspect-[3/4] bg-[#121622] rounded-2xl border overflow-hidden shadow-2xl transition-all duration-500 cubic-bezier(0.16, 1, 0.3, 1) cursor-pointer select-none group [transform-style:preserve-3d] touch-manipulation ${isActive
+          ? 'border-[#c5a059]/50 ring-1 ring-[#c5a059]/30 shadow-[0_20px_50px_rgba(0,0,0,0.6)]'
+          : 'border-white/10 hover:border-white/20 opacity-80'
         }`}
     >
-      {/* Image background with parallax */}
-      <div className="absolute inset-0 w-full h-full overflow-hidden z-0">
+      {/* Image background showcase */}
+      <div className="absolute inset-0 w-full h-full overflow-hidden z-0 bg-black/50">
         <img
+          ref={imgRef}
           src={project.image}
           alt={project.title}
-          style={imgStyle}
-          className="absolute inset-0 w-full h-full object-cover scale-[1.05] opacity-80 group-hover:scale-110 group-hover:opacity-95 transition-all duration-700 ease-out"
+          width="360"
+          height="480"
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-0 w-full h-full object-cover scale-[1.03] opacity-90 group-hover:scale-108 group-hover:opacity-100 transition-all duration-700 ease-out pointer-events-none"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent z-10" />
 
-        {/* Branch tag */}
-        <div className="absolute top-4 right-4 z-20">
-          <span className="bg-black/60 backdrop-blur-sm text-luxury-cream border border-white/10 px-3 py-1 rounded text-[7px] font-sans font-bold tracking-[0.2em] uppercase">
-            {project.branch.split(' ')[0]}
+        {/* Soft gradient overlay for text legibility */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-black/20 z-10 pointer-events-none" />
+
+        {/* Top Pill Bar */}
+        <div className="absolute top-4 left-4 z-20 pointer-events-none">
+          <span className="bg-black/60 backdrop-blur-md text-[#c5a059] border border-[#c5a059]/30 px-3.5 py-1.5 rounded-full text-[8.5px] font-sans font-bold tracking-[0.2em] uppercase shadow-sm">
+            {project.category}
           </span>
         </div>
       </div>
 
-      {/* Description Content */}
-      <div className="absolute inset-0 z-20 p-5 flex flex-col justify-end space-y-4">
-        <div className="space-y-1 transform translate-z-[30px]">
-          <span className="font-sans text-[8px] lg:text-[9px] font-bold tracking-[0.25em] text-[#c5a059] uppercase">
-            {project.category}
-          </span>
-          <h3 className="font-display text-base lg:text-lg font-light text-luxury-cream leading-tight group-hover:text-[#c5a059] transition-colors duration-300">
+      {/* Clean Minimalist Bottom Details Panel */}
+      <div className="absolute bottom-0 inset-x-0 z-20 p-6 flex flex-col justify-end space-y-3 pointer-events-none">
+        
+        {/* Project Title & Subtitle */}
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 text-[8px] font-sans text-white/50 tracking-widest uppercase">
+            <span>{project.sqft}</span>
+            <span>•</span>
+            <span>{project.architect}</span>
+          </div>
+          <h3 className="font-display text-lg md:text-xl font-light text-luxury-cream leading-snug group-hover:text-[#c5a059] transition-colors duration-300">
             {project.title}
           </h3>
         </div>
 
-        <p className="font-sans text-[10px] lg:text-[11px] text-white/50 leading-relaxed font-light line-clamp-3 transform translate-z-[20px] group-hover:text-white/70 transition-colors duration-300">
-          {project.description}
-        </p>
-
-        {/* Action helper */}
-        <div className="pt-2 flex items-center justify-between transform translate-z-[10px]">
+        {/* Clean Action CTA Pill (Visible on Active Focused Card) */}
+        <div className="pt-1 flex items-center justify-between border-t border-white/10">
           {isActive ? (
-            <span className="font-sans text-[7px] font-bold tracking-[0.2em] text-[#c5a059] uppercase">
-              ✦ Click to view full image
+            <span className="inline-flex items-center gap-1.5 text-[9px] font-sans font-bold tracking-[0.18em] text-[#c5a059] uppercase group-hover:text-white transition-colors">
+              <span>View Case Study</span>
+              <svg className="w-3 h-3 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              </svg>
             </span>
           ) : (
-            <span className="font-sans text-[7px] font-bold tracking-[0.2em] text-white/20 uppercase">
-              Click to center
+            <span className="text-[8px] font-sans font-medium tracking-[0.2em] text-white/30 uppercase">
+              Click to inspect
             </span>
           )}
-          <span className="w-1.5 h-1.5 bg-[#838f6f] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+          <span className={`w-2 h-2 rounded-full transition-all duration-300 ${isActive ? 'bg-[#c5a059] shadow-[0_0_8px_#c5a059]' : 'bg-white/20'}`} />
         </div>
+
       </div>
     </div>
   );
-}
+});
 
 function ProjectGlimpse({ onNavigate }) {
   useScrollReveal();
@@ -283,9 +290,7 @@ function ProjectGlimpse({ onNavigate }) {
   const [isScanning, setIsScanning] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [specialtiesScrollProgress, setSpecialtiesScrollProgress] = useState(0.5);
   const [isDesktop, setIsDesktop] = useState(true);
-  const sectionRef = useRef(null);
 
   const categories = ['ALL', 'RESIDENTIAL', 'MODULAR KITCHEN', 'COMMERCIAL', 'RENOVATION'];
 
@@ -315,7 +320,7 @@ function ProjectGlimpse({ onNavigate }) {
     const handleResize = () => {
       setIsDesktop(window.innerWidth >= 1024);
     };
-    window.addEventListener('resize', handleResize);
+    window.addEventListener('resize', handleResize, { passive: true });
     handleResize();
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -329,64 +334,54 @@ function ProjectGlimpse({ onNavigate }) {
     }
   }, [activeCategory]);
 
-  // Section local scroll tracker for Y-axis rotation
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!sectionRef.current) return;
-      const rect = sectionRef.current.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
-      const totalDist = rect.height + viewportHeight;
-      const scrolled = viewportHeight - rect.top;
-
-      const prog = Math.min(Math.max(0, scrolled / totalDist), 1);
-      setSpecialtiesScrollProgress(prog);
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // Trigger once on mount
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const triggerScanFetch = () => {
+  const triggerScanFetch = useCallback(() => {
     if (isScanning) return;
     setIsScanning(true);
     setTimeout(() => {
       setIsScanning(false);
     }, 1400);
-  };
+  }, [isScanning]);
 
-  const getCardTransform = (idx) => {
+  // 3D Perspective Card Transform Calculation (Zero overlapping, smooth perspective side-by-side depth)
+  const getCardTransform = useCallback((idx) => {
     const offset = idx - activeIndex;
-    const scrollParallaxOffset = (specialtiesScrollProgress - 0.5) * 45;
+    const absOffset = Math.abs(offset);
 
-    // Spread projects based on length of filtered set
-    const spreadAngle = filteredProjects.length <= 3 ? 42 : 32;
-    const angle = (offset * spreadAngle) + scrollParallaxOffset;
-    const rad = (angle * Math.PI) / 180;
+    // X separation: 390px on desktop, 280px on mobile to guarantee zero card overlap
+    const stepX = isDesktop ? 390 : 280;
+    const tx = offset * stepX;
 
-    const tx = Math.sin(rad) * (isDesktop ? 330 : 155);
-    const tz = Math.cos(rad) * (isDesktop ? 140 : 75) - (isDesktop ? 140 : 75);
-    const ry = -angle;
+    // Z depth pushback for curved 3D gallery effect
+    const stepZ = isDesktop ? 120 : 70;
+    const tz = -absOffset * stepZ;
 
-    const scale = 1 - Math.min(Math.abs(offset) * 0.12, 0.24);
+    // Gentle Y-axis rotation toward center
+    const maxRotY = 18;
+    const ry = offset === 0 ? 0 : (offset > 0 ? -maxRotY : maxRotY);
+
+    // Scale reduction for distant cards
+    const scale = 1 - Math.min(absOffset * 0.12, 0.3);
+
+    // Opacity fade for far cards
+    const opacity = absOffset > 2 ? 0 : (absOffset === 0 ? 1 : (absOffset === 1 ? 0.85 : 0.4));
 
     return {
       transform: `perspective(1200px) translateX(${tx}px) translateZ(${tz}px) rotateY(${ry}deg) scale(${scale})`,
-      opacity: Math.abs(angle) > 85 ? 0 : 1 - Math.min(Math.abs(angle) * 0.009, 0.8),
-      zIndex: 100 - Math.round(Math.abs(offset) * 10),
-      pointerEvents: Math.abs(angle) > 85 ? 'none' : 'auto',
-      filter: idx === activeIndex ? 'none' : 'blur(1.2px) brightness(0.4) contrast(0.95)',
-      transition: 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s, filter 0.5s',
-      willChange: 'transform, opacity, filter'
+      opacity: opacity,
+      zIndex: 100 - Math.round(absOffset * 10),
+      pointerEvents: absOffset > 2 ? 'none' : 'auto',
+      transition: 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s',
+      willChange: 'transform, opacity'
     };
-  };
+  }, [activeIndex, isDesktop]);
 
-  const handleCardClick = (project, idx) => {
+  const handleCardClick = useCallback((project, idx) => {
     if (idx !== activeIndex) {
       setActiveIndex(idx);
     } else {
       setSelectedProject(project);
     }
-  };
+  }, [activeIndex]);
 
   return (
     <>
@@ -402,7 +397,6 @@ function ProjectGlimpse({ onNavigate }) {
       `}</style>
 
       <section
-        ref={sectionRef}
         id="projects"
         className="relative z-30 bg-[#0a0c10] text-[#fbf9f6] py-10 px-6 md:px-16 lg:px-24 overflow-hidden border-t border-white/5"
       >
@@ -417,8 +411,6 @@ function ProjectGlimpse({ onNavigate }) {
             backgroundSize: '35px 35px'
           }}
         />
-        <div className="absolute w-[350px] h-[350px] rounded-full bg-[#838f6f]/5 blur-[120px] -left-20 top-20 pointer-events-none" />
-        <div className="absolute w-[350px] h-[350px] rounded-full bg-[#c5a059]/4 blur-[120px] -right-20 bottom-20 pointer-events-none" />
 
         <div className="max-w-7xl mx-auto relative z-10">
 
@@ -432,14 +424,14 @@ function ProjectGlimpse({ onNavigate }) {
                 Our Masterpiece Portfolios
               </h2>
               <p className="font-sans text-xs md:text-sm text-white/50 leading-relaxed font-light">
-                Explore custom spaces hand-engineered in Madurai and Ramanathapuram. Click cards or scroll the page to spin the curved 3D portfolio gallery.
+                Explore custom spaces hand-engineered in Madurai and Ramanathapuram. Click cards to view full project showcases.
               </p>
             </div>
 
             {/* Scan button */}
             <button
               onClick={triggerScanFetch}
-              className="flex items-center gap-2 px-5 py-2.5 border border-white/10 hover:border-[#838f6f] bg-white/5 rounded-none font-sans text-[10px] font-semibold tracking-wider uppercase text-white/80 hover:text-white transition-colors shadow-sm self-start md:self-end"
+              className="flex items-center gap-2 px-5 py-2.5 border border-white/10 hover:border-[#838f6f] bg-white/5 rounded-none font-sans text-[10px] font-semibold tracking-wider uppercase text-white/80 hover:text-white transition-colors shadow-sm self-start md:self-end touch-manipulation"
             >
               <svg className={`w-3.5 h-3.5 text-[#838f6f] ${isScanning ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
@@ -448,7 +440,7 @@ function ProjectGlimpse({ onNavigate }) {
             </button>
           </div>
 
-          {/* Filter row: Full-width row dedicated solely to filters */}
+          {/* Filter row */}
           <div className="flex justify-center border-b border-white/5">
             <div className="bg-white/5 border border-white/10 p-1 rounded-none flex flex-nowrap overflow-x-auto scrollbar-none gap-2 shadow-sm max-w-full">
               {categories.map((cat) => (
@@ -458,7 +450,7 @@ function ProjectGlimpse({ onNavigate }) {
                     setActiveCategory(cat);
                     triggerScanFetch();
                   }}
-                  className={`px-5 py-2.5 rounded-none font-sans text-[9px] md:text-[10px] font-bold tracking-widest uppercase transition-all duration-300 flex-shrink-0 ${activeCategory === cat
+                  className={`px-5 py-2.5 rounded-none font-sans text-[9px] md:text-[10px] font-bold tracking-widest uppercase transition-all duration-200 flex-shrink-0 touch-manipulation ${activeCategory === cat
                       ? 'bg-[#838f6f] text-white shadow-md'
                       : 'bg-transparent text-white/50 hover:text-white'
                     }`}
@@ -496,7 +488,7 @@ function ProjectGlimpse({ onNavigate }) {
                 return (
                   <div
                     key={project.id}
-                    className={`transition-all duration-500 transform ${isScanning ? 'opacity-40 scale-[0.98]' : 'opacity-100 scale-100'
+                    className={`transition-all duration-300 transform ${isScanning ? 'opacity-40 scale-[0.98]' : 'opacity-100 scale-100'
                       }`}
                     style={{
                       position: 'absolute',
@@ -528,12 +520,12 @@ function ProjectGlimpse({ onNavigate }) {
                 key={idx}
                 onClick={() => setActiveIndex(idx)}
                 aria-label={`Show project 0${idx + 1}`}
-                className={`w-3.5 h-3.5 rounded-full flex items-center justify-center border transition-all duration-300 cursor-pointer ${idx === activeIndex
+                className={`w-3.5 h-3.5 rounded-full flex items-center justify-center border transition-all duration-200 cursor-pointer touch-manipulation ${idx === activeIndex
                     ? 'border-[#c5a059] bg-[#c5a059]/10 scale-110'
                     : 'border-white/10 bg-white/5 hover:border-white/30 hover:bg-white/10'
                   }`}
               >
-                <span className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${idx === activeIndex ? 'bg-[#c5a059] scale-100' : 'bg-transparent scale-0'
+                <span className={`w-1.5 h-1.5 rounded-full transition-all duration-200 ${idx === activeIndex ? 'bg-[#c5a059] scale-100' : 'bg-transparent scale-0'
                   }`} />
               </button>
             ))}
@@ -542,8 +534,8 @@ function ProjectGlimpse({ onNavigate }) {
           {/* Bottom Action CTA */}
           <div className="flex justify-center pt-6">
             <button
-              onClick={() => onNavigate('projects')}
-              className="relative px-9 py-3.5 bg-white text-luxury-charcoal font-sans text-[10px] uppercase tracking-[0.2em] font-semibold overflow-hidden group transition-all duration-300 shadow-[0_15px_30px_rgba(255,255,255,0.05)] rounded-full hover:shadow-[0_15px_35px_rgba(255,255,255,0.1)]"
+              onClick={() => onNavigate && onNavigate('projects')}
+              className="relative px-9 py-3.5 bg-white text-luxury-charcoal font-sans text-[10px] uppercase tracking-[0.2em] font-semibold overflow-hidden group transition-all duration-300 shadow-[0_15px_30px_rgba(255,255,255,0.05)] rounded-full hover:shadow-[0_15px_35px_rgba(255,255,255,0.1)] touch-manipulation"
             >
               <span className="relative z-10 flex items-center gap-2">
                 <span>Explore Entire Gallery</span>
@@ -560,7 +552,7 @@ function ProjectGlimpse({ onNavigate }) {
       {/* Fullscreen High-Resolution Project Lightbox Modal */}
       {selectedProject && (
         <div
-          className="fixed inset-0 z-[9999] bg-black/95 backdrop-blur-2xl flex flex-col justify-between p-4 sm:p-6 md:p-10 transition-all duration-300 animate-fadeIn"
+          className="fixed inset-0 z-[9999] bg-black/95 backdrop-blur-2xl flex flex-col justify-between p-4 sm:p-6 md:p-10 transition-all duration-200 animate-fadeIn"
         >
           {/* Top Header Bar */}
           <div className="flex items-center justify-between border-b border-white/10 pb-4 z-20">
@@ -576,7 +568,7 @@ function ProjectGlimpse({ onNavigate }) {
             <button
               onClick={() => setSelectedProject(null)}
               aria-label="Close Lightbox"
-              className="w-11 h-11 sm:w-12 sm:h-12 rounded-full border border-white/20 bg-white/10 hover:bg-white hover:text-black text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg"
+              className="w-11 h-11 sm:w-12 sm:h-12 rounded-full border border-white/20 bg-white/10 hover:bg-white hover:text-black text-white flex items-center justify-center transition-all duration-200 cursor-pointer shadow-lg touch-manipulation"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -592,7 +584,10 @@ function ProjectGlimpse({ onNavigate }) {
             <img
               src={selectedProject.image}
               alt={selectedProject.title}
-              className="w-full h-full object-contain max-h-[75vh] md:max-h-[80vh] transition-transform duration-700 group-hover:scale-[1.02]"
+              width="1200"
+              height="800"
+              decoding="async"
+              className="w-full h-full object-contain max-h-[75vh] md:max-h-[80vh] transition-transform duration-500 group-hover:scale-[1.02]"
             />
 
             {/* Gradient Overlay at bottom for readable text */}
@@ -615,7 +610,7 @@ function ProjectGlimpse({ onNavigate }) {
                   setSelectedProject(null);
                   if (onNavigate) onNavigate('projects');
                 }}
-                className="px-6 py-3 bg-[#c5a059] text-black hover:bg-white transition-colors duration-300 font-sans text-[10px] font-bold uppercase tracking-widest rounded-full shadow-lg pointer-events-auto flex items-center gap-2 self-start md:self-end cursor-pointer"
+                className="px-6 py-3 bg-[#c5a059] text-black hover:bg-white transition-colors duration-200 font-sans text-[10px] font-bold uppercase tracking-widest rounded-full shadow-lg pointer-events-auto flex items-center gap-2 self-start md:self-end cursor-pointer touch-manipulation"
               >
                 <span>EXPLORE ALL PROJECTS</span>
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
@@ -637,3 +632,4 @@ function ProjectGlimpse({ onNavigate }) {
 }
 
 export default memo(ProjectGlimpse);
+

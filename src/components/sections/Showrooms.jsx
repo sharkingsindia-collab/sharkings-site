@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, memo } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef, memo } from 'react';
 import { useScrollReveal } from '../../hooks/useScrollReveal';
 
 const SHOWROOMS_DATA = [
@@ -72,7 +72,7 @@ const SHOWROOMS_DATA = [
   }
 ];
 
-function Showrooms({ showroomRef, scrollProgress = 0, isDesktop = true }) {
+function Showrooms({ showroomRef, isDesktop = true }) {
   useScrollReveal();
   const [activeLocationIdx, setActiveLocationIdx] = useState(0);
   const [activeMediaType, setActiveMediaType] = useState('map'); // 'map' or 'gallery'
@@ -82,6 +82,55 @@ function Showrooms({ showroomRef, scrollProgress = 0, isDesktop = true }) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxImg, setLightboxImg] = useState('');
   const [bookingSubmitted, setBookingSubmitted] = useState(false);
+  const [mapVisible, setMapVisible] = useState(false);
+  const mapSentinelRef = useRef(null);
+  const scrollProgressRef = useRef(0);
+  const watermarkRef = useRef(null);
+  const rafRef = useRef(null);
+
+  // Lazy-load Google Maps iframe only when section enters viewport
+  useEffect(() => {
+    const sentinel = mapSentinelRef.current || showroomRef?.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setMapVisible(true);
+        observer.disconnect();
+      }
+    }, { rootMargin: '300px 0px 300px 0px' });
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [showroomRef]);
+
+  // Local scroll-driven parallax for watermark (ref-based, no setState)
+  useEffect(() => {
+    const section = showroomRef?.current;
+    if (!section) return;
+
+    const handleScroll = () => {
+      if (rafRef.current) return;
+      rafRef.current = requestAnimationFrame(() => {
+        rafRef.current = null;
+        const rect = section.getBoundingClientRect();
+        const vh = window.innerHeight;
+        const totalDist = rect.height + vh;
+        const scrolled = vh - rect.top;
+        const prog = Math.min(Math.max(0, scrolled / totalDist), 1);
+        scrollProgressRef.current = prog;
+        if (watermarkRef.current) {
+          watermarkRef.current.style.transform = `translateX(${(prog - 0.5) * -120}px)`;
+        }
+      });
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, [showroomRef]);
 
   // Form state for booking modal
   const [bookingForm, setBookingForm] = useState({
@@ -92,36 +141,9 @@ function Showrooms({ showroomRef, scrollProgress = 0, isDesktop = true }) {
     interests: ['Modular Kitchen']
   });
 
-  const currentLocation = SHOWROOMS_DATA[activeLocationIdx];
+  const currentLocation = useMemo(() => SHOWROOMS_DATA[activeLocationIdx], [activeLocationIdx]);
 
-  // Mouse tilt parallax effect
-  const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
-  const cardRef = useRef(null);
-
-  const handleMouseMove = (e) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    setMouseOffset({ x: x * 8, y: y * -8 });
-  };
-
-  const handleMouseLeave = () => {
-    setMouseOffset({ x: 0, y: 0 });
-  };
-
-  const handleInterestToggle = (interest) => {
-    setBookingForm((prev) => {
-      const exists = prev.interests.includes(interest);
-      if (exists) {
-        return { ...prev, interests: prev.interests.filter((i) => i !== interest) };
-      } else {
-        return { ...prev, interests: [...prev.interests, interest] };
-      }
-    });
-  };
-
-  const handleBookingSubmit = (e) => {
+  const handleBookingSubmit = useCallback((e) => {
     e.preventDefault();
     setBookingSubmitted(true);
     setTimeout(() => {
@@ -129,7 +151,19 @@ function Showrooms({ showroomRef, scrollProgress = 0, isDesktop = true }) {
       setBookingModalOpen(false);
       setBookingForm({ name: '', phone: '', date: '', time: '11:00 AM', interests: ['Modular Kitchen'] });
     }, 2500);
-  };
+  }, []);
+
+  const handleTabSwitch = useCallback((idx) => {
+    setActiveLocationIdx(idx);
+    setActiveMediaType('map');
+  }, []);
+
+  const smoothScrollToContact = useCallback(() => {
+    const contactSection = document.querySelector('#get-in-touch');
+    if (contactSection) {
+      contactSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, []);
 
   return (
     <section
@@ -139,11 +173,9 @@ function Showrooms({ showroomRef, scrollProgress = 0, isDesktop = true }) {
     >
       {/* Background Parallax Floating Watermark */}
       <div
+        ref={watermarkRef}
         className="absolute font-display text-[18vw] text-[#710014]/[0.025] font-extralight select-none pointer-events-none z-0 left-0 top-1/4 whitespace-nowrap"
-        style={{
-          transform: `translateX(${(scrollProgress - 0.5) * -120}px)`,
-          willChange: 'transform'
-        }}
+        style={{ willChange: 'transform' }}
       >
         EXPERIENCE CENTRES
       </div>
@@ -180,13 +212,10 @@ function Showrooms({ showroomRef, scrollProgress = 0, isDesktop = true }) {
                 return (
                   <button
                     key={loc.id}
-                    onClick={() => {
-                      setActiveLocationIdx(idx);
-                      setActiveMediaType('map');
-                    }}
-                    className={`px-8 py-3 rounded-none text-xs font-sans font-bold tracking-widest uppercase transition-all duration-300 flex items-center gap-2.5 cursor-pointer relative ${isActive
-                        ? 'bg-[#710014] text-white shadow-md font-extrabold'
-                        : 'text-luxury-charcoal/70 hover:text-[#710014]'
+                    onClick={() => handleTabSwitch(idx)}
+                    className={`px-8 py-3 rounded-none text-xs font-sans font-bold tracking-widest uppercase transition-all duration-300 flex items-center gap-2.5 cursor-pointer relative touch-manipulation ${isActive
+                      ? 'bg-[#710014] text-white shadow-md font-extrabold'
+                      : 'text-luxury-charcoal/70 hover:text-[#710014]'
                       }`}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
@@ -203,15 +232,15 @@ function Showrooms({ showroomRef, scrollProgress = 0, isDesktop = true }) {
 
         {/* MAIN DISPLAY CONTAINER */}
         <div className="bg-white border border-black/10 rounded-3xl p-6 sm:p-8 lg:p-10 shadow-[0_25px_70px_rgba(0,0,0,0.06)] relative overflow-hidden reveal-3d-popup delay-100">
-          
+
           {/* Subtle Top Burgundy Line */}
           <div className="absolute top-0 left-0 right-0 h-1 bg-[#710014]" />
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch">
-            
+
             {/* LEFT COLUMN: Showroom Info Card */}
             <div className="lg:col-span-5 space-y-6 flex flex-col justify-between">
-              
+
               <div className="space-y-6">
                 {/* Badge & Name */}
                 <div className="space-y-2">
@@ -230,7 +259,7 @@ function Showrooms({ showroomRef, scrollProgress = 0, isDesktop = true }) {
 
                 {/* Address & Specs List */}
                 <div className="space-y-4 pt-2 border-t border-black/5">
-                  
+
                   <div className="flex items-start gap-3">
                     <div className="w-8 h-8 rounded-full bg-[#710014]/10 text-[#710014] flex items-center justify-center flex-shrink-0 mt-0.5">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
@@ -279,12 +308,12 @@ function Showrooms({ showroomRef, scrollProgress = 0, isDesktop = true }) {
 
               {/* Action Buttons Row */}
               <div className="pt-4 flex flex-col sm:flex-row items-center gap-4">
-                
+
                 <a
                   href={currentLocation.directMapUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="w-full sm:w-1/2 px-6 py-3.5 rounded-none border-2 border-[#710014] text-xs font-sans font-bold tracking-widest text-[#710014] bg-white hover:bg-[#710014] hover:text-white transition-all text-center flex items-center justify-center gap-2 group cursor-pointer shadow-sm"
+                  className="w-full sm:w-1/2 px-6 py-3.5 rounded-none border-2 border-[#710014] text-xs font-sans font-bold tracking-widest text-[#710014] bg-white hover:bg-[#710014] hover:text-white transition-all text-center flex items-center justify-center gap-2 group cursor-pointer shadow-sm touch-manipulation"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 group-hover:translate-x-0.5 transition-transform">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
@@ -293,13 +322,8 @@ function Showrooms({ showroomRef, scrollProgress = 0, isDesktop = true }) {
                 </a>
 
                 <button
-                  onClick={() => {
-                    const contactSection = document.querySelector('#get-in-touch');
-                    if (contactSection) {
-                      contactSection.scrollIntoView({ behavior: 'smooth' });
-                    }
-                  }}
-                  className="w-full sm:w-1/2 px-6 py-3.5 rounded-none bg-[#710014] text-white text-xs font-sans font-extrabold tracking-widest uppercase hover:bg-[#580010] transition-all text-center flex items-center justify-center gap-2 shadow-lg shadow-[#710014]/20 cursor-pointer"
+                  onClick={smoothScrollToContact}
+                  className="w-full sm:w-1/2 px-6 py-3.5 rounded-none bg-[#710014] text-white text-xs font-sans font-extrabold tracking-widest uppercase hover:bg-[#580010] transition-all text-center flex items-center justify-center gap-2 shadow-lg shadow-[#710014]/20 cursor-pointer touch-manipulation"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
                     <path fillRule="evenodd" d="M1.5 4.5a3 3 0 0 1 3-3h1.372c.86 0 1.61.586 1.819 1.42l1.105 4.423a1.875 1.875 0 0 1-.694 1.955l-1.293.97c.135.252.286.505.452.757.946 1.433 2.164 2.651 3.597 3.597.252.166.505.317.757.452l.97-1.293a1.875 1.875 0 0 1 1.955-.694l4.423 1.105c.834.209 1.42.959 1.42 1.82V19.5a3 3 0 0 1-3 3h-2.25C8.552 22.5 1.5 15.448 1.5 6.75V4.5Z" clipRule="evenodd" />
@@ -313,14 +337,14 @@ function Showrooms({ showroomRef, scrollProgress = 0, isDesktop = true }) {
 
             {/* RIGHT COLUMN: Map Frame & Clean Interactive Media Display */}
             <div className="lg:col-span-7 relative flex flex-col h-full min-h-[400px] lg:min-h-[460px]">
-              
+
               {/* Top Right Floating Mode Switcher */}
               <div className="absolute top-4 right-4 z-30 flex items-center gap-2">
                 {activeMediaType === 'gallery' ? (
                   <>
                     <button
                       onClick={() => setActiveMediaType('map')}
-                      className="px-3.5 py-2 rounded-full bg-[#0f1118]/90 text-white border border-[#c5a059]/40 hover:border-[#c5a059] text-[10px] font-sans font-bold tracking-widest uppercase flex items-center gap-2 transition-all shadow-xl cursor-pointer"
+                      className="px-3.5 py-2 rounded-full bg-[#0f1118]/90 text-white border border-[#c5a059]/40 hover:border-[#c5a059] text-[10px] font-sans font-bold tracking-widest uppercase flex items-center gap-2 transition-all shadow-xl cursor-pointer touch-manipulation"
                     >
                       <svg className="w-3.5 h-3.5 text-[#c5a059]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
@@ -333,7 +357,7 @@ function Showrooms({ showroomRef, scrollProgress = 0, isDesktop = true }) {
                         setLightboxImg(currentLocation.images[activeGalleryImgIdx].url);
                         setLightboxOpen(true);
                       }}
-                      className="w-8 h-8 rounded-full bg-[#0f1118]/90 text-[#c5a059] border border-[#c5a059]/40 hover:scale-105 flex items-center justify-center transition-all shadow-xl cursor-pointer"
+                      className="w-8 h-8 rounded-full bg-[#0f1118]/90 text-[#c5a059] border border-[#c5a059]/40 hover:scale-105 flex items-center justify-center transition-all shadow-xl cursor-pointer touch-manipulation"
                       title="Fullscreen Photo"
                     >
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
@@ -344,7 +368,7 @@ function Showrooms({ showroomRef, scrollProgress = 0, isDesktop = true }) {
                 ) : (
                   <button
                     onClick={() => setActiveMediaType('gallery')}
-                    className="px-4 py-2 rounded-full bg-[#710014] text-white border border-[#8a1226] hover:bg-[#5c0010] text-[10px] font-sans font-bold tracking-widest uppercase flex items-center gap-2 transition-all shadow-xl cursor-pointer group"
+                    className="px-4 py-2 rounded-full bg-[#710014] text-white border border-[#8a1226] hover:bg-[#5c0010] text-[10px] font-sans font-bold tracking-widest uppercase flex items-center gap-2 transition-all shadow-xl cursor-pointer group touch-manipulation"
                   >
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                     <span>Live Showroom Photo</span>
@@ -356,22 +380,35 @@ function Showrooms({ showroomRef, scrollProgress = 0, isDesktop = true }) {
               {/* Map View / Gallery Container (Fills 100% Height & Width) */}
               <div className="w-full h-full min-h-[400px] lg:min-h-[460px] rounded-2xl overflow-hidden border border-black/10 relative bg-[#eae8e3] flex-1">
                 {activeMediaType === 'map' ? (
-                  <iframe
-                    title={`${currentLocation.name} Map`}
-                    src={currentLocation.mapUrl}
-                    className="absolute inset-0 w-full h-full border-0 filter grayscale contrast-110 opacity-90 hover:grayscale-0 hover:opacity-100 transition-all duration-500"
-                    loading="lazy"
-                    allowFullScreen
-                  />
+                  <div ref={mapSentinelRef}>
+                  {mapVisible ? (
+                    <iframe
+                      title={`${currentLocation.name} Map`}
+                      src={currentLocation.mapUrl}
+                      className="absolute inset-0 w-full h-full border-0 filter grayscale contrast-110 opacity-90 hover:grayscale-0 hover:opacity-100 transition-all duration-500"
+                      loading="lazy"
+                      decoding="async"
+                      allowFullScreen
+                    />
+                  ) : (
+                    <div className="absolute inset-0 w-full h-full flex items-center justify-center bg-[#eae8e3]">
+                      <span className="text-luxury-charcoal/40 text-xs tracking-widest uppercase">Loading Map...</span>
+                    </div>
+                  )}
+                  </div>
                 ) : (
                   <div className="absolute inset-0 w-full h-full">
-                    <img 
-                      src={currentLocation.images[activeGalleryImgIdx].url} 
-                      alt={currentLocation.images[activeGalleryImgIdx].caption} 
+                    <img
+                      src={currentLocation.images[activeGalleryImgIdx].url}
+                      alt={currentLocation.images[activeGalleryImgIdx].caption}
+                      width="1000"
+                      height="667"
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                    
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
+
                     {/* Gallery Image Caption & Back Button Bar */}
                     <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between z-20">
                       <div className="bg-[#0f1118]/85 backdrop-blur-md border border-white/10 px-4 py-2 rounded-xl text-white">
@@ -385,7 +422,7 @@ function Showrooms({ showroomRef, scrollProgress = 0, isDesktop = true }) {
 
                       <button
                         onClick={() => setActiveMediaType('map')}
-                        className="px-3.5 py-2 rounded-xl bg-white/90 hover:bg-white text-luxury-charcoal text-[10px] font-sans font-bold tracking-wider uppercase shadow-lg transition-all cursor-pointer flex items-center gap-1.5"
+                        className="px-3.5 py-2 rounded-xl bg-white/90 hover:bg-white text-luxury-charcoal text-[10px] font-sans font-bold tracking-wider uppercase shadow-lg transition-all cursor-pointer flex items-center gap-1.5 touch-manipulation"
                       >
                         <span>← Back</span>
                       </button>
@@ -410,7 +447,7 @@ function Showrooms({ showroomRef, scrollProgress = 0, isDesktop = true }) {
             {/* Close Button */}
             <button
               onClick={() => setBookingModalOpen(false)}
-              className="absolute top-5 right-5 w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 flex items-center justify-center text-luxury-charcoal cursor-pointer"
+              className="absolute top-5 right-5 w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 flex items-center justify-center text-luxury-charcoal cursor-pointer touch-manipulation"
             >
               ✕
             </button>
@@ -444,9 +481,9 @@ function Showrooms({ showroomRef, scrollProgress = 0, isDesktop = true }) {
                       key={loc.id}
                       type="button"
                       onClick={() => setSelectedBookingLocation(loc.id)}
-                      className={`p-3 rounded-2xl border text-xs font-sans text-left transition-all cursor-pointer ${selectedBookingLocation === loc.id
-                          ? 'border-[#710014] bg-[#710014]/10 text-[#710014] font-bold'
-                          : 'border-black/10 bg-black/5 text-luxury-charcoal/60 hover:border-black/30'
+                      className={`p-3 rounded-2xl border text-xs font-sans text-left transition-all cursor-pointer touch-manipulation ${selectedBookingLocation === loc.id
+                        ? 'border-[#710014] bg-[#710014]/10 text-[#710014] font-bold'
+                        : 'border-black/10 bg-black/5 text-luxury-charcoal/60 hover:border-black/30'
                         }`}
                     >
                       <div className="font-bold">{loc.name.split(' ')[0]}</div>
@@ -498,7 +535,7 @@ function Showrooms({ showroomRef, scrollProgress = 0, isDesktop = true }) {
 
                 <button
                   type="submit"
-                  className="w-full py-4 rounded-full bg-[#710014] text-white text-xs font-sans font-bold tracking-widest uppercase hover:bg-[#580010] transition-all shadow-lg shadow-[#710014]/20 cursor-pointer"
+                  className="w-full py-4 rounded-full bg-[#710014] text-white text-xs font-sans font-bold tracking-widest uppercase hover:bg-[#580010] transition-all shadow-lg shadow-[#710014]/20 cursor-pointer touch-manipulation"
                 >
                   CONFIRM VIP RESERVATION
                 </button>
@@ -517,7 +554,7 @@ function Showrooms({ showroomRef, scrollProgress = 0, isDesktop = true }) {
         >
           <div className="relative max-w-4xl max-h-[85vh] rounded-2xl overflow-hidden border border-white/20">
             <img src={lightboxImg} alt="Enlarged showroom interior" className="w-full h-full object-contain" />
-            <button className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/60 text-white flex items-center justify-center text-xl">
+            <button className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/60 text-white flex items-center justify-center text-xl touch-manipulation">
               ✕
             </button>
           </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 
 // Billionaires Project Assets
 import b1 from '../assets/Billionaires/sharking1.webp';
@@ -25,8 +25,6 @@ const PROJECTS_DATA = [
     id: 'billionaires-project',
     title: 'Billionaires Project',
     category: 'LUXURY SALON & SPA',
-    branch: 'MADURAI STUDIO',
-    locationFull: 'MADURAI, TAMIL NADU',
     description: 'A high-end salon and spa project we designed and built in Madurai. Features custom lighted mirrors, smooth wall finishes, and comfortable styling stations tailored for a premium client experience.',
     coverImage: b1,
     gallery: [b1, b2, b3, b4, b5, b6, b7, b8]
@@ -35,15 +33,13 @@ const PROJECTS_DATA = [
     id: 'faceto-face-project',
     title: 'Face to Face Project',
     category: 'COMMERCIAL SALON ARCHITECTURE',
-    branch: 'RAMANATHAPURAM STUDIO',
-    locationFull: 'RAMANATHAPURAM, TAMIL NADU',
     description: 'A complete beauty and wellness studio completed in Ramanathapuram. Built with practical styling layouts, soft relaxing lighting, and clean finishes for a welcoming, calm space.',
     coverImage: f1,
     gallery: [f1, f01, f3, f4, f5, f6, f07, f8]
   }
 ];
 
-export default function ProjectPage({ onNavigate }) {
+function ProjectPage({ onNavigate }) {
   const [selectedProject, setSelectedProject] = useState(null);
   const [activeGalleryIndex, setActiveGalleryIndex] = useState(0);
 
@@ -68,16 +64,34 @@ export default function ProjectPage({ onNavigate }) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedProject]);
 
-  const openProjectModal = (proj) => {
+  const openProjectModal = useCallback((proj) => {
     setSelectedProject(proj);
     setActiveGalleryIndex(0);
     document.body.style.overflow = 'hidden';
-  };
+  }, []);
 
-  const closeProjectModal = () => {
+  const closeProjectModal = useCallback(() => {
     setSelectedProject(null);
     document.body.style.overflow = '';
-  };
+  }, []);
+
+  const handleContactNavigate = useCallback(() => {
+    onNavigate('landing');
+    setTimeout(() => {
+      const el = document.querySelector('#get-in-touch');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }, 300);
+  }, [onNavigate]);
+
+  const prevGalleryImg = useCallback(() => {
+    if (!selectedProject) return;
+    setActiveGalleryIndex((prev) => (prev - 1 + selectedProject.gallery.length) % selectedProject.gallery.length);
+  }, [selectedProject]);
+
+  const nextGalleryImg = useCallback(() => {
+    if (!selectedProject) return;
+    setActiveGalleryIndex((prev) => (prev + 1) % selectedProject.gallery.length);
+  }, [selectedProject]);
 
   return (
     <div className="min-h-screen bg-[#f9f8f4] text-[#1a1a1a] font-sans selection:bg-[#710014] selection:text-white relative overflow-x-hidden">
@@ -100,7 +114,7 @@ export default function ProjectPage({ onNavigate }) {
           
           <button
             onClick={() => onNavigate('landing')}
-            className="flex items-center gap-2 font-sans text-xs font-bold tracking-[0.2em] text-[#1a1a1a] hover:text-[#710014] transition-colors uppercase cursor-pointer focus:outline-none group"
+            className="flex items-center gap-2 font-sans text-xs font-bold tracking-[0.2em] text-[#1a1a1a] hover:text-[#710014] transition-colors uppercase cursor-pointer focus:outline-none group touch-manipulation"
           >
             <svg className="w-4 h-4 transform group-hover:-translate-x-1 transition-transform text-[#710014]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
@@ -113,19 +127,11 @@ export default function ProjectPage({ onNavigate }) {
             <span className="font-display text-sm sm:text-base tracking-[0.3em] font-light text-[#1a1a1a] uppercase">
               SHARKINGS <span className="text-[#710014] font-normal">INTERIORS & EXTERIORS</span>
             </span>
-            
           </div>
-          
 
           <button
-            onClick={() => {
-              onNavigate('landing');
-              setTimeout(() => {
-                const el = document.querySelector('#get-in-touch');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
-              }, 300);
-            }}
-            className="px-4 py-2 sm:px-5 sm:py-2.5 bg-[#710014] text-white text-[10px] font-sans font-bold tracking-wider uppercase hover:bg-[#580010] transition-colors cursor-pointer shadow-sm"
+            onClick={handleContactNavigate}
+            className="px-4 py-2 sm:px-5 sm:py-2.5 bg-[#710014] text-white text-[10px] font-sans font-bold tracking-wider uppercase hover:bg-[#580010] transition-colors cursor-pointer shadow-sm touch-manipulation"
           >
             CONTACT US
           </button>
@@ -157,7 +163,7 @@ export default function ProjectPage({ onNavigate }) {
             <div
               key={proj.id}
               onClick={() => openProjectModal(proj)}
-              className="bg-white border border-[#e5e0d3] rounded-3xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 group cursor-pointer flex flex-col justify-between"
+              className="bg-white border border-[#e5e0d3] rounded-3xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 group cursor-pointer flex flex-col justify-between touch-manipulation"
             >
               <div className="space-y-4 p-5 sm:p-6">
                 
@@ -166,11 +172,12 @@ export default function ProjectPage({ onNavigate }) {
                   <img
                     src={proj.coverImage}
                     alt={proj.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    width="800"
+                    height="500"
+                    loading="lazy"
+                    decoding="async"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  <div className="absolute top-4 left-4 bg-[#710014] text-white text-[9px] font-sans font-bold tracking-widest px-3 py-1 uppercase rounded shadow">
-                    {proj.branch}
-                  </div>
                   <div className="absolute bottom-4 right-4 bg-black/80 backdrop-blur-md text-white text-[10px] font-sans font-bold tracking-widest px-3 py-1.5 uppercase rounded shadow flex items-center gap-1.5">
                     <svg className="w-3.5 h-3.5 text-[#c5a059]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -198,7 +205,7 @@ export default function ProjectPage({ onNavigate }) {
 
               {/* Card Footer Button */}
               <div className="px-5 sm:px-6 pb-6 pt-2">
-                <button className="w-full py-3 bg-[#710014] text-white text-xs font-sans font-bold tracking-widest uppercase hover:bg-[#580010] transition-colors shadow-sm text-center cursor-pointer rounded-none">
+                <button className="w-full py-3 bg-[#710014] text-white text-xs font-sans font-bold tracking-widest uppercase hover:bg-[#580010] transition-colors shadow-sm text-center cursor-pointer rounded-none touch-manipulation">
                   INSPECT PROJECT GALLERY →
                 </button>
               </div>
@@ -220,7 +227,7 @@ export default function ProjectPage({ onNavigate }) {
               {/* Back Button */}
               <button
                 onClick={closeProjectModal}
-                className="flex items-center gap-2 font-sans text-xs font-bold tracking-[0.2em] text-[#555555] hover:text-[#710014] transition-colors uppercase cursor-pointer focus:outline-none"
+                className="flex items-center gap-2 font-sans text-xs font-bold tracking-[0.2em] text-[#555555] hover:text-[#710014] transition-colors uppercase cursor-pointer focus:outline-none touch-manipulation"
               >
                 <svg className="w-4 h-4 text-[#710014]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
@@ -231,16 +238,12 @@ export default function ProjectPage({ onNavigate }) {
               {/* Info Details */}
               <div className="space-y-3 sm:space-y-4 pt-1">
                 <span className="font-sans text-[10px] font-bold tracking-[0.35em] text-[#710014] uppercase block">
-                  {selectedProject.branch} • {selectedProject.category}
+                  {selectedProject.category}
                 </span>
 
                 <h2 className="font-display text-2xl sm:text-4xl font-light text-[#1a1a1a] leading-tight uppercase tracking-wider">
                   {selectedProject.title}
                 </h2>
-
-                <p className="font-sans text-[10px] font-bold tracking-widest text-[#a38652] uppercase">
-                  {selectedProject.locationFull}
-                </p>
 
                 <p className="font-sans text-xs sm:text-sm text-[#555555] leading-relaxed font-normal pt-1">
                   {selectedProject.description}
@@ -257,11 +260,19 @@ export default function ProjectPage({ onNavigate }) {
                         <button
                           key={idx}
                           onClick={() => setActiveGalleryIndex(idx)}
-                          className={`relative w-20 h-14 rounded-xl overflow-hidden border-2 transition-all cursor-pointer flex-shrink-0 ${
+                          className={`relative w-20 h-14 rounded-xl overflow-hidden border-2 transition-all cursor-pointer flex-shrink-0 touch-manipulation ${
                             activeGalleryIndex === idx ? 'border-[#710014] scale-105 shadow-md' : 'border-transparent opacity-60 hover:opacity-100'
                           }`}
                         >
-                          <img src={imgUrl} alt={`Thumb ${idx + 1}`} className="w-full h-full object-cover" />
+                          <img
+                            src={imgUrl}
+                            alt={`Thumb ${idx + 1}`}
+                            width="100"
+                            height="70"
+                            loading="lazy"
+                            decoding="async"
+                            className="w-full h-full object-cover"
+                          />
                         </button>
                       ))}
                     </div>
@@ -287,14 +298,18 @@ export default function ProjectPage({ onNavigate }) {
             <img
               src={selectedProject.gallery[activeGalleryIndex]}
               alt={selectedProject.title}
-              className="w-full h-full object-cover transition-all duration-700 ease-out"
+              width="1200"
+              height="800"
+              loading="lazy"
+              decoding="async"
+              className="w-full h-full object-cover transition-all duration-500 ease-out"
             />
 
             {/* Close Button Top Right for Mobile */}
             <button
               onClick={closeProjectModal}
               aria-label="Close Modal"
-              className="lg:hidden absolute top-4 right-4 w-9 h-9 rounded-full bg-black/80 text-white flex items-center justify-center backdrop-blur-md focus:outline-none"
+              className="lg:hidden absolute top-4 right-4 w-9 h-9 rounded-full bg-black/80 text-white flex items-center justify-center backdrop-blur-md focus:outline-none touch-manipulation"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -304,13 +319,9 @@ export default function ProjectPage({ onNavigate }) {
             {/* Navigation Arrows at Bottom Right */}
             <div className="absolute bottom-6 right-6 flex items-center gap-3 z-30">
               <button
-                onClick={() =>
-                  setActiveGalleryIndex(
-                    (prev) => (prev - 1 + selectedProject.gallery.length) % selectedProject.gallery.length
-                  )
-                }
+                onClick={prevGalleryImg}
                 aria-label="Previous Image"
-                className="w-11 h-11 sm:w-12 sm:h-12 rounded-full border border-white/20 bg-black/60 backdrop-blur-md flex items-center justify-center text-white hover:border-[#710014] hover:bg-[#710014] transition-all duration-300 cursor-pointer focus:outline-none"
+                className="w-11 h-11 sm:w-12 sm:h-12 rounded-full border border-white/20 bg-black/60 backdrop-blur-md flex items-center justify-center text-white hover:border-[#710014] hover:bg-[#710014] transition-all duration-300 cursor-pointer focus:outline-none touch-manipulation"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
@@ -318,13 +329,9 @@ export default function ProjectPage({ onNavigate }) {
               </button>
 
               <button
-                onClick={() =>
-                  setActiveGalleryIndex(
-                    (prev) => (prev + 1) % selectedProject.gallery.length
-                  )
-                }
+                onClick={nextGalleryImg}
                 aria-label="Next Image"
-                className="w-11 h-11 sm:w-12 sm:h-12 rounded-full border border-white/20 bg-black/60 backdrop-blur-md flex items-center justify-center text-white hover:border-[#710014] hover:bg-[#710014] transition-all duration-300 cursor-pointer focus:outline-none"
+                className="w-11 h-11 sm:w-12 sm:h-12 rounded-full border border-white/20 bg-black/60 backdrop-blur-md flex items-center justify-center text-white hover:border-[#710014] hover:bg-[#710014] transition-all duration-300 cursor-pointer focus:outline-none touch-manipulation"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
@@ -355,3 +362,6 @@ export default function ProjectPage({ onNavigate }) {
     </div>
   );
 }
+
+export default memo(ProjectPage);
+

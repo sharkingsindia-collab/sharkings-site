@@ -1,4 +1,4 @@
-import { useState, useRef, memo } from 'react';
+import { useState, useCallback, memo } from 'react';
 import { useScrollReveal } from '../../hooks/useScrollReveal';
 import { sendContactEmail } from '../../utils/emailService';
 
@@ -25,10 +25,8 @@ const FAQ_ITEMS = [
   }
 ];
 
-function GetInTouch({ getInTouchRef, isDesktop }) {
+function GetInTouch({ getInTouchRef }) {
   useScrollReveal();
-  const cardRef = useRef(null);
-  const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
   const [openFaqIdx, setOpenFaqIdx] = useState(0);
 
   const [formState, setFormState] = useState({
@@ -40,36 +38,23 @@ function GetInTouch({ getInTouchRef, isDesktop }) {
   });
 
   const [submitted, setSubmitted] = useState(false);
-
-  const handleMouseMove = (e) => {
-    if (!isDesktop || !cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const xc = rect.width / 2;
-    const yc = rect.height / 2;
-    const dx = (x - xc) / xc;
-    const dy = (y - yc) / yc;
-
-    setMouseOffset({
-      x: dx * 3,
-      y: -dy * 3
-    });
-  };
-
-  const handleMouseLeave = () => {
-    setMouseOffset({ x: 0, y: 0 });
-  };
-
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     await sendContactEmail(formState);
     setIsSubmitting(false);
     setSubmitted(true);
-  };
+  }, [formState]);
+
+  const handleInputChange = useCallback((field, value) => {
+    setFormState((prev) => ({ ...prev, [field]: value }));
+  }, []);
+
+  const toggleFaq = useCallback((idx) => {
+    setOpenFaqIdx((prev) => (prev === idx ? -1 : idx));
+  }, []);
 
   return (
     <section
@@ -113,13 +98,6 @@ function GetInTouch({ getInTouchRef, isDesktop }) {
           {/* LEFT COLUMN: Form (7 Cols) */}
           <div className="lg:col-span-7 reveal-3d-popup delay-100">
             <div
-              ref={cardRef}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-              style={{
-                transform: isDesktop ? `perspective(1200px) rotateY(${mouseOffset.x}deg) rotateX(${mouseOffset.y}deg)` : 'none',
-                transition: 'transform 0.15s ease-out'
-              }}
               className="w-full bg-white border border-black/10 p-6 md:p-10 shadow-[0_25px_70px_rgba(0,0,0,0.05)] relative overflow-hidden space-y-6"
             >
               <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-[#710014] to-transparent" />
@@ -145,7 +123,7 @@ function GetInTouch({ getInTouchRef, isDesktop }) {
                   <button
                     type="button"
                     onClick={() => setSubmitted(false)}
-                    className="px-6 py-2.5 bg-[#f6f5f1] border border-black/10 text-luxury-charcoal text-xs font-sans font-bold tracking-widest uppercase hover:bg-[#710014] hover:text-white transition-colors"
+                    className="px-6 py-2.5 bg-[#f6f5f1] border border-black/10 text-luxury-charcoal text-xs font-sans font-bold tracking-widest uppercase hover:bg-[#710014] hover:text-white transition-colors touch-manipulation"
                   >
                     Send Another Message
                   </button>
@@ -164,7 +142,7 @@ function GetInTouch({ getInTouchRef, isDesktop }) {
                         required
                         placeholder="E.g., Rajesh Kumar"
                         value={formState.name}
-                        onChange={(e) => setFormState({ ...formState, name: e.target.value })}
+                        onChange={(e) => handleInputChange('name', e.target.value)}
                         className="w-full px-4 py-3 bg-[#f6f5f1] border border-black/10 text-xs md:text-sm font-sans text-[#1a1a1a] placeholder:text-black/30 focus:outline-none focus:border-[#710014] transition-colors"
                       />
                     </div>
@@ -178,7 +156,7 @@ function GetInTouch({ getInTouchRef, isDesktop }) {
                         required
                         placeholder="name@example.com"
                         value={formState.email}
-                        onChange={(e) => setFormState({ ...formState, email: e.target.value })}
+                        onChange={(e) => handleInputChange('email', e.target.value)}
                         className="w-full px-4 py-3 bg-[#f6f5f1] border border-black/10 text-xs md:text-sm font-sans text-[#1a1a1a] placeholder:text-black/30 focus:outline-none focus:border-[#710014] transition-colors"
                       />
                     </div>
@@ -195,7 +173,7 @@ function GetInTouch({ getInTouchRef, isDesktop }) {
                         required
                         placeholder="+91 80980 XXXXX"
                         value={formState.phone}
-                        onChange={(e) => setFormState({ ...formState, phone: e.target.value })}
+                        onChange={(e) => handleInputChange('phone', e.target.value)}
                         className="w-full px-4 py-3 bg-[#f6f5f1] border border-black/10 text-xs md:text-sm font-sans text-[#1a1a1a] placeholder:text-black/30 focus:outline-none focus:border-[#710014] transition-colors"
                       />
                     </div>
@@ -206,7 +184,7 @@ function GetInTouch({ getInTouchRef, isDesktop }) {
                       </label>
                       <select
                         value={formState.subject}
-                        onChange={(e) => setFormState({ ...formState, subject: e.target.value })}
+                        onChange={(e) => handleInputChange('subject', e.target.value)}
                         className="w-full px-4 py-3 bg-[#f6f5f1] border border-black/10 text-xs md:text-sm font-sans text-[#1a1a1a] focus:outline-none focus:border-[#710014] transition-colors cursor-pointer"
                       >
                         <option value="Modular Kitchen">Modular Kitchen</option>
@@ -227,7 +205,7 @@ function GetInTouch({ getInTouchRef, isDesktop }) {
                       rows={3}
                       placeholder="Share a bit about your rooms, ideas, or questions..."
                       value={formState.message}
-                      onChange={(e) => setFormState({ ...formState, message: e.target.value })}
+                      onChange={(e) => handleInputChange('message', e.target.value)}
                       className="w-full px-4 py-3 bg-[#f6f5f1] border border-black/10 text-xs md:text-sm font-sans text-[#1a1a1a] placeholder:text-black/30 focus:outline-none focus:border-[#710014] transition-colors resize-none"
                     />
                   </div>
@@ -241,7 +219,7 @@ function GetInTouch({ getInTouchRef, isDesktop }) {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full sm:w-auto px-8 py-4 bg-[#710014] text-white text-xs font-sans font-extrabold tracking-widest uppercase hover:bg-[#580010] transition-all shadow-lg shadow-[#710014]/20 cursor-pointer flex items-center justify-center gap-2 group disabled:opacity-60"
+                      className="w-full sm:w-auto px-8 py-4 bg-[#710014] text-white text-xs font-sans font-extrabold tracking-widest uppercase hover:bg-[#580010] transition-all shadow-lg shadow-[#710014]/20 cursor-pointer flex items-center justify-center gap-2 group disabled:opacity-60 touch-manipulation"
                     >
                       {isSubmitting ? (
                         <>
@@ -283,7 +261,7 @@ function GetInTouch({ getInTouchRef, isDesktop }) {
                   </div>
                   <div>
                     <span className="text-[10px] font-bold tracking-widest text-[#710014] uppercase block mb-0.5">CALL US</span>
-                    <a href="tel:+918098090204" className="text-sm font-bold text-[#710014] hover:underline">
+                    <a href="tel:+918098090204" className="text-sm font-bold text-[#710014] hover:underline touch-manipulation">
                       +91 80980 90204
                     </a>
                   </div>
@@ -297,7 +275,7 @@ function GetInTouch({ getInTouchRef, isDesktop }) {
                   </div>
                   <div>
                     <span className="text-[10px] font-bold tracking-widest text-[#710014] uppercase block mb-0.5">EMAIL US</span>
-                    <a href="mailto:sharkingsindia@gmail.com" className="text-xs font-medium text-luxury-charcoal/80 hover:text-[#710014] transition-colors">
+                    <a href="mailto:sharkingsindia@gmail.com" className="text-xs font-medium text-luxury-charcoal/80 hover:text-[#710014] transition-colors touch-manipulation">
                       sharkingsindia@gmail.com
                     </a>
                   </div>
@@ -318,8 +296,8 @@ function GetInTouch({ getInTouchRef, isDesktop }) {
                     <div key={idx} className="border-b border-black/5 pb-3 last:border-0 last:pb-0">
                       <button
                         type="button"
-                        onClick={() => setOpenFaqIdx(isOpen ? -1 : idx)}
-                        className="w-full flex items-center justify-between text-left font-sans text-xs md:text-sm font-semibold text-[#1a1a1a] hover:text-[#710014] transition-colors py-1 cursor-pointer"
+                        onClick={() => toggleFaq(idx)}
+                        className="w-full flex items-center justify-between text-left font-sans text-xs md:text-sm font-semibold text-[#1a1a1a] hover:text-[#710014] transition-colors py-1 cursor-pointer touch-manipulation"
                       >
                         <div className="flex items-center gap-2.5 pr-2">
                           <span className="text-[10px] font-bold text-[#710014] bg-[#710014]/10 border border-[#710014]/20 px-2 py-0.5">
@@ -350,13 +328,13 @@ function GetInTouch({ getInTouchRef, isDesktop }) {
               </span>
 
               <div className="flex items-center gap-2.5">
-                <a href="https://instagram.com" target="_blank" rel="noreferrer" className="w-9 h-9 bg-[#f6f5f1] border border-black/10 text-luxury-charcoal hover:border-[#710014] hover:bg-[#710014] hover:text-white transition-all flex items-center justify-center">
+                <a href="https://instagram.com" target="_blank" rel="noreferrer" className="w-9 h-9 bg-[#f6f5f1] border border-black/10 text-luxury-charcoal hover:border-[#710014] hover:bg-[#710014] hover:text-white transition-all flex items-center justify-center touch-manipulation">
                   <svg className="w-4 h-4 fill-currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" /></svg>
                 </a>
-                <a href="https://facebook.com" target="_blank" rel="noreferrer" className="w-9 h-9 bg-[#f6f5f1] border border-black/10 text-luxury-charcoal hover:border-[#710014] hover:bg-[#710014] hover:text-white transition-all flex items-center justify-center">
+                <a href="https://facebook.com" target="_blank" rel="noreferrer" className="w-9 h-9 bg-[#f6f5f1] border border-black/10 text-luxury-charcoal hover:border-[#710014] hover:bg-[#710014] hover:text-white transition-all flex items-center justify-center touch-manipulation">
                   <svg className="w-4 h-4 fill-currentColor" viewBox="0 0 24 24"><path d="M9 8H6v4h3v12h5V12h3.642L18 8h-4V6.333C14 5.374 14.5 5 15.5 5H18V0h-3.808C10.592 0 9 1.583 9 4.615V8z" /></svg>
                 </a>
-                <a href="https://youtube.com" target="_blank" rel="noreferrer" className="w-9 h-9 bg-[#f6f5f1] border border-black/10 text-luxury-charcoal hover:border-[#710014] hover:bg-[#710014] hover:text-white transition-all flex items-center justify-center">
+                <a href="https://youtube.com" target="_blank" rel="noreferrer" className="w-9 h-9 bg-[#f6f5f1] border border-black/10 text-luxury-charcoal hover:border-[#710014] hover:bg-[#710014] hover:text-white transition-all flex items-center justify-center touch-manipulation">
                   <svg className="w-4 h-4 fill-currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" /></svg>
                 </a>
               </div>
