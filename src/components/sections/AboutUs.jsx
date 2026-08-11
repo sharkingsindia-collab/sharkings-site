@@ -171,7 +171,7 @@ function AboutUs({ onNavigate }) {
             <div className="relative rounded-3xl overflow-hidden shadow-[0_25px_70px_rgba(0,0,0,0.1)] border border-black/10 group">
 
               <img
-                src={homeInteriorImg}
+                src="/showrrom.png"
                 alt="Sharkings Full Service Living Interior"
                 width="600"
                 height="750"
