@@ -55,9 +55,9 @@ function Footer({ onNavigate }) {
                 <h4 className="font-display text-sm sm:text-lg font-bold text-white tracking-wider uppercase leading-none">
                   SHARKINGS INTERIORS & EXTERIORS
                 </h4>
-                <span className="text-[8px] sm:text-[9px] font-sans font-bold tracking-[0.25em] text-[#c5a059] uppercase block mt-1">
+                {/* <span className="text-[8px] sm:text-[9px] font-sans font-bold tracking-[0.25em] text-[#c5a059] uppercase block mt-1">
                   FULL-SERVICE INTERIOR DESIGN FIRM
-                </span>
+                </span> */}
               </div>
             </div>
 
@@ -226,7 +226,7 @@ function Footer({ onNavigate }) {
         </div>
 
         {/* SEO POPULAR SEARCH DIRECTORY */}
-        <div className="border-t border-[#c5a059]/20 pt-6 space-y-3 font-sans text-[11px] text-white/60">
+        {/* <div className="border-t border-[#c5a059]/20 pt-6 space-y-3 font-sans text-[11px] text-white/60">
           <div className="flex items-center justify-between cursor-pointer group touch-manipulation" onClick={toggleSeoDirectory}>
             <h5 className="font-display text-[11px] font-bold text-[#c5a059] tracking-[0.2em] uppercase flex items-center gap-2">
               <span>Popular Interior Searches — Madurai & Ramanathapuram (Ramnad)</span>
@@ -254,7 +254,7 @@ function Footer({ onNavigate }) {
               </div>
             </div>
           )}
-        </div>
+        </div> */}
 
         {/* MINIMAL FOOTER SUB-BAR */}
         <div className="border-t border-[#c5a059]/20 pt-4 sm:pt-6 flex flex-col sm:flex-row items-center justify-between gap-2 font-sans text-[10px] sm:text-[11px] text-white/50 text-center sm:text-left">

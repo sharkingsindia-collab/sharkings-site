@@ -339,7 +339,7 @@ function Showrooms({ showroomRef, isDesktop = true }) {
             <div className="lg:col-span-7 relative flex flex-col h-full min-h-[400px] lg:min-h-[460px]">
 
               {/* Top Right Floating Mode Switcher */}
-              <div className="absolute top-4 right-4 z-30 flex items-center gap-2">
+              {/* <div className="absolute top-4 right-4 z-30 flex items-center gap-2">
                 {activeMediaType === 'gallery' ? (
                   <>
                     <button
@@ -375,7 +375,7 @@ function Showrooms({ showroomRef, isDesktop = true }) {
                     <span className="text-[#c5a059] group-hover:translate-x-0.5 transition-transform">→</span>
                   </button>
                 )}
-              </div>
+              </div> */}
 
               {/* Map View / Gallery Container (Fills 100% Height & Width) */}
               <div className="w-full h-full min-h-[400px] lg:min-h-[460px] rounded-2xl overflow-hidden border border-black/10 relative bg-[#eae8e3] flex-1">
