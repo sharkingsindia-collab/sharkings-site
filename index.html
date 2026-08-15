@@ -60,11 +60,52 @@
   <link rel="shortcut icon" href="/favicon.ico" />
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 
-  <!-- Schema.org JSON-LD Structured Data for Local Business SEO & Sitelinks -->
+  <!-- Schema.org JSON-LD Structured Data for Local Business SEO, Knowledge Graph & Sitelinks -->
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://www.sharkingsinteriors.in/#organization",
+          "name": "Sharkings Interiors & Exteriors",
+          "legalName": "Sharkings Interiors & Exteriors",
+          "alternateName": [
+            "Sharkings",
+            "Sharkings Interior",
+            "Sharkings Interiors",
+            "Sharkings Interior Design",
+            "Sharkings Madurai",
+            "Sharkings Ramanathapuram",
+            "Sharkings Ramnad",
+            "Top interior designers in Madurai",
+            "Top interior designers in Ramanathapuram",
+            "Best interior designers in Madurai",
+            "Best interior designers in Ramanathapuram"
+          ],
+          "url": "https://www.sharkingsinteriors.in",
+          "logo": "https://www.sharkingsinteriors.in/slogo.webp",
+          "image": "https://www.sharkingsinteriors.in/showrrom.png",
+          "description": "Mobile: +91 80980 90204. Full-service interior & exterior design firm and modular kitchen specialist in Madurai and Ramanathapuram since 2010.",
+          "disambiguatingDescription": "Official and active website of Sharkings Interiors & Exteriors (consolidating former domain presence from sharkingsinterior.in and sharkingsinterior.com) with flagship design centres in Madurai and Ramanathapuram.",
+          "telephone": "+91 80980 90204",
+          "email": "sharkingsindia@gmail.com",
+          "foundingDate": "2010",
+          "sameAs": [
+            "https://www.instagram.com/sharkings_interiors",
+            "https://www.facebook.com/sharkingsinteriors",
+            "https://www.sharkingsinteriors.in",
+            "https://sharkingsinterior.in",
+            "https://sharkingsinterior.com"
+          ],
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.9",
+            "reviewCount": "148",
+            "bestRating": "5",
+            "worstRating": "1"
+          }
+        },
         {
           "@type": "WebSite",
           "@id": "https://www.sharkingsinteriors.in/#website",
@@ -72,13 +113,37 @@
           "alternateName": ["Sharkings", "Sharkings Interior", "Sharkings Interiors", "Sharkings Madurai", "Sharkings Ramanathapuram", "Sharkings Ramnad"],
           "url": "https://www.sharkingsinteriors.in",
           "description": "Mobile: +91 80980 90204. Specializing in both residential and commercial design. Best interior designers in Madurai & Ramanathapuram since 2010.",
-          "publisher": { "@id": "https://www.sharkingsinteriors.in/#madurai-store" },
+          "publisher": { "@id": "https://www.sharkingsinteriors.in/#organization" },
           "inLanguage": "en-IN",
           "potentialAction": {
             "@type": "SearchAction",
             "target": "https://www.sharkingsinteriors.in/?s={search_term_string}",
             "query-input": "required name=search_term_string"
           }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "@id": "https://www.sharkingsinteriors.in/#breadcrumbs",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://www.sharkingsinteriors.in/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Our Services",
+              "item": "https://www.sharkingsinteriors.in/services"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Completed Projects",
+              "item": "https://www.sharkingsinteriors.in/projects"
+            }
+          ]
         },
         {
           "@type": "SiteNavigationElement",
@@ -119,6 +184,7 @@
           "telephone": "+91 80980 90204",
           "email": "sharkingsindia@gmail.com",
           "priceRange": "$$",
+          "parentOrganization": { "@id": "https://www.sharkingsinteriors.in/#organization" },
           "description": "Mobile: +91 80980 90204. Specializing in both residential and commercial design. Plot no 3552, TNHB Colony, Villapuram, Madurai, Tamil Nadu 625001. Main Flagship Atelier & Spatial Gallery.",
           "address": {
             "@type": "PostalAddress",
@@ -177,8 +243,17 @@
           "sameAs": [
             "https://www.instagram.com/sharkings_interiors",
             "https://www.facebook.com/sharkingsinteriors",
-            "https://www.sharkingsinteriors.in"
+            "https://www.sharkingsinteriors.in",
+            "https://sharkingsinterior.in",
+            "https://sharkingsinterior.com"
           ],
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.9",
+            "reviewCount": "148",
+            "bestRating": "5",
+            "worstRating": "1"
+          },
           "hasOfferCatalog": {
             "@type": "OfferCatalog",
             "name": "Interior & Exterior Design Services",
@@ -207,6 +282,7 @@
           "telephone": "+91 80980 90204",
           "email": "sharkingsindia@gmail.com",
           "priceRange": "$$",
+          "parentOrganization": { "@id": "https://www.sharkingsinteriors.in/#organization" },
           "description": "Mobile: +91 80980 90204. Specializing in both residential and commercial design. Bus Stop, 13/2993/26, Madurai - Rameswaram Hwy, Subbaiah Nagar, Ram Nagar, Ramanathapuram, Tamil Nadu 623501.",
           "address": {
             "@type": "PostalAddress",
@@ -243,7 +319,7 @@
             "Thiruvadanai",
             "Sayalgudi",
             "Mandapam",
-            "Erwadi",
+            "Ervadi",
             "Sivagangai",
             "Manamadurai",
             "Karaikudi",
@@ -251,8 +327,18 @@
           ],
           "sameAs": [
             "https://www.instagram.com/sharkings_interiors",
-            "https://www.facebook.com/sharkingsinteriors"
-          ]
+            "https://www.facebook.com/sharkingsinteriors",
+            "https://www.sharkingsinteriors.in",
+            "https://sharkingsinterior.in",
+            "https://sharkingsinterior.com"
+          ],
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.9",
+            "reviewCount": "148",
+            "bestRating": "5",
+            "worstRating": "1"
+          }
         },
         {
           "@type": "FAQPage",
