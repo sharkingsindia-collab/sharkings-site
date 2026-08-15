@@ -118,11 +118,11 @@ function Footer({ onNavigate }) {
               </li>
               <li>
                 <a
-                  href="#/services"
+                  href="/services"
                   onClick={(e) => {
                     e.preventDefault();
                     if (onNavigate) onNavigate('services');
-                    else window.location.hash = '#/services';
+                    else window.history.pushState({ page: 'services' }, '', '/services');
                   }}
                   className="hover:text-[#c5a059] transition-colors flex items-center gap-1.5 touch-manipulation"
                 >
@@ -143,11 +143,11 @@ function Footer({ onNavigate }) {
               </li>
               <li>
                 <a
-                  href="#/projects"
+                  href="/projects"
                   onClick={(e) => {
                     e.preventDefault();
                     if (onNavigate) onNavigate('projects');
-                    else window.location.hash = '#/projects';
+                    else window.history.pushState({ page: 'projects' }, '', '/projects');
                   }}
                   className="hover:text-[#c5a059] transition-colors flex items-center gap-1.5 touch-manipulation"
                 >

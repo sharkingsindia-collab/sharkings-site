@@ -262,7 +262,7 @@ function Hero({
                         style={{ transitionDelay: '0ms' }}
                       >
                         <a
-                          href="#/projects"
+                          href="/projects"
                           onClick={(e) => {
                             e.preventDefault();
                             onNavigate && onNavigate('projects');
