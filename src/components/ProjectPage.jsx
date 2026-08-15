@@ -20,6 +20,29 @@ import f6 from '../assets/FacetoFace/sharking6.webp';
 import f07 from '../assets/FacetoFace/sharking07.webp';
 import f8 from '../assets/FacetoFace/sharking8.webp';
 
+// Home Decor Project Assets
+import h1 from '../assets/HomeDec/h1.jpg';
+import h2 from '../assets/HomeDec/h2.jpg';
+import h3 from '../assets/HomeDec/h3.jpg';
+import h4 from '../assets/HomeDec/h4.jpg';
+import h5 from '../assets/HomeDec/h5.jpg';
+import h6 from '../assets/HomeDec/h6.jpg';
+import h7 from '../assets/HomeDec/h7.jpg';
+import h8 from '../assets/HomeDec/h8.jpg';
+import h9 from '../assets/HomeDec/h9.jpg';
+import h10 from '../assets/HomeDec/h10.jpg';
+import h11 from '../assets/HomeDec/h11.jpg';
+import h12 from '../assets/HomeDec/h12.jpg';
+import h13 from '../assets/HomeDec/h13.jpg';
+import h14 from '../assets/HomeDec/h14.jpg';
+import h15 from '../assets/HomeDec/h15.jpg';
+import h16 from '../assets/HomeDec/h16.jpg';
+
+// Sofa Decor Project Assets
+import s1 from '../assets/SofaDec/s1.jpg';
+import s2 from '../assets/SofaDec/s2.jpg';
+import s3 from '../assets/SofaDec/s3.jpg';
+
 const PROJECTS_DATA = [
   {
     id: 'billionaires-project',
@@ -36,6 +59,22 @@ const PROJECTS_DATA = [
     description: 'A complete beauty and wellness studio completed in Ramanathapuram. Built with practical styling layouts, soft relaxing lighting, and clean finishes for a welcoming, calm space.',
     coverImage: f1,
     gallery: [f1, f01, f3, f4, f5, f6, f07, f8]
+  },
+  {
+    id: 'home-decor-project',
+    title: 'Home Decor & Interior Showcase',
+    category: 'RESIDENTIAL DECOR & INTERIORS',
+    description: 'A comprehensive home decor and bespoke interior project showcasing elegant residential spaces, custom wall accents, curated furniture styling, and luxury interior finishing.',
+    coverImage: h4,
+    gallery: [h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14, h15, h16]
+  },
+  {
+    id: 'sofa-decor-project',
+    title: 'Custom Sofa & Lounge Collection',
+    category: 'LUXURY FURNITURE & SOFA DECOR',
+    description: 'A handcrafted custom sofa and living lounge interior suite featuring premium upholstery, ergonomic sectional designs, and tailored living room aesthetics.',
+    coverImage: s1,
+    gallery: [s1, s2, s3]
   }
 ];
 

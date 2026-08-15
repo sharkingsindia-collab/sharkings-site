@@ -9,6 +9,10 @@ import f1 from '../../assets/FacetoFace/sharking1.webp';
 import f3 from '../../assets/FacetoFace/sharking3.webp';
 import f4 from '../../assets/FacetoFace/sharking4.webp';
 
+// Home Decor & Sofa Decor Assets
+import h1 from '../../assets/HomeDec/h4.jpg';
+import s1 from '../../assets/SofaDec/s1.jpg';
+
 // Core Service & Project Assets
 import homeInteriorImg from '../../assets/home-interior.webp';
 import modularKitchenImg from '../../assets/modular-kitchen.webp';
@@ -169,6 +173,40 @@ const PROJECTS_DATA = [
       { name: 'Teak Wood Veneer', color: '#795548' },
       { name: 'Brushed Brass', color: '#d4af37' },
       { name: 'Velvet Trim', color: '#556b2f' }
+    ]
+  },
+  {
+    id: 10,
+    category: 'RESIDENTIAL',
+    branch: 'MADURAI BRANCH',
+    image: h1,
+    title: 'Home Decor & Interior Suite',
+    description: 'An elegant home interior and decor suite showcasing custom wall cladding, curated furnishings, lighting design, and contemporary residential styling.',
+    tags: ['Home Decor', 'Residential Interiors', 'Custom Paneling', 'Ambient Lighting'],
+    architect: 'R. K. SIVANESH',
+    sqft: '3,100 SQ. FT.',
+    materials: [
+      { name: 'Warm Oak Veneer', color: '#8a6543' },
+      { name: 'Bespoke Wall Accent', color: '#dcc6a8' },
+      { name: 'Satin Brass Trim', color: '#cfb53b' },
+      { name: 'Italian Marble', color: '#eaeaea' }
+    ]
+  },
+  {
+    id: 11,
+    category: 'RESIDENTIAL',
+    branch: 'RAMANATHAPURAM BRANCH',
+    image: s1,
+    title: 'Custom Sofa & Lounge Collection',
+    description: 'Handcrafted luxury sofa and upholstery lounge suite featuring ergonomic seating, premium velvet finishes, and bespoke living room aesthetics.',
+    tags: ['Sofa Decor', 'Custom Upholstery', 'Luxury Lounge', 'Living Room'],
+    architect: 'A. MEERA',
+    sqft: '2,200 SQ. FT.',
+    materials: [
+      { name: 'Velvet Upholstery', color: '#38000a' },
+      { name: 'Polished Brass Legs', color: '#d4af37' },
+      { name: 'Smoked Glass Table', color: '#333333' },
+      { name: 'Charcoal Fabric', color: '#2a2a2a' }
     ]
   }
 ];
