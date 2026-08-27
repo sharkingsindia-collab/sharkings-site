@@ -171,7 +171,7 @@ function Navbar({ onNavigate }) {
               height="40"
               loading="eager"
               decoding="async"
-              fetchpriority="high"
+              fetchPriority="high"
               className="h-7 sm:h-8 md:h-10 w-auto object-contain transition-all duration-300 opacity-90 group-hover:opacity-100 group-hover:scale-[1.03] mix-blend-multiply"
             />
           </a>

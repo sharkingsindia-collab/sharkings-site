@@ -34,35 +34,8 @@ function BeforeAfter() {
     updateDOMSlider(percentage);
   }, [updateDOMSlider]);
 
-  // Smooth scroll-driven automated comparison reveal when entering viewport
   useEffect(() => {
-    const handleScroll = () => {
-      if (isDraggingRef.current || !containerRef.current) return;
-      if (rafIdRef.current) return;
-
-      rafIdRef.current = requestAnimationFrame(() => {
-        rafIdRef.current = null;
-        if (!containerRef.current) return;
-        const rect = containerRef.current.getBoundingClientRect();
-        const viewportHeight = window.innerHeight;
-        const totalDist = rect.height + viewportHeight;
-        const scrolled = viewportHeight - rect.top;
-
-        if (scrolled >= 0 && scrolled <= totalDist) {
-          const prog = Math.min(Math.max(0, scrolled / totalDist), 1);
-          const percentage = 20 + prog * 60;
-          updateDOMSlider(percentage);
-        }
-      });
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
     updateDOMSlider(50);
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
-    };
   }, [updateDOMSlider]);
 
   // Global Pointer Events for smooth drag outside component bounds
@@ -93,7 +66,7 @@ function BeforeAfter() {
   };
 
   return (
-    <section id="transformation" className="relative z-30 bg-[#fbf9f6] text-luxury-charcoal py-20 px-6 md:px-16 lg:px-24 border-t border-black/5 overflow-hidden">
+    <section id="transformation" className="relative z-30 bg-[#fbf9f6] text-luxury-charcoal py-14 sm:py-20 px-4 sm:px-8 md:px-16 lg:px-24 border-t border-black/5 overflow-hidden">
       {/* Background Watermark */}
       <div className="absolute font-display text-[16vw] text-[#710014]/[0.02] font-extralight select-none pointer-events-none z-0 left-0 top-1/3 whitespace-nowrap">
         LIVE TRANSFORMATION
@@ -105,17 +78,17 @@ function BeforeAfter() {
         <div className="text-center max-w-3xl mx-auto space-y-3 reveal-3d-popup">
           <div className="flex items-center justify-center gap-3">
             <span className="w-8 h-[1px] bg-[#710014]/30" />
-            <span className="font-sans text-[10px] md:text-xs font-bold tracking-[0.35em] text-[#710014] uppercase">
+            <span className="font-sans text-xs md:text-sm font-extrabold tracking-[0.35em] text-[#710014] uppercase">
               INTERACTIVE COMPARISON
             </span>
             <span className="w-8 h-[1px] bg-[#710014]/30" />
           </div>
 
-          <h2 className="font-display text-3xl md:text-5xl lg:text-6xl font-light text-[#1a1a1a] tracking-tight">
+          <h2 className="font-display text-3xl sm:text-5xl lg:text-6xl font-normal text-[#1a1a1a] tracking-tight">
             The Art of Sharkings <span className="italic font-normal text-[#710014]">Design</span>
           </h2>
 
-          <p className="font-sans text-xs md:text-sm text-luxury-charcoal/70 leading-relaxed font-light max-w-2xl mx-auto">
+          <p className="font-sans text-sm md:text-base text-luxury-charcoal/75 leading-relaxed font-medium max-w-2xl mx-auto">
             Drag the slider to compare before-and-after layouts and see how a custom design completely changes the space.
           </p>
         </div>
@@ -138,8 +111,8 @@ function BeforeAfter() {
               className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
             />
             {/* Tag (Right aligned) */}
-            <div className="absolute top-6 right-6 z-10 pointer-events-none">
-              <span className="bg-[#121622] text-white border border-white/20 px-3.5 py-1.5 rounded-lg text-[9px] font-sans font-bold tracking-[0.2em] uppercase shadow-md">
+            <div className="absolute top-3 right-3 sm:top-6 sm:right-6 z-10 pointer-events-none">
+              <span className="bg-[#121622] text-white border border-white/20 px-2.5 py-1 sm:px-3.5 sm:py-1.5 rounded-lg text-[9px] sm:text-[11px] font-sans font-extrabold tracking-[0.15em] sm:tracking-[0.2em] uppercase shadow-md">
                 BEFORE: BARE SITE FRAME
               </span>
             </div>
@@ -161,9 +134,9 @@ function BeforeAfter() {
               className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
             />
             {/* Tag (Left aligned) */}
-            <div className="absolute top-6 left-6 z-10 pointer-events-none">
-              <span className="bg-luxury-sage text-luxury-cream border border-luxury-sage/30 px-3.5 py-1.5 rounded-lg text-[9px] font-sans font-bold tracking-[0.2em] uppercase shadow-lg">
-                AFTER: SHARKINGS MODULAR KITCHEN
+            <div className="absolute top-3 left-3 sm:top-6 sm:left-6 z-10 pointer-events-none">
+              <span className="bg-luxury-sage text-luxury-cream border border-luxury-sage/30 px-2.5 py-1 sm:px-3.5 sm:py-1.5 rounded-lg text-[9px] sm:text-[11px] font-sans font-extrabold tracking-[0.15em] sm:tracking-[0.2em] uppercase shadow-lg">
+                AFTER: MODULAR KITCHEN
               </span>
             </div>
           </div>
@@ -191,7 +164,7 @@ function BeforeAfter() {
 
         {/* Drag Helper tip under card */}
         <div className="text-center">
-          <p className="font-sans text-[10px] tracking-[0.2em] uppercase text-luxury-charcoal/50">
+          <p className="font-sans text-xs font-semibold tracking-[0.2em] uppercase text-luxury-charcoal/60">
             ← Drag gold handle to compare before & after →
           </p>
         </div>

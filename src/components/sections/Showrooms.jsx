@@ -104,34 +104,6 @@ function Showrooms({ showroomRef, isDesktop = true }) {
     return () => observer.disconnect();
   }, [showroomRef]);
 
-  // Local scroll-driven parallax for watermark (ref-based, no setState)
-  useEffect(() => {
-    const section = showroomRef?.current;
-    if (!section) return;
-
-    const handleScroll = () => {
-      if (rafRef.current) return;
-      rafRef.current = requestAnimationFrame(() => {
-        rafRef.current = null;
-        const rect = section.getBoundingClientRect();
-        const vh = window.innerHeight;
-        const totalDist = rect.height + vh;
-        const scrolled = vh - rect.top;
-        const prog = Math.min(Math.max(0, scrolled / totalDist), 1);
-        scrollProgressRef.current = prog;
-        if (watermarkRef.current) {
-          watermarkRef.current.style.transform = `translateX(${(prog - 0.5) * -120}px)`;
-        }
-      });
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
-  }, [showroomRef]);
-
   // Form state for booking modal
   const [bookingForm, setBookingForm] = useState({
     name: '',
@@ -169,13 +141,11 @@ function Showrooms({ showroomRef, isDesktop = true }) {
     <section
       ref={showroomRef}
       id="showrooms"
-      className="relative w-full py-28 bg-[#f8f7f3] text-luxury-charcoal overflow-hidden z-30 shadow-[0_-20px_50px_rgba(0,0,0,0.05)]"
+      className="relative w-full py-16 sm:py-28 bg-[#f8f7f3] text-luxury-charcoal overflow-hidden z-30 shadow-[0_-20px_50px_rgba(0,0,0,0.05)]"
     >
-      {/* Background Parallax Floating Watermark */}
+      {/* Background Floating Watermark */}
       <div
-        ref={watermarkRef}
         className="absolute font-display text-[18vw] text-[#710014]/[0.025] font-extralight select-none pointer-events-none z-0 left-0 top-1/4 whitespace-nowrap"
-        style={{ willChange: 'transform' }}
       >
         EXPERIENCE CENTRES
       </div>
@@ -184,36 +154,36 @@ function Showrooms({ showroomRef, isDesktop = true }) {
       <div className="absolute top-1/3 -left-32 w-[600px] h-[600px] bg-[#710014]/[0.04] rounded-full blur-[150px] pointer-events-none z-0" />
       <div className="absolute bottom-10 right-0 w-[550px] h-[550px] bg-[#838f6f]/[0.04] rounded-full blur-[140px] pointer-events-none z-0" />
 
-      <div className="max-w-7xl mx-auto w-full px-6 md:px-16 lg:px-24 relative z-10 space-y-12">
+      <div className="max-w-7xl mx-auto w-full px-4 sm:px-8 md:px-16 lg:px-24 relative z-10 space-y-12">
 
         {/* SECTION HEADER (Rich Light Theme with Royal Burgundy Accent) */}
         <div className="text-center max-w-3xl mx-auto space-y-4 reveal-3d-popup">
           <div className="flex items-center justify-center gap-3">
             <span className="w-8 h-[1px] bg-[#710014]/30" />
-            <span className="font-sans text-[10px] md:text-xs font-bold tracking-[0.35em] text-[#710014] uppercase">
+            <span className="font-sans text-xs md:text-sm font-extrabold tracking-[0.35em] text-[#710014] uppercase">
               OUR STUDIOS
             </span>
             <span className="w-8 h-[1px] bg-[#710014]/30" />
           </div>
 
-          <h2 className="font-display text-3xl md:text-5xl lg:text-6xl font-light text-[#1a1a1a] tracking-tight">
+          <h2 className="font-display text-3xl sm:text-5xl lg:text-6xl font-normal text-[#1a1a1a] tracking-tight">
             Visit Our <span className="italic font-normal text-[#710014]">Design Studios</span>
           </h2>
 
-          <p className="font-sans text-xs md:text-sm text-luxury-charcoal/70 leading-relaxed font-light max-w-2xl mx-auto">
+          <p className="font-sans text-sm md:text-base text-luxury-charcoal/75 leading-relaxed font-medium max-w-2xl mx-auto">
             Drop by our studio to check out real wood finishes, look at metal hardware in person, and chat with our designers over a cup of coffee to plan your space.
           </p>
 
           {/* LOCATION TABS SWITCHER (Royal Burgundy Pill Tabs) */}
           <div className="pt-6 flex items-center justify-center">
-            <div className="p-1 rounded-none bg-white border border-black/10 shadow-lg inline-flex items-center gap-1.5 relative">
+            <div className="p-1 rounded-none bg-white border border-black/10 shadow-lg inline-flex items-center gap-1.5 relative max-w-full">
               {SHOWROOMS_DATA.map((loc, idx) => {
                 const isActive = activeLocationIdx === idx;
                 return (
                   <button
                     key={loc.id}
                     onClick={() => handleTabSwitch(idx)}
-                    className={`px-8 py-3 rounded-none text-xs font-sans font-bold tracking-widest uppercase transition-all duration-300 flex items-center gap-2.5 cursor-pointer relative touch-manipulation ${isActive
+                    className={`px-4 py-2.5 sm:px-8 sm:py-3 rounded-none text-[11px] sm:text-sm font-sans font-bold tracking-wider sm:tracking-widest uppercase transition-all duration-300 flex items-center gap-1.5 sm:gap-2.5 cursor-pointer relative touch-manipulation ${isActive
                       ? 'bg-[#710014] text-white shadow-md font-extrabold'
                       : 'text-luxury-charcoal/70 hover:text-[#710014]'
                       }`}
@@ -245,14 +215,14 @@ function Showrooms({ showroomRef, isDesktop = true }) {
                 {/* Badge & Name */}
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <span className="px-3 py-1 rounded-full bg-[#710014]/10 text-[#710014] text-[9px] font-sans font-bold tracking-widest uppercase border border-[#710014]/20">
+                    <span className="px-3 py-1 rounded-full bg-[#710014]/10 text-[#710014] text-[11px] font-sans font-extrabold tracking-widest uppercase border border-[#710014]/20">
                       {currentLocation.badge}
                     </span>
-                    <span className="text-[10px] font-sans text-luxury-charcoal/50 font-medium">
+                    <span className="text-xs font-sans text-luxury-charcoal/60 font-semibold">
                       STUDIO LOCATION
                     </span>
                   </div>
-                  <h3 className="font-display text-2xl sm:text-3xl font-light text-luxury-charcoal">
+                  <h3 className="font-display text-2xl sm:text-3xl font-normal text-luxury-charcoal">
                     {currentLocation.name}
                   </h3>
                 </div>
@@ -268,8 +238,8 @@ function Showrooms({ showroomRef, isDesktop = true }) {
                       </svg>
                     </div>
                     <div>
-                      <span className="font-sans text-[10px] font-bold tracking-widest uppercase text-[#710014]/70 block mb-0.5">ADDRESS</span>
-                      <p className="font-sans text-xs text-luxury-charcoal/85 leading-relaxed font-medium">
+                      <span className="font-sans text-xs font-extrabold tracking-widest uppercase text-[#710014] block mb-0.5">ADDRESS</span>
+                      <p className="font-sans text-sm text-luxury-charcoal/90 leading-relaxed font-medium">
                         {currentLocation.address}
                       </p>
                     </div>
@@ -282,8 +252,8 @@ function Showrooms({ showroomRef, isDesktop = true }) {
                       </svg>
                     </div>
                     <div>
-                      <span className="font-sans text-[10px] font-bold tracking-widest uppercase text-[#710014]/70 block mb-0.5">PHONE & INQUIRIES</span>
-                      <p className="font-sans text-xs text-luxury-charcoal/85 leading-relaxed font-medium">
+                      <span className="font-sans text-xs font-extrabold tracking-widest uppercase text-[#710014] block mb-0.5">PHONE & INQUIRIES</span>
+                      <p className="font-sans text-sm text-luxury-charcoal/90 leading-relaxed font-bold">
                         {currentLocation.phone}
                       </p>
                     </div>
@@ -296,8 +266,8 @@ function Showrooms({ showroomRef, isDesktop = true }) {
                       </svg>
                     </div>
                     <div>
-                      <span className="font-sans text-[10px] font-bold tracking-widest uppercase text-[#710014]/70 block mb-0.5">VISITING HOURS</span>
-                      <p className="font-sans text-xs text-luxury-charcoal/85 leading-relaxed font-medium">
+                      <span className="font-sans text-xs font-extrabold tracking-widest uppercase text-[#710014] block mb-0.5">VISITING HOURS</span>
+                      <p className="font-sans text-sm text-luxury-charcoal/90 leading-relaxed font-medium">
                         {currentLocation.hours}
                       </p>
                     </div>

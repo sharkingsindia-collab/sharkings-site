@@ -5,42 +5,42 @@ const SPECIALTIES_DATA = [
     id: 1,
     title: 'Custom Veneers',
     tag: 'ORGANIC CARPENTRY',
-    image: '/images/service-furniture.png',
+    image: '/images/service-furniture.webp',
     description: 'Natural oak, teak, and solid walnut panels matching minimalist wood line aesthetics.'
   },
   {
     id: 2,
     title: 'Polished Brass',
     tag: 'METAL ARCHITECTURES',
-    image: '/images/slide-dining.png',
+    image: '/images/slide-dining.webp',
     description: 'Custom hand-finished golden grips, cabinet trim profiles, and premium metallic accents.'
   },
   {
     id: 3,
     title: 'Sensory Lights',
     tag: 'AMBIENCE CONCEPTS',
-    image: '/images/slide-bedroom.png',
+    image: '/images/slide-bedroom.webp',
     description: 'Low-glow uplighting arrays, twilight twilight dimming switches, and spotlight maps.'
   },
   {
     id: 4,
     title: 'Organic Marble',
     tag: 'SOLID STONE SLABS',
-    image: '/images/service-commercial.png',
+    image: '/images/service-commercial.webp',
     description: 'Hand-selected Nero Marquina, Carrara marble, and tactile travertine slabs.'
   },
   {
     id: 5,
     title: 'Tactile Plasters',
     tag: 'EARTHY WALL FINISHES',
-    image: '/images/slide-living.png',
+    image: '/images/slide-living.webp',
     description: 'Hand-applied charcoal plasters, premium raw stucco coatings, and textured finishes.'
   },
   {
     id: 6,
     title: 'Plush Textiles',
     tag: 'ORGANIC FIBERS',
-    image: '/images/service-residential.png',
+    image: '/images/service-residential.webp',
     description: 'Bespoke high-grade velvet, raw linen upholstery, and premium sensory carpets.'
   }
 ];

@@ -106,17 +106,17 @@ function CuratedAtelier({
         <div className="text-center max-w-3xl mx-auto space-y-3 reveal-3d-popup">
           <div className="flex items-center justify-center gap-3">
             <span className="w-8 h-[1px] bg-[#710014]/30" />
-            <span className="font-sans text-[10px] md:text-xs font-bold tracking-[0.35em] text-[#710014] uppercase">
+            <span className="font-sans text-xs md:text-sm font-extrabold tracking-[0.35em] text-[#710014] uppercase">
               WHAT WE DO
             </span>
             <span className="w-8 h-[1px] bg-[#710014]/30" />
           </div>
 
-          <h2 className="font-display text-3xl md:text-5xl lg:text-6xl font-light text-[#1a1a1a] tracking-tight">
+          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-normal text-[#1a1a1a] tracking-tight">
             Architectural Services & <span className="italic font-normal text-[#710014]">Portfolio</span>
           </h2>
 
-          <p className="font-sans text-xs md:text-sm text-luxury-charcoal/70 leading-relaxed font-light max-w-2xl mx-auto">
+          <p className="font-sans text-sm md:text-base text-luxury-charcoal/75 leading-relaxed font-medium max-w-2xl mx-auto">
             From modern residential homes to commercial offices and modular kitchens, we deliver high-quality interior design and factory setup across Tamil Nadu.
           </p>
         </div>
@@ -155,7 +155,7 @@ function CuratedAtelier({
             {/* Tag Capsule */}
             <div className="absolute top-4 left-4 lg:top-6 lg:left-6 z-30">
               <div className="bg-black/80 backdrop-blur-md border border-white/10 px-3.5 py-1.5 rounded-none">
-                <span className="font-sans text-[8px] lg:text-[9px] font-bold tracking-[0.25em] text-[#c5a059] uppercase">
+                <span className="font-sans text-[10px] lg:text-[11px] font-extrabold tracking-[0.25em] text-[#c5a059] uppercase">
                   ✦ {activeService.tag}
                 </span>
               </div>
@@ -166,7 +166,7 @@ function CuratedAtelier({
               <div className="font-display text-3xl lg:text-5xl font-extralight text-[#c5a059] leading-none">
                 {activeService.chapter}
               </div>
-              <div className="font-sans text-[7px] lg:text-[8px] font-bold tracking-[0.4em] text-white/50 uppercase">
+              <div className="font-sans text-[8px] lg:text-[10px] font-extrabold tracking-[0.4em] text-white/60 uppercase">
                 FEATURED SERVICE
               </div>
             </div>
@@ -182,7 +182,7 @@ function CuratedAtelier({
                 <button
                   key={tab.id}
                   onClick={() => setActiveTabIdx(idx)}
-                  className={`px-4 py-2 rounded-none font-sans text-[9px] lg:text-[10px] font-bold tracking-widest uppercase transition-all duration-200 flex-shrink-0 touch-manipulation ${
+                  className={`px-4 py-2 rounded-none font-sans text-[11px] lg:text-xs font-extrabold tracking-widest uppercase transition-all duration-200 flex-shrink-0 touch-manipulation ${
                     idx === activeTabIdx 
                       ? 'bg-[#710014] text-white shadow-md' 
                       : 'bg-transparent text-luxury-charcoal/50 border border-luxury-charcoal/10 hover:border-[#710014] hover:text-[#710014]'
@@ -196,15 +196,15 @@ function CuratedAtelier({
             {/* Content Panel */}
             <div className="space-y-4 lg:space-y-5 flex-grow flex flex-col justify-center">
               
-              <div className="font-sans text-[9px] lg:text-[10px] font-bold tracking-[0.3em] text-luxury-sage uppercase">
+              <div className="font-sans text-[11px] lg:text-xs font-extrabold tracking-[0.3em] text-luxury-sage uppercase">
                 {activeService.concept}
               </div>
 
-              <h3 className="font-display text-xl lg:text-3xl font-light text-luxury-charcoal tracking-wide uppercase">
+              <h3 className="font-display text-2xl lg:text-4xl font-normal text-luxury-charcoal tracking-wide uppercase">
                 {activeService.title}
               </h3>
 
-              <p className="font-sans text-xs lg:text-sm text-luxury-charcoal/75 leading-relaxed font-light">
+              <p className="font-sans text-sm lg:text-base text-luxury-charcoal/80 leading-relaxed font-medium">
                 {activeService.description}
               </p>
 
@@ -216,7 +216,7 @@ function CuratedAtelier({
                         <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                       </svg>
                     </div>
-                    <span className="font-sans text-xs text-luxury-charcoal/80 font-medium">
+                    <span className="font-sans text-sm text-luxury-charcoal/85 font-semibold">
                       {feature}
                     </span>
                   </div>
@@ -251,7 +251,7 @@ function CuratedAtelier({
 
               <button 
                 onClick={handleNavigateServices}
-                className="relative px-5 py-2.5 bg-luxury-charcoal text-white font-sans text-[9px] lg:text-[10px] uppercase tracking-widest font-semibold overflow-hidden group transition-all duration-300 shadow-[0_5px_15px_rgba(22,22,22,0.1)] flex-shrink touch-manipulation"
+                className="relative px-5 py-2.5 bg-luxury-charcoal text-white font-sans text-[11px] lg:text-xs uppercase tracking-widest font-bold overflow-hidden group transition-all duration-300 shadow-[0_5px_15px_rgba(22,22,22,0.1)] flex-shrink touch-manipulation"
               >
                 <span className="relative z-10 flex items-center gap-1.5">
                   <span className="hidden sm:inline">Explore All Services</span>

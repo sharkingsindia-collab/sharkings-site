@@ -84,7 +84,7 @@ function ReturnToHomeFAB() {
   return (
     <div 
       ref={containerRef}
-      className="fixed bottom-8 right-8 z-[100] transition-all duration-500 ease-out flex items-center gap-3 opacity-0 translate-y-12 pointer-events-none"
+      className="fixed bottom-5 right-5 sm:bottom-8 sm:right-8 z-[100] transition-all duration-500 ease-out flex items-center gap-3 opacity-0 translate-y-12 pointer-events-none"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >

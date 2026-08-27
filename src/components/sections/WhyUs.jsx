@@ -55,16 +55,16 @@ function WhyUs({ whyUsRef }) {
         <div className="max-w-3xl space-y-2">
           <div className="flex items-center gap-2.5">
             <span className="w-6 h-[1px] bg-[#710014]" />
-            <span className="font-sans text-[10px] font-bold tracking-[0.3em] text-[#710014] uppercase">
+            <span className="font-sans text-xs font-extrabold tracking-[0.3em] text-[#710014] uppercase">
               WHY CHOOSE US
             </span>
           </div>
 
-          <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-light text-luxury-charcoal leading-tight tracking-wide">
+          <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-normal text-luxury-charcoal leading-tight tracking-wide">
             Why Work With Sharkings Interiors?
           </h2>
 
-          <p className="font-sans text-xs sm:text-sm text-luxury-charcoal/75 leading-relaxed font-light max-w-2xl">
+          <p className="font-sans text-sm sm:text-base text-luxury-charcoal/80 leading-relaxed font-medium max-w-2xl">
             We handle design, factory manufacturing, and installation for homes, offices, and commercial spaces in Madurai and Ramanathapuram.
           </p>
         </div>
@@ -86,7 +86,7 @@ function WhyUs({ whyUsRef }) {
                 <div className="space-y-4">
                   {/* Tag & Step Number */}
                   <div className="flex items-center justify-between">
-                    <span className={`text-[9px] font-sans font-bold tracking-[0.2em] px-3 py-1 rounded-full uppercase ${
+                    <span className={`text-[11px] font-sans font-extrabold tracking-[0.2em] px-3 py-1 rounded-full uppercase ${
                       isCenter
                         ? 'bg-white/15 text-white border border-white/20'
                         : 'bg-[#710014]/10 text-[#710014] border border-[#710014]/20'
@@ -117,14 +117,14 @@ function WhyUs({ whyUsRef }) {
                   </div>
 
                   {/* Card Title */}
-                  <h3 className={`font-display text-xl sm:text-2xl font-light leading-snug ${
+                  <h3 className={`font-display text-2xl sm:text-3xl font-normal leading-snug ${
                     isCenter ? 'text-white' : 'text-[#710014]'
                   }`}>
                     {step.title}
                   </h3>
 
                   {/* Card Description */}
-                  <p className={`font-sans text-xs leading-relaxed font-light ${
+                  <p className={`font-sans text-sm leading-relaxed font-medium ${
                     isCenter ? 'text-white/85' : 'text-luxury-charcoal/80'
                   }`}>
                     {step.description}
@@ -132,7 +132,7 @@ function WhyUs({ whyUsRef }) {
                 </div>
 
                 {/* Card Footer Pill */}
-                <div className={`pt-3.5 border-t font-sans text-[11px] font-semibold tracking-wider uppercase ${
+                <div className={`pt-3.5 border-t font-sans text-xs font-bold tracking-wider uppercase ${
                   isCenter
                     ? 'border-white/20 text-[#c5a059]'
                     : 'border-black/10 text-[#710014]'

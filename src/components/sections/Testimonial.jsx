@@ -96,16 +96,16 @@ function Testimonial({ testimonialRef }) {
         <div className="text-center max-w-2xl mx-auto space-y-3">
           <div className="flex items-center justify-center gap-3">
             <span className="w-6 h-[1px] bg-luxury-sage" />
-            <span className="font-sans text-[10px] sm:text-xs font-bold tracking-[0.35em] text-luxury-sage uppercase">
+            <span className="font-sans text-xs sm:text-sm font-extrabold tracking-[0.35em] text-luxury-sage uppercase">
               CLIENT STORIES
             </span>
             <span className="w-6 h-[1px] bg-luxury-sage" />
           </div>
 
-          <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-light text-luxury-cream tracking-wide">
+          <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-normal text-luxury-cream tracking-wide">
             Loved by Our Clients
           </h2>
-          <p className="font-sans text-xs sm:text-sm text-luxury-cream/60 leading-relaxed font-light">
+          <p className="font-sans text-sm sm:text-base text-luxury-cream/70 leading-relaxed font-medium">
             Real feedback from families and business owners across Madurai & Ramanathapuram.
           </p>
         </div>
@@ -127,24 +127,24 @@ function Testimonial({ testimonialRef }) {
                     ))}
                   </div>
 
-                  <span className="text-[9px] font-sans font-bold tracking-widest text-[#c5a059] uppercase border border-[#c5a059]/20 px-2.5 py-0.5 rounded-full bg-[#c5a059]/5">
+                  <span className="text-[11px] font-sans font-extrabold tracking-widest text-[#c5a059] uppercase border border-[#c5a059]/20 px-2.5 py-0.5 rounded-full bg-[#c5a059]/5">
                     {client.tag}
                   </span>
                 </div>
 
-                <p className="font-sans text-xs lg:text-sm text-luxury-cream/80 leading-relaxed font-light italic">
+                <p className="font-sans text-sm lg:text-base text-luxury-cream/85 leading-relaxed font-medium italic">
                   "{client.quote}"
                 </p>
               </div>
 
               <div className="flex items-center gap-3.5 pt-4 border-t border-white/10">
                 <div className="w-11 h-11 rounded-full bg-[#c5a059]/15 border border-[#c5a059]/40 flex items-center justify-center flex-shrink-0">
-                  <span className="font-sans text-xs font-bold tracking-wider text-[#c5a059]">
+                  <span className="font-sans text-sm font-bold tracking-wider text-[#c5a059]">
                     {getInitials(client.name)}
                   </span>
                 </div>
                 <div>
-                  <h3 className="font-display text-sm font-light text-luxury-cream group-hover:text-[#c5a059] transition-colors">
+                  <h3 className="font-display text-base font-normal text-luxury-cream group-hover:text-[#c5a059] transition-colors">
                     {client.name}
                   </h3>
                 </div>
@@ -182,23 +182,23 @@ function Testimonial({ testimonialRef }) {
                         ))}
                       </div>
 
-                      <span className="text-[9px] font-sans font-bold tracking-widest text-[#c5a059] uppercase border border-[#c5a059]/20 px-2.5 py-0.5 rounded-full bg-[#c5a059]/5">
+                      <span className="text-[11px] font-sans font-extrabold tracking-widest text-[#c5a059] uppercase border border-[#c5a059]/20 px-2.5 py-0.5 rounded-full bg-[#c5a059]/5">
                         {client.tag}
                       </span>
                     </div>
 
-                    <p className="font-sans text-xs text-luxury-cream/90 leading-relaxed font-light italic">
+                    <p className="font-sans text-sm text-luxury-cream/95 leading-relaxed font-medium italic">
                       "{client.quote}"
                     </p>
 
                     <div className="flex items-center gap-3 pt-3 border-t border-white/10">
                       <div className="w-10 h-10 rounded-full bg-[#c5a059]/15 border border-[#c5a059]/40 flex items-center justify-center flex-shrink-0">
-                        <span className="font-sans text-xs font-bold tracking-wider text-[#c5a059]">
+                        <span className="font-sans text-sm font-bold tracking-wider text-[#c5a059]">
                           {getInitials(client.name)}
                         </span>
                       </div>
                       <div>
-                        <h3 className="font-display text-sm font-light text-luxury-cream">
+                        <h3 className="font-display text-base font-normal text-luxury-cream">
                           {client.name}
                         </h3>
                       </div>
@@ -250,7 +250,7 @@ function Testimonial({ testimonialRef }) {
             </button>
           </div>
 
-          <p className="text-center font-sans text-[9px] tracking-widest text-luxury-cream/40 uppercase">
+          <p className="text-center font-sans text-[11px] font-semibold tracking-widest text-luxury-cream/50 uppercase">
             Swipe left or right to explore reviews
           </p>
 

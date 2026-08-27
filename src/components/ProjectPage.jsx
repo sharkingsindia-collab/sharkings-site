@@ -21,27 +21,27 @@ import f07 from '../assets/FacetoFace/sharking07.webp';
 import f8 from '../assets/FacetoFace/sharking8.webp';
 
 // Home Decor Project Assets
-import h1 from '../assets/HomeDec/h1.jpg';
-import h2 from '../assets/HomeDec/h2.jpg';
-import h3 from '../assets/HomeDec/h3.jpg';
-import h4 from '../assets/HomeDec/h4.jpg';
-import h5 from '../assets/HomeDec/h5.jpg';
-import h6 from '../assets/HomeDec/h6.jpg';
-import h7 from '../assets/HomeDec/h7.jpg';
-import h8 from '../assets/HomeDec/h8.jpg';
-import h9 from '../assets/HomeDec/h9.jpg';
-import h10 from '../assets/HomeDec/h10.jpg';
-import h11 from '../assets/HomeDec/h11.jpg';
-import h12 from '../assets/HomeDec/h12.jpg';
-import h13 from '../assets/HomeDec/h13.jpg';
-import h14 from '../assets/HomeDec/h14.jpg';
-import h15 from '../assets/HomeDec/h15.jpg';
-import h16 from '../assets/HomeDec/h16.jpg';
+import h1 from '../assets/HomeDec/h1.webp';
+import h2 from '../assets/HomeDec/h2.webp';
+import h3 from '../assets/HomeDec/h3.webp';
+import h4 from '../assets/HomeDec/h4.webp';
+import h5 from '../assets/HomeDec/h5.webp';
+import h6 from '../assets/HomeDec/h6.webp';
+import h7 from '../assets/HomeDec/h7.webp';
+import h8 from '../assets/HomeDec/h8.webp';
+import h9 from '../assets/HomeDec/h9.webp';
+import h10 from '../assets/HomeDec/h10.webp';
+import h11 from '../assets/HomeDec/h11.webp';
+import h12 from '../assets/HomeDec/h12.webp';
+import h13 from '../assets/HomeDec/h13.webp';
+import h14 from '../assets/HomeDec/h14.webp';
+import h15 from '../assets/HomeDec/h15.webp';
+import h16 from '../assets/HomeDec/h16.webp';
 
 // Sofa Decor Project Assets
-import s1 from '../assets/SofaDec/s1.jpg';
-import s2 from '../assets/SofaDec/s2.jpg';
-import s3 from '../assets/SofaDec/s3.jpg';
+import s1 from '../assets/SofaDec/s1.webp';
+import s2 from '../assets/SofaDec/s2.webp';
+import s3 from '../assets/SofaDec/s3.webp';
 
 const PROJECTS_DATA = [
   {
@@ -183,15 +183,15 @@ function ProjectPage({ onNavigate }) {
         
         {/* Title Block */}
         <div className="space-y-3 border-b border-[#e5e0d3] pb-6">
-          <span className="font-sans text-[10px] sm:text-xs font-bold tracking-[0.35em] text-[#710014] uppercase block">
+          <span className="font-sans text-xs sm:text-sm font-extrabold tracking-[0.35em] text-[#710014] uppercase block">
             SIGNATURE SHOWCASES
           </span>
 
-          <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-light text-[#1a1a1a] leading-tight uppercase tracking-wider">
+          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-normal text-[#1a1a1a] leading-tight uppercase tracking-wider">
             Our Masterpieces
           </h1>
 
-          <p className="font-sans text-xs sm:text-sm text-[#4a4a4a] leading-relaxed font-normal max-w-2xl">
+          <p className="font-sans text-sm sm:text-base text-[#333333] leading-relaxed font-medium max-w-2xl">
             A showcase of signature residences and commercial spaces crafted across Madurai and Ramanathapuram. Select any project to explore the complete gallery and design story.
           </p>
         </div>
@@ -202,7 +202,7 @@ function ProjectPage({ onNavigate }) {
             <div
               key={proj.id}
               onClick={() => openProjectModal(proj)}
-              className="bg-white border border-[#e5e0d3] rounded-3xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 group cursor-pointer flex flex-col justify-between touch-manipulation"
+              className="bg-white border border-[#e5e0d3] rounded-3xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 group cursor-pointer flex flex-col justify-between touch-manipulation"
             >
               <div className="space-y-4 p-5 sm:p-6">
                 
@@ -217,7 +217,7 @@ function ProjectPage({ onNavigate }) {
                     decoding="async"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  <div className="absolute bottom-4 right-4 bg-black/80 backdrop-blur-md text-white text-[10px] font-sans font-bold tracking-widest px-3 py-1.5 uppercase rounded shadow flex items-center gap-1.5">
+                  <div className="absolute bottom-4 right-4 bg-black/80 backdrop-blur-md text-white text-[11px] font-sans font-extrabold tracking-widest px-3 py-1.5 uppercase rounded shadow flex items-center gap-1.5">
                     <svg className="w-3.5 h-3.5 text-[#c5a059]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
@@ -227,15 +227,15 @@ function ProjectPage({ onNavigate }) {
 
                 {/* Details */}
                 <div className="space-y-2">
-                  <span className="text-[10px] font-sans font-bold tracking-widest text-[#710014] uppercase block">
+                  <span className="text-xs font-sans font-extrabold tracking-widest text-[#710014] uppercase block">
                     {proj.category}
                   </span>
 
-                  <h3 className="font-display text-2xl font-light text-[#1a1a1a] uppercase group-hover:text-[#710014] transition-colors">
+                  <h3 className="font-display text-2xl sm:text-3xl font-normal text-[#1a1a1a] uppercase group-hover:text-[#710014] transition-colors">
                     {proj.title}
                   </h3>
 
-                  <p className="font-sans text-xs text-[#555555] font-normal leading-relaxed">
+                  <p className="font-sans text-sm text-[#444444] font-medium leading-relaxed">
                     {proj.description}
                   </p>
                 </div>
@@ -244,7 +244,7 @@ function ProjectPage({ onNavigate }) {
 
               {/* Card Footer Button */}
               <div className="px-5 sm:px-6 pb-6 pt-2">
-                <button className="w-full py-3 bg-[#710014] text-white text-xs font-sans font-bold tracking-widest uppercase hover:bg-[#580010] transition-colors shadow-sm text-center cursor-pointer rounded-none touch-manipulation">
+                <button className="w-full py-3.5 bg-[#710014] text-white text-xs sm:text-sm font-sans font-extrabold tracking-widest uppercase hover:bg-[#580010] transition-colors shadow-sm text-center cursor-pointer rounded-none touch-manipulation">
                   INSPECT PROJECT GALLERY →
                 </button>
               </div>
@@ -257,7 +257,7 @@ function ProjectPage({ onNavigate }) {
 
       {/* Full-Screen Exhibition Split Showcase Modal */}
       {selectedProject && (
-        <div className="fixed inset-0 z-[200] bg-[#0a0c10]/95 backdrop-blur-3xl flex flex-col lg:flex-row overflow-hidden transition-all duration-500">
+        <div className="fixed inset-0 z-[200] bg-[#0a0c10]/95 backdrop-blur-3xl flex flex-col lg:flex-row overflow-hidden transition-all duration-300">
 
           {/* LEFT SIDEBAR / MOBILE TOP SHEET: Info Panel */}
           <div className="w-full lg:w-[35%] xl:w-[32%] bg-[#f9f8f4] border-b lg:border-b-0 lg:border-r border-[#e5e0d3] p-6 sm:p-10 flex flex-col justify-between overflow-y-auto z-10 text-[#1a1a1a] max-h-[50vh] lg:max-h-full">
@@ -276,22 +276,22 @@ function ProjectPage({ onNavigate }) {
 
               {/* Info Details */}
               <div className="space-y-3 sm:space-y-4 pt-1">
-                <span className="font-sans text-[10px] font-bold tracking-[0.35em] text-[#710014] uppercase block">
+                <span className="font-sans text-xs font-extrabold tracking-[0.35em] text-[#710014] uppercase block">
                   {selectedProject.category}
                 </span>
 
-                <h2 className="font-display text-2xl sm:text-4xl font-light text-[#1a1a1a] leading-tight uppercase tracking-wider">
+                <h2 className="font-display text-2xl sm:text-4xl font-normal text-[#1a1a1a] leading-tight uppercase tracking-wider">
                   {selectedProject.title}
                 </h2>
 
-                <p className="font-sans text-xs sm:text-sm text-[#555555] leading-relaxed font-normal pt-1">
+                <p className="font-sans text-sm md:text-base text-[#444444] leading-relaxed font-medium pt-1">
                   {selectedProject.description}
                 </p>
 
                 {/* Thumbnail Strip */}
                 {selectedProject.gallery.length > 1 && (
                   <div className="pt-4 border-t border-[#e5e0d3] space-y-2">
-                    <span className="text-[10px] font-sans font-bold tracking-wider text-[#710014] uppercase block">
+                    <span className="text-xs font-sans font-extrabold tracking-wider text-[#710014] uppercase block">
                       PROJECT GALLERY ({selectedProject.gallery.length} PHOTOS)
                     </span>
                     <div className="flex items-center gap-2.5 overflow-x-auto pb-1 scrollbar-none">
@@ -321,9 +321,9 @@ function ProjectPage({ onNavigate }) {
             </div>
 
             {/* Bottom Footer Info */}
-            <div className="hidden sm:flex items-center justify-between pt-6 border-t border-[#e5e0d3] font-sans text-[10px] tracking-widest text-[#777777] uppercase">
-              <span>SHARKINGS INTERIORS & EXTERIORS</span>
-              <span className="font-bold text-[#710014]">
+            <div className="hidden sm:flex items-center justify-between pt-6 border-t border-[#e5e0d3] font-sans text-xs tracking-widest text-[#777777] uppercase">
+              <span className="font-bold">SHARKINGS INTERIORS</span>
+              <span className="font-extrabold text-[#710014]">
                 0{activeGalleryIndex + 1} / 0{selectedProject.gallery.length}
               </span>
             </div>

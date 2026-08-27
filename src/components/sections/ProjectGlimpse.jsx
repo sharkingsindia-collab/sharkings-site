@@ -10,8 +10,8 @@ import f3 from '../../assets/FacetoFace/sharking3.webp';
 import f4 from '../../assets/FacetoFace/sharking4.webp';
 
 // Home Decor & Sofa Decor Assets
-import h1 from '../../assets/HomeDec/h4.jpg';
-import s1 from '../../assets/SofaDec/s1.jpg';
+import h1 from '../../assets/HomeDec/h4.webp';
+import s1 from '../../assets/SofaDec/s1.webp';
 
 // Core Service & Project Assets
 import homeInteriorImg from '../../assets/home-interior.webp';
@@ -212,65 +212,25 @@ const PROJECTS_DATA = [
 ];
 
 const ProjectCard = memo(function ProjectCard({ project, onClick, cardStyle, isActive }) {
-  const cardRef = useRef(null);
-  const imgRef = useRef(null);
-
-  // Direct DOM tilt mutation (Zero React re-renders on mousemove)
-  const handleMouseMove = useCallback((e) => {
-    if (!isActive || !cardRef.current || !imgRef.current) return;
-    const card = cardRef.current;
-    const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const xc = rect.width / 2;
-    const yc = rect.height / 2;
-    const rotX = ((yc - y) / yc) * 3;
-    const rotY = ((x - xc) / xc) * 3;
-
-    card.style.transform = `${cardStyle.transform} rotateX(${rotX}deg) rotateY(${rotY}deg)`;
-    card.style.transition = 'transform 0.1s ease-out';
-    card.style.willChange = 'transform';
-
-    const transX = ((x - xc) / xc) * -6;
-    const transY = ((yc - y) / yc) * -6;
-    imgRef.current.style.transform = `scale(1.08) translate(${transX}px, ${transY}px)`;
-    imgRef.current.style.transition = 'transform 0.1s ease-out';
-  }, [isActive, cardStyle.transform]);
-
-  const handleMouseLeave = useCallback(() => {
-    if (cardRef.current) {
-      cardRef.current.style.transform = cardStyle.transform;
-      cardRef.current.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
-    }
-    if (imgRef.current) {
-      imgRef.current.style.transform = 'scale(1.03) translate(0px, 0px)';
-      imgRef.current.style.transition = 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
-    }
-  }, [cardStyle.transform]);
-
   return (
     <div
-      ref={cardRef}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
       onClick={onClick}
       style={cardStyle}
-      className={`absolute w-[250px] sm:w-[300px] md:w-[340px] aspect-[3/4] bg-[#121622] rounded-2xl border overflow-hidden shadow-2xl transition-all duration-500 cubic-bezier(0.16, 1, 0.3, 1) cursor-pointer select-none group [transform-style:preserve-3d] touch-manipulation ${isActive
-          ? 'border-[#c5a059]/50 ring-1 ring-[#c5a059]/30 shadow-[0_20px_50px_rgba(0,0,0,0.6)]'
-          : 'border-white/10 hover:border-white/20 opacity-80'
+      className={`absolute w-[240px] sm:w-[300px] md:w-[340px] aspect-[3/4] bg-[#121622] rounded-2xl border overflow-hidden shadow-2xl transition-all duration-300 ease-out cursor-pointer select-none group touch-manipulation hover:-translate-y-1.5 ${isActive
+        ? 'border-[#c5a059]/60 ring-1 ring-[#c5a059]/40 shadow-[0_20px_50px_rgba(0,0,0,0.6)]'
+        : 'border-white/10 hover:border-white/30 opacity-80'
         }`}
     >
       {/* Image background showcase */}
       <div className="absolute inset-0 w-full h-full overflow-hidden z-0 bg-black/50">
         <img
-          ref={imgRef}
           src={project.image}
           alt={project.title}
           width="360"
           height="480"
           loading="lazy"
           decoding="async"
-          className="absolute inset-0 w-full h-full object-cover scale-[1.03] opacity-90 group-hover:scale-108 group-hover:opacity-100 transition-all duration-700 ease-out pointer-events-none"
+          className="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:scale-105 group-hover:opacity-100 transition-transform duration-500 ease-out pointer-events-none"
         />
 
         {/* Soft gradient overlay for text legibility */}
@@ -278,7 +238,7 @@ const ProjectCard = memo(function ProjectCard({ project, onClick, cardStyle, isA
 
         {/* Top Pill Bar */}
         <div className="absolute top-4 left-4 z-20 pointer-events-none">
-          <span className="bg-black/60 backdrop-blur-md text-[#c5a059] border border-[#c5a059]/30 px-3.5 py-1.5 rounded-full text-[8.5px] font-sans font-bold tracking-[0.2em] uppercase shadow-sm">
+          <span className="bg-black/60 backdrop-blur-md text-[#c5a059] border border-[#c5a059]/30 px-3.5 py-1.5 rounded-full text-[11px] font-sans font-extrabold tracking-[0.2em] uppercase shadow-sm">
             {project.category}
           </span>
         </div>
@@ -286,15 +246,15 @@ const ProjectCard = memo(function ProjectCard({ project, onClick, cardStyle, isA
 
       {/* Clean Minimalist Bottom Details Panel */}
       <div className="absolute bottom-0 inset-x-0 z-20 p-6 flex flex-col justify-end space-y-3 pointer-events-none">
-        
+
         {/* Project Title & Subtitle */}
         <div className="space-y-1">
-          <div className="flex items-center gap-2 text-[8px] font-sans text-white/50 tracking-widest uppercase">
+          <div className="flex items-center gap-2 text-[11px] font-sans font-semibold text-white/70 tracking-widest uppercase">
             <span>{project.sqft}</span>
             <span>•</span>
             <span>{project.architect}</span>
           </div>
-          <h3 className="font-display text-lg md:text-xl font-light text-luxury-cream leading-snug group-hover:text-[#c5a059] transition-colors duration-300">
+          <h3 className="font-display text-xl md:text-2xl font-semibold text-luxury-cream leading-snug group-hover:text-[#c5a059] transition-colors duration-300">
             {project.title}
           </h3>
         </div>
@@ -302,14 +262,14 @@ const ProjectCard = memo(function ProjectCard({ project, onClick, cardStyle, isA
         {/* Clean Action CTA Pill (Visible on Active Focused Card) */}
         <div className="pt-1 flex items-center justify-between border-t border-white/10">
           {isActive ? (
-            <span className="inline-flex items-center gap-1.5 text-[9px] font-sans font-bold tracking-[0.18em] text-[#c5a059] uppercase group-hover:text-white transition-colors">
+            <span className="inline-flex items-center gap-1.5 text-[12px] font-sans font-extrabold tracking-[0.18em] text-[#c5a059] uppercase group-hover:text-white transition-colors">
               <span>View Case Study</span>
               <svg className="w-3 h-3 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
               </svg>
             </span>
           ) : (
-            <span className="text-[8px] font-sans font-medium tracking-[0.2em] text-white/30 uppercase">
+            <span className="text-[11px] font-sans font-bold tracking-[0.2em] text-white/50 uppercase">
               Click to inspect
             </span>
           )}
@@ -423,20 +383,9 @@ function ProjectGlimpse({ onNavigate }) {
 
   return (
     <>
-      <style>{`
-        @keyframes scanLaser {
-          0% { top: 0%; opacity: 1; }
-          50% { top: 100%; opacity: 1; }
-          100% { top: 0%; opacity: 0; }
-        }
-        .laser-line {
-          animation: scanLaser 1.4s ease-in-out infinite;
-        }
-      `}</style>
-
       <section
         id="projects"
-        className="relative z-30 bg-[#0a0c10] text-[#fbf9f6] py-10 px-6 md:px-16 lg:px-24 overflow-hidden border-t border-white/5"
+        className="relative z-30 bg-[#0a0c10] text-[#fbf9f6] py-12 sm:py-16 px-4 sm:px-8 md:px-16 lg:px-24 overflow-hidden border-t border-white/5"
       >
         {/* Grid lines background layout */}
         <div
@@ -455,42 +404,30 @@ function ProjectGlimpse({ onNavigate }) {
           {/* Header row */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/5 pb-8 reveal-3d-popup">
             <div className="space-y-4 max-w-2xl">
-              <span className="font-sans text-[10px] md:text-xs font-bold tracking-[0.35em] text-[#838f6f] uppercase">
+              <span className="font-sans text-xs md:text-sm font-extrabold tracking-[0.35em] text-[#838f6f] uppercase">
                 SIGNATURE SHOWCASE
               </span>
-              <h2 className="font-display text-3xl md:text-5xl font-extralight text-luxury-cream leading-tight uppercase tracking-wider">
+              <h2 className="font-display text-3xl sm:text-5xl md:text-6xl font-medium text-luxury-cream leading-tight uppercase tracking-wider">
                 Our Masterpiece Portfolios
               </h2>
-              <p className="font-sans text-xs md:text-sm text-white/50 leading-relaxed font-light">
+              <p className="font-sans text-sm md:text-base text-white/70 leading-relaxed font-medium">
                 Explore custom spaces hand-engineered in Madurai and Ramanathapuram. Click cards to view full project showcases.
               </p>
             </div>
-
-            {/* Scan button */}
-            <button
-              onClick={triggerScanFetch}
-              className="flex items-center gap-2 px-5 py-2.5 border border-white/10 hover:border-[#838f6f] bg-white/5 rounded-none font-sans text-[10px] font-semibold tracking-wider uppercase text-white/80 hover:text-white transition-colors shadow-sm self-start md:self-end touch-manipulation"
-            >
-              <svg className={`w-3.5 h-3.5 text-[#838f6f] ${isScanning ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
-              </svg>
-              <span>Simulate Projects Fetch</span>
-            </button>
           </div>
 
           {/* Filter row */}
-          <div className="flex justify-center border-b border-white/5">
+          <div className="flex justify-center border-b border-white/5 pt-4">
             <div className="bg-white/5 border border-white/10 p-1 rounded-none flex flex-nowrap overflow-x-auto scrollbar-none gap-2 shadow-sm max-w-full">
               {categories.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => {
                     setActiveCategory(cat);
-                    triggerScanFetch();
                   }}
-                  className={`px-5 py-2.5 rounded-none font-sans text-[9px] md:text-[10px] font-bold tracking-widest uppercase transition-all duration-200 flex-shrink-0 touch-manipulation ${activeCategory === cat
-                      ? 'bg-[#838f6f] text-white shadow-md'
-                      : 'bg-transparent text-white/50 hover:text-white'
+                  className={`px-5 py-2.5 rounded-none font-sans text-xs sm:text-sm font-extrabold tracking-widest uppercase transition-all duration-200 flex-shrink-0 touch-manipulation cursor-pointer ${activeCategory === cat
+                    ? 'bg-[#838f6f] text-white shadow-md'
+                    : 'bg-transparent text-white/50 hover:text-white'
                     }`}
                 >
                   {cat}
@@ -559,8 +496,8 @@ function ProjectGlimpse({ onNavigate }) {
                 onClick={() => setActiveIndex(idx)}
                 aria-label={`Show project 0${idx + 1}`}
                 className={`w-3.5 h-3.5 rounded-full flex items-center justify-center border transition-all duration-200 cursor-pointer touch-manipulation ${idx === activeIndex
-                    ? 'border-[#c5a059] bg-[#c5a059]/10 scale-110'
-                    : 'border-white/10 bg-white/5 hover:border-white/30 hover:bg-white/10'
+                  ? 'border-[#c5a059] bg-[#c5a059]/10 scale-110'
+                  : 'border-white/10 bg-white/5 hover:border-white/30 hover:bg-white/10'
                   }`}
               >
                 <span className={`w-1.5 h-1.5 rounded-full transition-all duration-200 ${idx === activeIndex ? 'bg-[#c5a059] scale-100' : 'bg-transparent scale-0'
@@ -573,7 +510,7 @@ function ProjectGlimpse({ onNavigate }) {
           <div className="flex justify-center pt-6">
             <button
               onClick={() => onNavigate && onNavigate('projects')}
-              className="relative px-9 py-3.5 bg-white text-luxury-charcoal font-sans text-[10px] uppercase tracking-[0.2em] font-semibold overflow-hidden group transition-all duration-300 shadow-[0_15px_30px_rgba(255,255,255,0.05)] rounded-full hover:shadow-[0_15px_35px_rgba(255,255,255,0.1)] touch-manipulation"
+              className="relative px-9 py-3.5 bg-white text-luxury-charcoal font-sans text-xs uppercase tracking-[0.2em] font-bold overflow-hidden group transition-all duration-300 shadow-[0_15px_30px_rgba(255,255,255,0.05)] rounded-full hover:shadow-[0_15px_35px_rgba(255,255,255,0.1)] touch-manipulation"
             >
               <span className="relative z-10 flex items-center gap-2">
                 <span>Explore Entire Gallery</span>
@@ -595,10 +532,10 @@ function ProjectGlimpse({ onNavigate }) {
           {/* Top Header Bar */}
           <div className="flex items-center justify-between border-b border-white/10 pb-4 z-20">
             <div className="space-y-1">
-              <span className="font-sans text-[10px] md:text-xs font-bold tracking-[0.3em] text-[#c5a059] uppercase block">
+              <span className="font-sans text-xs md:text-sm font-extrabold tracking-[0.3em] text-[#c5a059] uppercase block">
                 {selectedProject.category} • {selectedProject.branch}
               </span>
-              <h3 className="font-display text-xl sm:text-3xl font-light text-luxury-cream uppercase tracking-wider">
+              <h3 className="font-display text-2xl sm:text-4xl font-semibold text-luxury-cream uppercase tracking-wider">
                 {selectedProject.title}
               </h3>
             </div>
@@ -634,10 +571,10 @@ function ProjectGlimpse({ onNavigate }) {
             {/* Floating Info Overlay */}
             <div className="absolute bottom-6 left-6 right-6 md:left-8 md:right-8 flex flex-col md:flex-row md:items-end justify-between gap-4 pointer-events-none">
               <div className="max-w-3xl space-y-2 pointer-events-auto">
-                <span className="font-sans text-[9px] font-bold tracking-[0.25em] text-[#838f6f] uppercase">
+                <span className="font-sans text-xs font-extrabold tracking-[0.25em] text-[#838f6f] uppercase">
                   {selectedProject.category}
                 </span>
-                <p className="font-sans text-xs md:text-sm text-white/80 leading-relaxed font-light drop-shadow-md">
+                <p className="font-sans text-sm md:text-base text-white/90 leading-relaxed font-medium drop-shadow-md">
                   {selectedProject.description}
                 </p>
               </div>
@@ -648,7 +585,7 @@ function ProjectGlimpse({ onNavigate }) {
                   setSelectedProject(null);
                   if (onNavigate) onNavigate('projects');
                 }}
-                className="px-6 py-3 bg-[#c5a059] text-black hover:bg-white transition-colors duration-200 font-sans text-[10px] font-bold uppercase tracking-widest rounded-full shadow-lg pointer-events-auto flex items-center gap-2 self-start md:self-end cursor-pointer touch-manipulation"
+                className="px-6 py-3 bg-[#c5a059] text-black hover:bg-white transition-colors duration-200 font-sans text-xs font-extrabold uppercase tracking-widest rounded-full shadow-lg pointer-events-auto flex items-center gap-2 self-start md:self-end cursor-pointer touch-manipulation"
               >
                 <span>EXPLORE ALL PROJECTS</span>
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
@@ -659,7 +596,7 @@ function ProjectGlimpse({ onNavigate }) {
           </div>
 
           {/* Bottom Bar Footer hint */}
-          <div className="flex items-center justify-between text-white/40 font-sans text-[9px] font-medium tracking-widest uppercase pt-1">
+          <div className="flex items-center justify-between text-white/50 font-sans text-[11px] font-bold tracking-widest uppercase pt-1">
             <span>SHARKINGS INTERIORS & EXTERIORS • {selectedProject.branch}</span>
             <span>CLICK ANYWHERE TO CLOSE (ESC)</span>
           </div>

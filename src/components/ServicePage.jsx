@@ -210,15 +210,15 @@ function ServicePage({ onNavigate }) {
 
         {/* Title Block */}
         <section className="space-y-3 border-b border-[#e5e0d3] pb-6">
-          <span className="font-sans text-[10px] sm:text-xs font-bold tracking-[0.35em] text-[#710014] uppercase block">
+          <span className="font-sans text-xs sm:text-sm font-extrabold tracking-[0.35em] text-[#710014] uppercase block">
             WHAT WE DO
           </span>
 
-          <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-light text-[#1a1a1a] leading-tight uppercase tracking-wider">
+          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-normal text-[#1a1a1a] leading-tight uppercase tracking-wider">
             Architectural Services
           </h1>
 
-          <p className="font-sans text-xs sm:text-sm text-[#4a4a4a] leading-relaxed font-normal max-w-2xl">
+          <p className="font-sans text-sm sm:text-base text-[#333333] leading-relaxed font-medium max-w-2xl">
             Explore our complete range of custom home interiors, modular kitchens, and commercial projects across Madurai and Ramanathapuram.
           </p>
         </section>
@@ -239,7 +239,7 @@ function ServicePage({ onNavigate }) {
                   className={`px-3.5 py-2 rounded-lg text-xs font-sans whitespace-nowrap transition-all cursor-pointer touch-manipulation ${
                     isSelected
                       ? 'bg-[#710014] text-white font-bold shadow-sm'
-                      : 'bg-[#f6f4ee] text-[#333333] hover:bg-[#e5e0d3]'
+                      : 'bg-[#f6f4ee] text-[#333333] hover:bg-[#e5e0d3] font-medium'
                   }`}
                 >
                   {service.title}
@@ -256,8 +256,8 @@ function ServicePage({ onNavigate }) {
           <div className="hidden lg:block lg:col-span-5 bg-white border border-[#e5e0d3] rounded-3xl p-5 shadow-sm space-y-4">
             
             <div className="border-b border-[#e5e0d3] pb-3 flex items-center justify-between">
-              <span className="font-sans text-xs font-bold tracking-wider text-[#710014] uppercase">SERVICES CATALOG</span>
-              <span className="font-sans text-[10px] text-[#777777] font-semibold uppercase">SELECT TO INSPECT</span>
+              <span className="font-sans text-xs font-extrabold tracking-wider text-[#710014] uppercase">SERVICES CATALOG</span>
+              <span className="font-sans text-[11px] text-[#777777] font-bold uppercase">SELECT TO INSPECT</span>
             </div>
 
             <div className="space-y-1 max-h-[500px] overflow-y-auto pr-2 scrollbar-thin">
@@ -269,12 +269,12 @@ function ServicePage({ onNavigate }) {
                     onClick={() => selectService(idx)}
                     className={`w-full text-left py-3 px-4 transition-all duration-200 flex items-center justify-between group cursor-pointer border-b border-[#f0ece1] last:border-0 touch-manipulation ${
                       isSelected
-                        ? 'bg-[#710014]/5 text-[#710014] font-bold border-l-4 border-l-[#710014] pl-5'
-                        : 'text-[#333333] hover:bg-[#f6f4ee] hover:text-[#710014]'
+                        ? 'bg-[#710014]/10 text-[#710014] font-bold border-l-4 border-l-[#710014] pl-5'
+                        : 'text-[#333333] hover:bg-[#f6f4ee] hover:text-[#710014] font-medium'
                     }`}
                   >
-                    <span className="font-sans text-xs tracking-wide">{service.title}</span>
-                    <span className={`text-xs transition-transform duration-200 ${isSelected ? 'translate-x-1 font-bold' : 'opacity-40 group-hover:opacity-100 group-hover:translate-x-1'}`}>
+                    <span className="font-sans text-sm tracking-wide">{service.title}</span>
+                    <span className={`text-sm transition-transform duration-200 ${isSelected ? 'translate-x-1 font-bold' : 'opacity-40 group-hover:opacity-100 group-hover:translate-x-1'}`}>
                       →
                     </span>
                   </button>
@@ -303,7 +303,7 @@ function ServicePage({ onNavigate }) {
 
                 {/* Badge Overlay Top Left */}
                 <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-20">
-                  <span className="px-3 py-1 bg-[#710014] text-white text-[9px] font-sans font-bold tracking-[0.2em] uppercase rounded shadow-md">
+                  <span className="px-3 py-1 bg-[#710014] text-white text-[11px] font-sans font-extrabold tracking-[0.2em] uppercase rounded shadow-md">
                     ✦ {activeService.badge}
                   </span>
                 </div>
@@ -314,16 +314,16 @@ function ServicePage({ onNavigate }) {
                 
                 {/* Category & Title */}
                 <div className="space-y-0.5 border-b border-[#e5e0d3] pb-3">
-                  <span className="text-[10px] font-sans font-bold tracking-[0.25em] text-[#710014] uppercase">
+                  <span className="text-xs font-sans font-extrabold tracking-[0.25em] text-[#710014] uppercase">
                     {activeService.category}
                   </span>
-                  <h2 className="font-display text-2xl sm:text-3xl font-light text-[#1a1a1a] uppercase tracking-wide">
+                  <h2 className="font-display text-2xl sm:text-3xl font-normal text-[#1a1a1a] uppercase tracking-wide">
                     {activeService.title}
                   </h2>
                 </div>
 
                 {/* Description */}
-                <p className="font-sans text-xs sm:text-sm text-[#4a4a4a] leading-relaxed font-normal">
+                <p className="font-sans text-sm sm:text-base text-[#333333] leading-relaxed font-medium">
                   {activeService.description}
                 </p>
 
@@ -331,19 +331,19 @@ function ServicePage({ onNavigate }) {
                 <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
                   <button
                     onClick={handleContactNavigate}
-                    className="w-full sm:w-1/2 py-3 px-6 bg-[#710014] text-white text-xs font-sans font-bold tracking-widest uppercase hover:bg-[#580010] transition-all shadow-md cursor-pointer text-center rounded-none touch-manipulation"
+                    className="w-full sm:w-1/2 py-3.5 px-6 bg-[#710014] text-white text-xs sm:text-sm font-sans font-extrabold tracking-widest uppercase hover:bg-[#580010] transition-all shadow-md cursor-pointer text-center rounded-none touch-manipulation"
                   >
                     CONTACT US
                   </button>
 
                   <a
                     href="tel:+918098090204"
-                    className="w-full sm:w-1/2 py-3 px-6 bg-white border border-[#710014] text-[#710014] text-xs font-sans font-bold tracking-widest uppercase hover:bg-[#710014] hover:text-white transition-all cursor-pointer text-center rounded-none flex items-center justify-center gap-2 touch-manipulation"
+                    className="w-full sm:w-1/2 py-3.5 px-6 bg-white border-2 border-[#710014] text-[#710014] text-xs sm:text-sm font-sans font-bold tracking-widest uppercase hover:bg-[#710014] hover:text-white transition-all cursor-pointer text-center rounded-none flex items-center justify-center gap-2 touch-manipulation"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-[#710014]">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
                       <path fillRule="evenodd" d="M1.5 4.5a3 3 0 0 1 3-3h1.372c.86 0 1.61.586 1.819 1.42l1.105 4.423a1.875 1.875 0 0 1-.694 1.955l-1.293.97c.135.252.286.505.452.757.946 1.433 2.164 2.651 3.597 3.597.252.166.505.317.757.452l.97-1.293a1.875 1.875 0 0 1 1.955-.694l4.423 1.105c.834.209 1.42.959 1.42 1.82V19.5a3 3 0 0 1-3 3h-2.25C8.552 22.5 1.5 15.448 1.5 6.75V4.5Z" clipRule="evenodd" />
                     </svg>
-                    <span>CALL EXPERIENCE</span>
+                    <span>CALL US</span>
                   </a>
                 </div>
 

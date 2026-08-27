@@ -4,8 +4,8 @@ import slogo from '../../assets/slogo.webp';
 
 const localSlides = [
   {
-    image: '/images/slide-living.png',
-    alt: 'Sharkings Interior luxury living room interior design studio',
+    image: '/images/slide-living.webp',
+    alt: 'Sharkings Interior luxury living room interior design studio in Madurai & Ramanathapuram',
     subtitle: 'LUXURY HOMES & RESIDENCES',
     title: 'Luxury Interior Design Studio',
     description: 'We design beautiful luxury homes and custom living spaces. From initial idea to final setup, Sharkings Interior creates modern, comfortable, and elegant home interiors.',
@@ -14,8 +14,8 @@ const localSlides = [
     accentHex: '#710014'
   },
   {
-    image: '/images/slide-dining.png',
-    alt: 'Modern luxury dining room interior design by Sharkings Interior',
+    image: '/images/slide-dining.webp',
+    alt: 'Modern luxury dining room and modular interior design by Sharkings Interior',
     subtitle: 'DINING & LIVING ROOM DESIGN',
     title: 'Custom Dining Room Interior Design',
     description: 'Transform your dining room with custom furniture, warm lighting, and stylish decor. Built for family meals and welcoming your guests.',
@@ -24,8 +24,8 @@ const localSlides = [
     accentHex: '#838F6F'
   },
   {
-    image: '/images/slide-bedroom.png',
-    alt: 'Bespoke luxury bedroom interior design by Sharkings Interior',
+    image: '/images/slide-bedroom.webp',
+    alt: 'Bespoke luxury master bedroom interior design by Sharkings Interior Madurai',
     subtitle: 'BEDROOM & MASTER SUITE DESIGN',
     title: 'Bespoke Bedroom & Master Suite Design',
     description: 'Create your dream master bedroom with custom wall paneling, soft ambient lighting, and luxury seating designed for pure relaxation.',
@@ -44,46 +44,6 @@ function Hero({
   handleNext,
   selectSlide
 }) {
-  const heroInnerRef = useRef(null);
-  const rafRef = useRef(null);
-  const lastScrollRef = useRef(-1);
-
-  // Pure GPU composited scroll parallax — zero layout reflows
-  const updateParallax = useCallback(() => {
-    const scrollPos = window.scrollY;
-    const vh = window.innerHeight;
-
-    if (scrollPos > vh * 1.1) return;
-    if (Math.abs(scrollPos - lastScrollRef.current) < 0.5) return;
-    lastScrollRef.current = scrollPos;
-
-    const opacity = Math.max(0, 1 - scrollPos / (vh * 0.7));
-    const textY = scrollPos * 0.2;
-
-    if (heroInnerRef.current) {
-      heroInnerRef.current.style.opacity = opacity;
-      heroInnerRef.current.style.transform = `translate3d(0, ${textY}px, 0)`;
-    }
-  }, []);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (rafRef.current) return;
-      rafRef.current = requestAnimationFrame(() => {
-        rafRef.current = null;
-        updateParallax();
-      });
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    updateParallax();
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
-  }, [updateParallax]);
-
   const smoothScrollToTarget = useCallback((targetSelector) => {
     const elem = document.querySelector(targetSelector);
     if (!elem) return;
@@ -184,9 +144,7 @@ function Hero({
         className="relative w-full h-screen min-h-[640px] bg-luxury-charcoal z-10 overflow-hidden"
       >
         <div
-          ref={heroInnerRef}
-          className="relative w-full h-full overflow-hidden bg-luxury-charcoal shadow-2xl transform-gpu"
-          style={{ willChange: 'transform, opacity' }}
+          className="relative w-full h-full overflow-hidden bg-luxury-charcoal shadow-2xl"
         >
           {/* Subtle Ambient Radial Glow */}
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(113,0,20,0.18),transparent_70%)] pointer-events-none z-1" />
@@ -209,9 +167,11 @@ function Hero({
                     <img
                       src={slide.image}
                       alt={slide.alt || "Sharkings Interior - Bespoke Luxury Interior Design"}
+                      width="1920"
+                      height="1080"
                       loading={idx === 0 ? "eager" : "lazy"}
                       decoding="async"
-                      fetchpriority={idx === 0 ? "high" : "low"}
+                      fetchPriority={idx === 0 ? "high" : "low"}
                       className={`w-full h-full object-cover transition-transform duration-300 ease-out ${
                         isActive ? 'scale-105' : 'scale-100'
                       }`}
@@ -219,9 +179,9 @@ function Hero({
                   </div>
 
                   <div
-                    className="absolute inset-0 flex flex-col justify-center px-6 sm:px-12 lg:px-24 pt-24 sm:pt-28 lg:pt-32 pb-16 sm:pb-20 lg:pb-24 z-30"
+                    className="absolute inset-0 flex flex-col justify-center px-4 sm:px-12 lg:px-24 pt-20 sm:pt-28 lg:pt-32 pb-16 sm:pb-20 lg:pb-24 z-30"
                   >
-                    <div className="max-w-2xl lg:max-w-3xl space-y-4 sm:space-y-6">
+                    <div className="max-w-2xl lg:max-w-3xl space-y-3 sm:space-y-6">
 
                       <div
                         className={`transition-all duration-150 ease-out ${
@@ -231,14 +191,14 @@ function Hero({
                       >
                         <div className="flex items-center gap-3">
                           <span className="w-8 h-[1px] bg-luxury-sage" />
-                          <span className="font-sans text-[10px] sm:text-xs font-bold tracking-[0.25em] text-luxury-sage uppercase">
+                          <span className="font-sans text-xs sm:text-sm font-extrabold tracking-[0.25em] text-luxury-sage uppercase">
                             {slide.subtitle}
                           </span>
                         </div>
                       </div>
 
                       <h1
-                        className={`font-display text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extralight leading-[1.1] text-luxury-cream transition-all duration-150 ease-out ${
+                        className={`font-display text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-light leading-[1.1] text-luxury-cream transition-all duration-150 ease-out ${
                           isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'
                         }`}
                         style={{ transitionDelay: '0ms' }}
@@ -247,7 +207,7 @@ function Hero({
                       </h1>
 
                       <p
-                        className={`font-sans text-xs sm:text-sm text-luxury-cream/80 max-w-xl leading-relaxed font-light tracking-wide transition-all duration-150 ease-out ${
+                        className={`font-sans text-sm sm:text-base text-luxury-cream/90 max-w-xl leading-relaxed font-medium tracking-wide transition-all duration-150 ease-out ${
                           isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'
                         }`}
                         style={{ transitionDelay: '0ms' }}
@@ -267,7 +227,7 @@ function Hero({
                             e.preventDefault();
                             onNavigate && onNavigate('projects');
                           }}
-                          className="relative px-6 sm:px-8 py-3.5 bg-luxury-cream text-luxury-charcoal font-sans text-xs uppercase tracking-widest font-semibold overflow-hidden group transition-all duration-300 cursor-pointer text-center touch-manipulation"
+                          className="relative px-6 sm:px-8 py-3.5 bg-luxury-cream text-luxury-charcoal font-sans text-sm uppercase tracking-widest font-bold overflow-hidden group transition-all duration-300 cursor-pointer text-center touch-manipulation"
                           style={{
                             boxShadow: isActive ? `0 10px 30px -15px ${slide.accentHex}` : 'none'
                           }}
@@ -284,7 +244,7 @@ function Hero({
                             e.preventDefault();
                             smoothScrollToTarget('#get-in-touch');
                           }}
-                          className="relative px-6 sm:px-8 py-3.5 text-luxury-cream border border-luxury-cream/20 hover:border-luxury-cream font-sans text-xs uppercase tracking-widest font-medium overflow-hidden group transition-all duration-300 cursor-pointer text-center touch-manipulation"
+                          className="relative px-6 sm:px-8 py-3.5 text-luxury-cream border border-luxury-cream/20 hover:border-luxury-cream font-sans text-sm uppercase tracking-widest font-semibold overflow-hidden group transition-all duration-300 cursor-pointer text-center touch-manipulation"
                         >
                           <span className="relative z-10">
                             Contact Us
@@ -354,7 +314,7 @@ function Hero({
                 onClick={() => selectSlide(idx)}
                 className="group py-4 flex flex-col items-start focus:outline-none cursor-pointer touch-manipulation"
               >
-                <span className={`font-sans text-[9px] tracking-widest transition-all duration-200 ${
+                <span className={`font-sans text-[11px] font-semibold tracking-widest transition-all duration-200 ${
                   idx === activeIndex ? 'text-luxury-cream font-bold opacity-100' : 'text-luxury-cream/40 opacity-70 group-hover:text-luxury-cream/80'
                 }`}>
                   0{idx + 1}
@@ -375,7 +335,7 @@ function Hero({
           <div
             className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 hidden lg:flex flex-col items-center gap-2 transition-opacity duration-300"
           >
-            <span className="font-sans text-[9px] tracking-[0.3em] uppercase text-luxury-cream/30">
+            <span className="font-sans text-[11px] font-medium tracking-[0.3em] uppercase text-luxury-cream/40">
               Scroll Down
             </span>
             <div className="w-5 h-8 border border-luxury-cream/20 rounded-full flex justify-center py-1">

@@ -20,7 +20,7 @@ const COUNTERTOP_STONES = [
 
 const KITCHEN_LAYOUTS = [
   { id: 'l-shaped', label: 'L-Shaped + Island' },
-  { id: 'parallel', label: 'Parallel Studio' },
+ 
   { id: 'minimalist', label: 'Linear Wall' }
 ];
 
@@ -59,31 +59,9 @@ function InteractiveStudio({
 
   // Auto-rotate ref (avoid dependency in animation loop)
   const autoRotateRef = useRef(studioAutoRotate);
+  const isVisibleRef = useRef(false);
 
   const [gltfLoadStatus, setGltfLoadStatus] = useState(null);
-
-  // Tilt effect using ref-based DOM manipulation — no setState
-  const tiltCardRef = useRef(null);
-  const handleCardMouseMove = useCallback((e) => {
-    const card = tiltCardRef.current;
-    if (!card) return;
-    const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const xc = rect.width / 2;
-    const yc = rect.height / 2;
-    const rotX = ((yc - y) / yc) * 2.5;
-    const rotY = ((x - xc) / xc) * 2.5;
-    card.style.transform = `perspective(1000px) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
-    card.style.transition = 'transform 0.1s ease-out';
-  }, []);
-
-  const handleCardMouseLeave = useCallback(() => {
-    const card = tiltCardRef.current;
-    if (!card) return;
-    card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg)`;
-    card.style.transition = 'transform 0.5s ease-out';
-  }, []);
 
   // Keep auto-rotate ref in sync
   useEffect(() => {
@@ -553,26 +531,41 @@ function InteractiveStudio({
       }
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
     container.addEventListener('pointerdown', handlePointerDown);
     window.addEventListener('pointermove', handlePointerMove);
     window.addEventListener('pointerup', handlePointerUp);
 
+    const renderScene = () => {
+      camera.position.x = radius * Math.sin(yawRef.current) * Math.cos(pitchRef.current);
+      camera.position.z = radius * Math.cos(yawRef.current) * Math.cos(pitchRef.current);
+      camera.position.y = radius * Math.sin(pitchRef.current) + 1.8;
+      camera.lookAt(-0.5, 1.2, -2.4);
+      renderer.render(scene, camera);
+    };
+
     const animate = () => {
+      if (!isVisibleRef.current) return;
       animationFrameIdRef.current = requestAnimationFrame(animate);
 
       if (autoRotateRef.current && !isDragging) {
         yawRef.current += 0.0025;
       }
 
-      camera.position.x = radius * Math.sin(yawRef.current) * Math.cos(pitchRef.current);
-      camera.position.z = radius * Math.cos(yawRef.current) * Math.cos(pitchRef.current);
-      camera.position.y = radius * Math.sin(pitchRef.current) + 1.8;
-      camera.lookAt(-0.5, 1.2, -2.4);
-
-      renderer.render(scene, camera);
+      renderScene();
     };
-    animate();
+
+    // Pause WebGL rendering when off-screen to save CPU and GPU
+    const observer = new IntersectionObserver(([entry]) => {
+      isVisibleRef.current = entry.isIntersecting;
+      if (entry.isIntersecting) {
+        if (animationFrameIdRef.current) cancelAnimationFrame(animationFrameIdRef.current);
+        animate();
+      } else {
+        if (animationFrameIdRef.current) cancelAnimationFrame(animationFrameIdRef.current);
+      }
+    }, { rootMargin: '100px 0px 100px 0px' });
+
+    observer.observe(container);
 
     const handleResize = () => {
       if (!container) return;
@@ -581,14 +574,15 @@ function InteractiveStudio({
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
+      renderScene();
     };
 
     window.addEventListener('resize', handleResize);
 
     return () => {
-      cancelAnimationFrame(animationFrameIdRef.current);
+      observer.disconnect();
+      if (animationFrameIdRef.current) cancelAnimationFrame(animationFrameIdRef.current);
       window.removeEventListener('resize', handleResize);
-      window.removeEventListener('scroll', handleScroll);
       container.removeEventListener('pointerdown', handlePointerDown);
       window.removeEventListener('pointermove', handlePointerMove);
       window.removeEventListener('pointerup', handlePointerUp);
@@ -662,23 +656,23 @@ function InteractiveStudio({
         <div className="text-center max-w-3xl mx-auto space-y-4 reveal-3d-popup">
           <div className="flex items-center justify-center gap-3">
             <span className="w-8 h-[1px] bg-[#838f6f]/40" />
-            <span className="font-sans text-[10px] md:text-xs font-bold tracking-[0.35em] text-[#838f6f] uppercase">
+            <span className="font-sans text-xs md:text-sm font-extrabold tracking-[0.35em] text-[#838f6f] uppercase">
               VIRTUAL SPATIAL ATELIER
             </span>
             <span className="w-8 h-[1px] bg-[#838f6f]/40" />
           </div>
 
-          <h2 className="font-display text-3xl md:text-5xl font-extralight text-luxury-cream leading-tight uppercase tracking-wider">
+          <h2 className="font-display text-3xl md:text-5xl font-normal text-luxury-cream leading-tight uppercase tracking-wider">
             Interactive 3D <span className="italic font-normal text-[#838f6f]">Modular Kitchen</span> Studio
           </h2>
 
-          <p className="font-sans text-xs md:text-sm text-luxury-cream/60 leading-relaxed font-light max-w-2xl mx-auto">
+          <p className="font-sans text-sm md:text-base text-luxury-cream/75 leading-relaxed font-medium max-w-2xl mx-auto">
             Design your ideal kitchen environment in real-time 3D. Experiment with tactile wood veneers, polished marble countertops, under-cabinet ambient lighting, and spatial layouts live.
           </p>
 
           {gltfLoadStatus && (
             <div className="pt-2">
-              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-sans text-white/70">
+              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-sans text-white/70">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                 {gltfLoadStatus}
               </span>
@@ -688,11 +682,7 @@ function InteractiveStudio({
 
         {/* Studio Panel Card */}
         <div
-          ref={tiltCardRef}
-          onMouseMove={handleCardMouseMove}
-          onMouseLeave={handleCardMouseLeave}
           className="bg-[#141722] border border-white/10 rounded-[24px] p-4 md:p-6 lg:p-8 shadow-[0_40px_80px_rgba(0,0,0,0.5)] grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch"
-          style={{ willChange: 'transform' }}
         >
 
           {/* Left Column: 3D Canvas (8 cols) */}
@@ -816,32 +806,7 @@ function InteractiveStudio({
 
             </div>
 
-            {/* Footer metadata & auto-rotate */}
-            <div className="space-y-3 pt-4 border-t border-white/5">
-
-              <div className="flex items-center justify-between text-[10px] font-sans">
-                <span className="text-white/40">3D Camera Orbit</span>
-                <button
-                  onClick={() => setStudioAutoRotate(!studioAutoRotate)}
-                  className={`px-3 py-1 rounded text-[8px] font-bold uppercase tracking-wider transition-colors duration-300 ${studioAutoRotate
-                    ? 'bg-[#838f6f] text-white'
-                    : 'bg-white/5 text-white/60 hover:bg-white/10'
-                    }`}
-                >
-                  {studioAutoRotate ? 'ROTATING' : 'PAUSED'}
-                </button>
-              </div>
-
-              <div className="bg-white/[0.02] p-2.5 rounded border border-white/5 space-y-1">
-                <p className="text-[9px] font-sans text-white/60 font-medium">
-                  💡 SketchUp (.skp) File Notice:
-                </p>
-                <p className="text-[8px] font-sans text-white/40 leading-relaxed font-light">
-                  To view your custom SketchUp model here, export <code className="text-amber-300">web modular kitchen file.skp</code> as <code className="text-amber-300">web-kitchen.glb</code> and place it in <code className="text-amber-300">frontend/public/</code>.
-                </p>
-              </div>
-
-            </div>
+           
 
           </div>
 

@@ -85,7 +85,7 @@ const LandingPage = ({ onNavigate }) => {
 
     // Preload primary hero slide image
     const mainHeroImg = new Image();
-    mainHeroImg.src = '/images/slide-living.png';
+    mainHeroImg.src = '/images/slide-living.webp';
 
     const handleMainLoad = () => {
       clearTimeout(timeoutId);
@@ -97,7 +97,7 @@ const LandingPage = ({ onNavigate }) => {
 
     // Asynchronously cache secondary slides in background without blocking initial paint
     setTimeout(() => {
-      ['/images/slide-dining.png', '/images/slide-bedroom.png'].forEach(url => {
+      ['/images/slide-dining.webp', '/images/slide-bedroom.webp'].forEach(url => {
         const img = new Image();
         img.src = url;
       });
