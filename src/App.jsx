@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import LandingPage from './components/LandingPage';
 import ServicePage from './components/ServicePage';
 import ProjectPage from './components/ProjectPage';
+import WhatsAppFAB from './components/sections/WhatsAppFAB';
 
 function getRouteFromLocation() {
   const pathname = window.location.pathname.toLowerCase().replace(/\/+$/, '') || '/';
@@ -145,13 +146,14 @@ export default function App() {
     }
   }, []);
 
-  if (currentPage === 'services') {
-    return <ServicePage onNavigate={navigateTo} />;
-  }
-
-  if (currentPage === 'projects') {
-    return <ProjectPage onNavigate={navigateTo} />;
-  }
-
-  return <LandingPage onNavigate={navigateTo} />;
+  return (
+    <>
+      {currentPage === 'services' && <ServicePage onNavigate={navigateTo} />}
+      {currentPage === 'projects' && <ProjectPage onNavigate={navigateTo} />}
+      {currentPage !== 'services' && currentPage !== 'projects' && (
+        <LandingPage onNavigate={navigateTo} />
+      )}
+      <WhatsAppFAB />
+    </>
+  );
 }
