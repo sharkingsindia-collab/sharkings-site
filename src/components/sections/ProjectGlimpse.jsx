@@ -46,8 +46,6 @@ const PROJECTS_DATA = [
     title: 'Billionaires VIP Styling Bay',
     description: 'Exclusive workstation bays crafted with polished marble countertops, recessed LED ambient backlighting, and custom leather seating in Madurai.',
     tags: ['VIP Suite', 'Ambient Lighting', 'Marble Countertops', 'Commercial'],
-    architect: 'R. K. SIVANESH',
-    sqft: '1,800 SQ. FT.',
     gallery: [b1, b2, b3, b4, b5, b6, b7, b8]
   },
   {
@@ -58,8 +56,7 @@ const PROJECTS_DATA = [
     title: 'Face to Face Reception Lounge',
     description: 'Welcoming reception and styling lounge featuring soft ceiling cove illumination, marble islands, and custom branding displays in Ramanathapuram.',
     tags: ['Reception Lounge', 'Cove Lighting', 'Styling Islands', 'Commercial'],
-    architect: 'A. MEERA',
-    sqft: '1,600 SQ. FT.',
+
     gallery: [f1, f01, f3, f4, f5, f6, f07, f8]
   },
   {
@@ -70,8 +67,7 @@ const PROJECTS_DATA = [
     title: 'Home Decor & Living Suite',
     description: 'An elegant residential suite showcasing custom decorative wall fluting, curated living room furniture, and bespoke ambient LED lighting.',
     tags: ['Home Decor', 'Residential Living', 'Wall Fluting', 'Ambient Lighting'],
-    architect: 'R. K. SIVANESH',
-    sqft: '3,100 SQ. FT.',
+
     gallery: [h1, h2, h3, h4, h5, h6, h7, h8]
   },
   {
@@ -82,8 +78,7 @@ const PROJECTS_DATA = [
     title: 'Custom Sofa & Lounge Collection',
     description: 'Handcrafted luxury sofa and upholstery lounge suite featuring ergonomic seating, premium velvet finishes, and bespoke living room aesthetics.',
     tags: ['Sofa Decor', 'Custom Upholstery', 'Luxury Lounge', 'Living Room'],
-    architect: 'A. MEERA',
-    sqft: '2,200 SQ. FT.',
+
     gallery: [s1, s2, s3]
   },
   {
@@ -94,8 +89,7 @@ const PROJECTS_DATA = [
     title: 'Billionaires Luxury Studio',
     description: 'A high-end salon and spa project designed and built in Madurai featuring custom lighted mirrors, smooth wall finishes, and comfortable styling stations.',
     tags: ['Luxury Salon', 'Madurai Studio', 'Lighted Mirrors', 'Gold Hardware'],
-    architect: 'R. K. SIVANESH',
-    sqft: '3,500 SQ. FT.',
+
     gallery: [b1, b2, b3, b4, b5, b6, b7, b8]
   },
   {
@@ -106,8 +100,7 @@ const PROJECTS_DATA = [
     title: 'Face to Face Wellness Studio',
     description: 'A complete beauty and wellness studio completed in Ramanathapuram. Built with practical styling layouts, soft relaxing lighting, and clean finishes.',
     tags: ['Wellness Studio', 'Ramanathapuram', 'Relaxing Lighting', 'Clean Finishes'],
-    architect: 'A. MEERA',
-    sqft: '2,800 SQ. FT.',
+
     gallery: [f1, f01, f3, f4, f5, f6, f07, f8]
   },
   {
@@ -118,8 +111,6 @@ const PROJECTS_DATA = [
     title: 'Modern Wall Paneling & Fluting',
     description: 'High-contrast decorative wall fluting, integrated warm LED channels, and bespoke luxury console styling for family living halls.',
     tags: ['Wall Paneling', 'LED Channels', 'Console Decor', 'Living Room'],
-    architect: 'R. K. SIVANESH',
-    sqft: '2,400 SQ. FT.',
     gallery: [h1, h2, h3, h4, h5, h6, h7, h8]
   },
   {
@@ -130,8 +121,7 @@ const PROJECTS_DATA = [
     title: 'Ergonomic Sectional Living Lounge',
     description: 'Hand-tailored modular living room sofa suite designed with high-resilience foam, brass legs, and stain-resistant luxury fabrics.',
     tags: ['Sectional Sofa', 'Brass Legs', 'Living Room', 'Madurai & Ramnad'],
-    architect: 'A. MEERA',
-    sqft: '2,000 SQ. FT.',
+
     gallery: [s1, s2, s3]
   }
 ];
@@ -602,13 +592,6 @@ function ProjectGlimpse({ onNavigate }) {
               <p className="font-sans text-xs sm:text-sm text-white/85 max-w-2xl leading-relaxed">
                 {selectedProject.description}
               </p>
-              <div className="flex flex-wrap gap-2 pt-1">
-                {selectedProject.tags.map((tag, tIdx) => (
-                  <span key={tIdx} className="text-[10px] font-sans font-semibold text-[#c5a059] bg-[#c5a059]/10 px-2.5 py-0.5 rounded border border-[#c5a059]/20">
-                    #{tag}
-                  </span>
-                ))}
-              </div>
             </div>
 
             <button
