@@ -4,20 +4,20 @@ import slogo from '../../assets/slogo.webp';
 const localSlides = [
   {
     image: '/images/slide-living.webp',
-    alt: 'Sharkings Interior luxury living room interior design studio in Madurai & Ramanathapuram',
-    subtitle: 'LUXURY HOMES & RESIDENCES',
-    title: 'Luxury Interior Design Studio',
-    description: 'We design beautiful luxury homes and custom living spaces. From initial 3D concept to turnkey completion, Sharkings creates modern, comfortable, and elegant home interiors.',
+    alt: 'Sharkings Interior - Best interior designers in Madurai and Ramanathapuram',
+    subtitle: 'MADURAI • RAMANATHAPURAM • SOUTH TAMIL NADU',
+    title: 'Best Interior Designers in Madurai & Ramanathapuram',
+    description: 'Specializing in residential & commercial design since 2010. Flagship design studios in Madurai & Ramnad, executing turnkey luxury interiors across South Tamil Nadu and all of Tamil Nadu.',
     badge: '01 / LIVING ROOMS',
     imageSide: 'right', // Slide 1: Text Left, Image Right
     accentHex: '#c5a059'
   },
   {
     image: '/images/slide-dining.webp',
-    alt: 'Modern luxury dining room and modular interior design by Sharkings Interior',
-    subtitle: 'DINING & LIVING ROOM DESIGN',
-    title: 'Custom Dining & Social Spaces',
-    description: 'Transform your dining spaces with handcrafted furniture, warm ambient lighting, and bespoke decor tailored for family dinners and hosting guests.',
+    alt: 'Modern luxury dining room and modular interior design by Sharkings Interior Madurai',
+    subtitle: 'DINING & MODULAR LIVING SUITES',
+    title: 'Custom Dining & Modular Living Spaces',
+    description: 'Transform your dining spaces with handcrafted furniture, warm ambient lighting, and bespoke decor tailored for family dinners and hosting guests across Tamil Nadu.',
     badge: '02 / DINING SUITES',
     imageSide: 'left', // Slide 2: Image Left, Text Right (Alternating)
     accentHex: '#838F6F'
@@ -26,7 +26,7 @@ const localSlides = [
     image: '/images/slide-bedroom.webp',
     alt: 'Bespoke luxury master bedroom interior design by Sharkings Interior Madurai',
     subtitle: 'BEDROOM & MASTER SUITE DESIGN',
-    title: 'Bespoke Bedroom & Master Suites',
+    title: 'Bespoke Bedroom & Wardrobe Suites',
     description: 'Create your dream master bedroom with custom acoustic wall paneling, integrated warm LED lighting, and luxury wardrobes designed for pure relaxation.',
     badge: '03 / MASTER BEDROOMS',
     imageSide: 'right', // Slide 3: Text Left, Image Right

@@ -42,6 +42,7 @@ import h16 from '../assets/HomeDec/h16.webp';
 import s1 from '../assets/SofaDec/s1.webp';
 import s2 from '../assets/SofaDec/s2.webp';
 import s3 from '../assets/SofaDec/s3.webp';
+import slogo from '../assets/slogo.webp';
 
 const PROJECTS_DATA = [
   {
@@ -161,11 +162,16 @@ function ProjectPage({ onNavigate }) {
             <span>HOME</span>
           </button>
 
-          {/* Clean Typography Title */}
-          <div className="text-center">
-            <span className="font-display text-sm sm:text-base tracking-[0.3em] font-light text-[#1a1a1a] uppercase">
-              SHARKINGS <span className="text-[#710014] font-normal">INTERIORS & EXTERIORS</span>
-            </span>
+          {/* Brand Identity Logo (Mobile, Tablet, Laptop & Desktop) */}
+          <div className="flex items-center justify-center">
+            <img
+              src={slogo}
+              alt="Sharkings Interiors & Exteriors"
+              width="140"
+              height="36"
+              className="h-7 sm:h-8 md:h-9 w-auto object-contain mix-blend-multiply transition-transform duration-300 hover:scale-105 cursor-pointer"
+              onClick={() => onNavigate('landing')}
+            />
           </div>
 
           <button
@@ -184,15 +190,15 @@ function ProjectPage({ onNavigate }) {
         {/* Title Block */}
         <div className="space-y-3 border-b border-[#e5e0d3] pb-6">
           <span className="font-sans text-xs sm:text-sm font-extrabold tracking-[0.35em] text-[#710014] uppercase block">
-            SIGNATURE SHOWCASES
+            SIGNATURE SHOWCASES • MADURAI • RAMANATHAPURAM • SOUTH TAMIL NADU
           </span>
 
-          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-normal text-[#1a1a1a] leading-tight uppercase tracking-wider">
-            Our Masterpieces
+          <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-normal text-[#1a1a1a] leading-tight uppercase tracking-wider">
+            Completed Interior Design Projects in Madurai, Ramnad &amp; South Tamil Nadu
           </h1>
 
-          <p className="font-sans text-sm sm:text-base text-[#333333] leading-relaxed font-medium max-w-2xl">
-            A showcase of signature residences and commercial spaces crafted across Madurai and Ramanathapuram. Select any project to explore the complete gallery and design story.
+          <p className="font-sans text-sm sm:text-base text-[#333333] leading-relaxed font-medium max-w-3xl">
+            A showcase of signature residential villas, modular home decors, luxury salons, and commercial spaces crafted across Madurai, Ramanathapuram, South Tamil Nadu, and across Tamil Nadu. Select any project to explore the complete gallery and design story.
           </p>
         </div>
 

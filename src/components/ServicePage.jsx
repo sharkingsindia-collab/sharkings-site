@@ -13,6 +13,7 @@ import acpElevationImg from '../assets/ACP-elevation.webp';
 import aluminiumPartitionImg from '../assets/aluminium-partition.webp';
 import officeInteriorImg from '../assets/office-interior.webp';
 import salonInteriorImg from '../assets/salon-interior.webp';
+import slogo from '../assets/slogo.webp';
 
 const SERVICES_CATALOG = [
   {
@@ -188,11 +189,16 @@ function ServicePage({ onNavigate }) {
             <span>HOME</span>
           </button>
 
-          {/* Clean Typography Brand Title */}
-          <div className="text-center">
-            <span className="font-display text-sm sm:text-base tracking-[0.3em] font-light text-[#1a1a1a] uppercase">
-              SHARKINGS <span className="text-[#710014] font-normal">INTERIORS & EXTERIORS</span>
-            </span>
+          {/* Brand Identity Logo (Mobile, Tablet, Laptop & Desktop) */}
+          <div className="flex items-center justify-center">
+            <img
+              src={slogo}
+              alt="Sharkings Interiors & Exteriors"
+              width="140"
+              height="36"
+              className="h-7 sm:h-8 md:h-9 w-auto object-contain mix-blend-multiply transition-transform duration-300 hover:scale-105 cursor-pointer"
+              onClick={() => onNavigate('landing')}
+            />
           </div>
 
           <button
@@ -211,15 +217,15 @@ function ServicePage({ onNavigate }) {
         {/* Title Block */}
         <section className="space-y-3 border-b border-[#e5e0d3] pb-6">
           <span className="font-sans text-xs sm:text-sm font-extrabold tracking-[0.35em] text-[#710014] uppercase block">
-            WHAT WE DO
+            WHAT WE DO • MADURAI • RAMANATHAPURAM • SOUTH TAMIL NADU
           </span>
 
-          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-normal text-[#1a1a1a] leading-tight uppercase tracking-wider">
-            Architectural Services
+          <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-normal text-[#1a1a1a] leading-tight uppercase tracking-wider">
+            Interior &amp; Exterior Design Services in Madurai, Ramnad &amp; South Tamil Nadu
           </h1>
 
-          <p className="font-sans text-sm sm:text-base text-[#333333] leading-relaxed font-medium max-w-2xl">
-            Explore our complete range of custom home interiors, modular kitchens, and commercial projects across Madurai and Ramanathapuram.
+          <p className="font-sans text-sm sm:text-base text-[#333333] leading-relaxed font-medium max-w-3xl">
+            Explore our complete range of custom home interiors, waterproof modular kitchens, false ceilings, wardrobe suites, ACP elevations, and commercial projects across Madurai, Ramanathapuram, South Tamil Nadu, and throughout Tamil Nadu.
           </p>
         </section>
 

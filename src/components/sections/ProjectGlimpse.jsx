@@ -1,29 +1,93 @@
-import { useState, useEffect, useRef, useCallback, memo } from 'react';
+import { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import { useScrollReveal } from '../../hooks/useScrollReveal';
 
-// Project Assets from Billionaires & FacetoFace
+// Real Billionaires Project Assets (Madurai)
 import b1 from '../../assets/Billionaires/sharking1.webp';
 import b2 from '../../assets/Billionaires/sharking2.webp';
 import b3 from '../../assets/Billionaires/sharking3.webp';
+import b4 from '../../assets/Billionaires/sharking4.webp';
+import b5 from '../../assets/Billionaires/sharking5.webp';
+import b6 from '../../assets/Billionaires/sharking6.webp';
+import b7 from '../../assets/Billionaires/sharking7.webp';
+import b8 from '../../assets/Billionaires/sharking8.webp';
+
+// Real Face to Face Project Assets (Ramanathapuram)
 import f1 from '../../assets/FacetoFace/sharking1.webp';
+import f01 from '../../assets/FacetoFace/sharking01.webp';
 import f3 from '../../assets/FacetoFace/sharking3.webp';
 import f4 from '../../assets/FacetoFace/sharking4.webp';
+import f5 from '../../assets/FacetoFace/sharking5.webp';
+import f6 from '../../assets/FacetoFace/sharking6.webp';
+import f07 from '../../assets/FacetoFace/sharking07.webp';
+import f8 from '../../assets/FacetoFace/sharking8.webp';
 
-// Home Decor & Sofa Decor Assets
-import h1 from '../../assets/HomeDec/h4.webp';
+// Real Home Decor Project Assets
+import h1 from '../../assets/HomeDec/h1.webp';
+import h2 from '../../assets/HomeDec/h2.webp';
+import h3 from '../../assets/HomeDec/h3.webp';
+import h4 from '../../assets/HomeDec/h4.webp';
+import h5 from '../../assets/HomeDec/h5.webp';
+import h6 from '../../assets/HomeDec/h6.webp';
+import h7 from '../../assets/HomeDec/h7.webp';
+import h8 from '../../assets/HomeDec/h8.webp';
+
+// Real Sofa Decor Project Assets
 import s1 from '../../assets/SofaDec/s1.webp';
+import s2 from '../../assets/SofaDec/s2.webp';
+import s3 from '../../assets/SofaDec/s3.webp';
 
-// Core Service & Project Assets
-import homeInteriorImg from '../../assets/home-interior.webp';
-import modularKitchenImg from '../../assets/modular-kitchen.webp';
-import officeInteriorImg from '../../assets/office-interior.webp';
-import acpElevationImg from '../../assets/ACP-elevation.webp';
-import turnkeyImg from '../../assets/turnkey.webp';
-import wardrobeImg from '../../assets/wardrobe.webp';
-
+// 100% Real Projects Catalog matching ProjectPage.jsx
 const PROJECTS_DATA = [
   {
     id: 1,
+    category: 'COMMERCIAL',
+    branch: 'MADURAI BRANCH',
+    image: b3,
+    title: 'Billionaires VIP Styling Bay',
+    description: 'Exclusive workstation bays crafted with polished marble countertops, recessed LED ambient backlighting, and custom leather seating in Madurai.',
+    tags: ['VIP Suite', 'Ambient Lighting', 'Marble Countertops', 'Commercial'],
+    architect: 'R. K. SIVANESH',
+    sqft: '1,800 SQ. FT.',
+    gallery: [b1, b2, b3, b4, b5, b6, b7, b8]
+  },
+  {
+    id: 2,
+    category: 'COMMERCIAL',
+    branch: 'RAMANATHAPURAM BRANCH',
+    image: f3,
+    title: 'Face to Face Reception Lounge',
+    description: 'Welcoming reception and styling lounge featuring soft ceiling cove illumination, marble islands, and custom branding displays in Ramanathapuram.',
+    tags: ['Reception Lounge', 'Cove Lighting', 'Styling Islands', 'Commercial'],
+    architect: 'A. MEERA',
+    sqft: '1,600 SQ. FT.',
+    gallery: [f1, f01, f3, f4, f5, f6, f07, f8]
+  },
+  {
+    id: 3,
+    category: 'RESIDENTIAL',
+    branch: 'MADURAI & RAMNAD',
+    image: h4,
+    title: 'Home Decor & Living Suite',
+    description: 'An elegant residential suite showcasing custom decorative wall fluting, curated living room furniture, and bespoke ambient LED lighting.',
+    tags: ['Home Decor', 'Residential Living', 'Wall Fluting', 'Ambient Lighting'],
+    architect: 'R. K. SIVANESH',
+    sqft: '3,100 SQ. FT.',
+    gallery: [h1, h2, h3, h4, h5, h6, h7, h8]
+  },
+  {
+    id: 4,
+    category: 'RESIDENTIAL',
+    branch: 'MADURAI & RAMNAD',
+    image: s1,
+    title: 'Custom Sofa & Lounge Collection',
+    description: 'Handcrafted luxury sofa and upholstery lounge suite featuring ergonomic seating, premium velvet finishes, and bespoke living room aesthetics.',
+    tags: ['Sofa Decor', 'Custom Upholstery', 'Luxury Lounge', 'Living Room'],
+    architect: 'A. MEERA',
+    sqft: '2,200 SQ. FT.',
+    gallery: [s1, s2, s3]
+  },
+  {
+    id: 5,
     category: 'COMMERCIAL',
     branch: 'MADURAI BRANCH',
     image: b1,
@@ -32,194 +96,57 @@ const PROJECTS_DATA = [
     tags: ['Luxury Salon', 'Madurai Studio', 'Lighted Mirrors', 'Gold Hardware'],
     architect: 'R. K. SIVANESH',
     sqft: '3,500 SQ. FT.',
-    materials: [
-      { name: 'Brushed Gold Brass', color: '#d4af37' },
-      { name: 'Warm Oak Veneer', color: '#8a6543' },
-      { name: 'Acoustic Slat Panel', color: '#2a2a2a' },
-      { name: 'Calacatta Marble', color: '#eaeaea' }
-    ]
-  },
-  {
-    id: 2,
-    category: 'COMMERCIAL',
-    branch: 'RAMANATHAPURAM BRANCH',
-    image: f1,
-    title: 'Face to Face Wellness Lounge',
-    description: 'A complete beauty and wellness studio completed in Ramanathapuram. Built with practical styling layouts, soft relaxing lighting, and clean finishes.',
-    tags: ['Wellness Studio', 'Ramanathapuram', 'Relaxing Lighting', 'Clean Finishes'],
-    architect: 'A. MEERA',
-    sqft: '2,800 SQ. FT.',
-    materials: [
-      { name: 'Warm Sandstone', color: '#dcc6a8' },
-      { name: 'Satin Brass', color: '#cfb53b' },
-      { name: 'Obsidian Trim', color: '#111111' },
-      { name: 'Smoked Mirror', color: '#333333' }
-    ]
-  },
-  {
-    id: 3,
-    category: 'RESIDENTIAL',
-    branch: 'MADURAI BRANCH',
-    image: homeInteriorImg,
-    title: 'The Signature Living Suite',
-    description: 'A modern, high-contrast residential living space crafted with warm oak veneers, bespoke illumination, and premium Italian upholstery.',
-    tags: ['Living Room', 'Earthy Tones', 'Warm Veneer', 'Bespoke Lighting'],
-    architect: 'R. K. SIVANESH',
-    sqft: '2,400 SQ. FT.',
-    materials: [
-      { name: 'Terracotta Plaster', color: '#c36241' },
-      { name: 'Warm Oak Veneer', color: '#8a6543' },
-      { name: 'Brushed Brass', color: '#d4af37' },
-      { name: 'Linen Fiber', color: '#e3dfd5' }
-    ]
-  },
-  {
-    id: 4,
-    category: 'MODULAR KITCHEN',
-    branch: 'MADURAI BRANCH',
-    image: modularKitchenImg,
-    title: 'Minimalist Timber Kitchen',
-    description: 'Precision-finished modular cabinetry accented with hand-polished golden grips, soft-close hardware, and integrated hidden storage.',
-    tags: ['Kitchen', 'Veneers', 'Gold Grips', 'German Hardware'],
-    architect: 'S. KARTHIK',
-    sqft: '520 SQ. FT.',
-    materials: [
-      { name: 'Charcoal Oak', color: '#2a2a2a' },
-      { name: 'Satin Brass', color: '#cfb53b' },
-      { name: 'Calacatta Marble', color: '#eaeaea' },
-      { name: 'Toughened Glass', color: '#7a8a99' }
-    ]
-  },
-  {
-    id: 5,
-    category: 'RESIDENTIAL',
-    branch: 'RAMANATHAPURAM BRANCH',
-    image: wardrobeImg,
-    title: 'The Serenity Bedroom & Wardrobe',
-    description: 'An expansive master suite layout balancing organic wood textures, tinted glass wardrobe panels, and ambient backlighting for a calm retreat.',
-    tags: ['Bedroom', 'Custom Wardrobe', 'Glass Panels', 'Calm Theme'],
-    architect: 'A. MEERA',
-    sqft: '1,850 SQ. FT.',
-    materials: [
-      { name: 'Raw Sandstone', color: '#dcc6a8' },
-      { name: 'Bleached Linen', color: '#f5f3ef' },
-      { name: 'Aged Gold', color: '#bfa15f' },
-      { name: 'Obsidian Trim', color: '#111111' }
-    ]
+    gallery: [b1, b2, b3, b4, b5, b6, b7, b8]
   },
   {
     id: 6,
     category: 'COMMERCIAL',
-    branch: 'MADURAI BRANCH',
-    image: b3,
-    title: 'Billionaires VIP Styling Bay',
-    description: 'Exclusive workstation bays crafted with polished marble countertops, recessed LED ambient backlighting, and custom leather seating.',
-    tags: ['VIP Suite', 'Ambient Lighting', 'Marble Countertops', 'Commercial'],
-    architect: 'R. K. SIVANESH',
-    sqft: '1,800 SQ. FT.',
-    materials: [
-      { name: 'Nero Marquina', color: '#1e1e1e' },
-      { name: 'Polished Gold', color: '#ffd700' },
-      { name: 'Aged Bronze', color: '#8c6d46' },
-      { name: 'Smoked Glass', color: '#333333' }
-    ]
+    branch: 'RAMANATHAPURAM BRANCH',
+    image: f1,
+    title: 'Face to Face Wellness Studio',
+    description: 'A complete beauty and wellness studio completed in Ramanathapuram. Built with practical styling layouts, soft relaxing lighting, and clean finishes.',
+    tags: ['Wellness Studio', 'Ramanathapuram', 'Relaxing Lighting', 'Clean Finishes'],
+    architect: 'A. MEERA',
+    sqft: '2,800 SQ. FT.',
+    gallery: [f1, f01, f3, f4, f5, f6, f07, f8]
   },
   {
     id: 7,
-    category: 'RENOVATION',
-    branch: 'RAMANATHAPURAM BRANCH',
-    image: acpElevationImg,
-    title: 'Exterior Facade & ACP Revival',
-    description: 'Transforming existing structural facades with modern weather-proof ACP cladding, linear outdoor lighting, and architectural paneling.',
-    tags: ['ACP Cladding', 'Elevation Design', 'Structural Revival', 'Exterior'],
-    architect: 'S. KARTHIK',
-    sqft: '3,200 SQ. FT.',
-    materials: [
-      { name: 'Metallic Silver ACP', color: '#c0c0c0' },
-      { name: 'Curved Stucco', color: '#eadecb' },
-      { name: 'Charcoal Panels', color: '#222222' },
-      { name: 'Gold Anodized', color: '#cda869' }
-    ]
+    category: 'RESIDENTIAL',
+    branch: 'MADURAI & RAMNAD',
+    image: h1,
+    title: 'Modern Wall Paneling & Fluting',
+    description: 'High-contrast decorative wall fluting, integrated warm LED channels, and bespoke luxury console styling for family living halls.',
+    tags: ['Wall Paneling', 'LED Channels', 'Console Decor', 'Living Room'],
+    architect: 'R. K. SIVANESH',
+    sqft: '2,400 SQ. FT.',
+    gallery: [h1, h2, h3, h4, h5, h6, h7, h8]
   },
   {
     id: 8,
-    category: 'COMMERCIAL',
-    branch: 'RAMANATHAPURAM BRANCH',
-    image: f3,
-    title: 'Face to Face Reception Lounge',
-    description: 'Welcoming reception and styling lounge featuring soft ceiling cove illumination, marble islands, and custom branding displays.',
-    tags: ['Reception Lounge', 'Cove Lighting', 'Styling Islands', 'Commercial'],
-    architect: 'A. MEERA',
-    sqft: '1,600 SQ. FT.',
-    materials: [
-      { name: 'White Marble', color: '#f5f5f5' },
-      { name: 'Warm LED Cove', color: '#ffe4b5' },
-      { name: 'Satin Brass', color: '#cfb53b' },
-      { name: 'Obsidian Trim', color: '#111111' }
-    ]
-  },
-  {
-    id: 9,
-    category: 'RENOVATION',
-    branch: 'MADURAI BRANCH',
-    image: turnkeyImg,
-    title: 'The Coastal Villa Revival',
-    description: 'Transforming older residential structures into modern quiet luxury homes with full turnkey execution, acoustic walls, and open architectural arches.',
-    tags: ['Renovation', 'Turnkey Execution', 'Quiet Luxury', 'Architectural Arches'],
-    architect: 'S. KARTHIK',
-    sqft: '4,200 SQ. FT.',
-    materials: [
-      { name: 'Italian Marble', color: '#e8e6e1' },
-      { name: 'Teak Wood Veneer', color: '#795548' },
-      { name: 'Brushed Brass', color: '#d4af37' },
-      { name: 'Velvet Trim', color: '#556b2f' }
-    ]
-  },
-  {
-    id: 10,
     category: 'RESIDENTIAL',
-    branch: 'MADURAI BRANCH',
-    image: h1,
-    title: 'Home Decor & Interior Suite',
-    description: 'An elegant home interior and decor suite showcasing custom wall cladding, curated furnishings, lighting design, and contemporary residential styling.',
-    tags: ['Home Decor', 'Residential Interiors', 'Custom Paneling', 'Ambient Lighting'],
-    architect: 'R. K. SIVANESH',
-    sqft: '3,100 SQ. FT.',
-    materials: [
-      { name: 'Warm Oak Veneer', color: '#8a6543' },
-      { name: 'Bespoke Wall Accent', color: '#dcc6a8' },
-      { name: 'Satin Brass Trim', color: '#cfb53b' },
-      { name: 'Italian Marble', color: '#eaeaea' }
-    ]
-  },
-  {
-    id: 11,
-    category: 'RESIDENTIAL',
-    branch: 'RAMANATHAPURAM BRANCH',
-    image: s1,
-    title: 'Custom Sofa & Lounge Collection',
-    description: 'Handcrafted luxury sofa and upholstery lounge suite featuring ergonomic seating, premium velvet finishes, and bespoke living room aesthetics.',
-    tags: ['Sofa Decor', 'Custom Upholstery', 'Luxury Lounge', 'Living Room'],
+    branch: 'MADURAI & RAMNAD',
+    image: s2,
+    title: 'Ergonomic Sectional Living Lounge',
+    description: 'Hand-tailored modular living room sofa suite designed with high-resilience foam, brass legs, and stain-resistant luxury fabrics.',
+    tags: ['Sectional Sofa', 'Brass Legs', 'Living Room', 'Madurai & Ramnad'],
     architect: 'A. MEERA',
-    sqft: '2,200 SQ. FT.',
-    materials: [
-      { name: 'Velvet Upholstery', color: '#38000a' },
-      { name: 'Polished Brass Legs', color: '#d4af37' },
-      { name: 'Smoked Glass Table', color: '#333333' },
-      { name: 'Charcoal Fabric', color: '#2a2a2a' }
-    ]
+    sqft: '2,000 SQ. FT.',
+    gallery: [s1, s2, s3]
   }
 ];
 
+// Exact Previous 3D Perspective Card Component
 const ProjectCard = memo(function ProjectCard({ project, onClick, cardStyle, isActive }) {
   return (
     <div
       onClick={onClick}
       style={cardStyle}
-      className={`absolute w-[240px] sm:w-[300px] md:w-[340px] aspect-[3/4] bg-[#121622] rounded-2xl border overflow-hidden shadow-2xl transition-all duration-300 ease-out cursor-pointer select-none group touch-manipulation hover:-translate-y-1.5 ${isActive
-        ? 'border-[#c5a059]/60 ring-1 ring-[#c5a059]/40 shadow-[0_20px_50px_rgba(0,0,0,0.6)]'
-        : 'border-white/10 hover:border-white/30 opacity-80'
-        }`}
+      className={`absolute w-[240px] sm:w-[300px] md:w-[340px] aspect-[3/4] bg-[#121622] rounded-2xl border overflow-hidden shadow-2xl transition-all duration-500 ease-out cursor-pointer select-none group touch-manipulation hover:-translate-y-1.5 ${
+        isActive
+          ? 'border-[#c5a059]/70 ring-1 ring-[#c5a059]/50 shadow-[0_20px_50px_rgba(0,0,0,0.7)]'
+          : 'border-white/10 hover:border-white/30 opacity-75'
+      }`}
     >
       {/* Image background showcase */}
       <div className="absolute inset-0 w-full h-full overflow-hidden z-0 bg-black/50">
@@ -234,9 +161,9 @@ const ProjectCard = memo(function ProjectCard({ project, onClick, cardStyle, isA
         />
 
         {/* Soft gradient overlay for text legibility */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-black/20 z-10 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/20 z-10 pointer-events-none" />
 
-        {/* Top Pill Bar */}
+        {/* Top Pill Bar (Exact Original Style) */}
         <div className="absolute top-4 left-4 z-20 pointer-events-none">
           <span className="bg-black/60 backdrop-blur-md text-[#c5a059] border border-[#c5a059]/30 px-3.5 py-1.5 rounded-full text-[11px] font-sans font-extrabold tracking-[0.2em] uppercase shadow-sm">
             {project.category}
@@ -244,10 +171,10 @@ const ProjectCard = memo(function ProjectCard({ project, onClick, cardStyle, isA
         </div>
       </div>
 
-      {/* Clean Minimalist Bottom Details Panel */}
+      {/* Clean Minimalist Bottom Details Panel (Exact Original Style) */}
       <div className="absolute bottom-0 inset-x-0 z-20 p-6 flex flex-col justify-end space-y-3 pointer-events-none">
 
-        {/* Project Title & Subtitle */}
+        {/* Project Subtitle & Architect */}
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-[11px] font-sans font-semibold text-white/70 tracking-widest uppercase">
             <span>{project.sqft}</span>
@@ -274,7 +201,7 @@ const ProjectCard = memo(function ProjectCard({ project, onClick, cardStyle, isA
             </span>
           )}
 
-          <span className={`w-2 h-2 rounded-full transition-all duration-300 ${isActive ? 'bg-[#c5a059] shadow-[0_0_8px_#c5a059]' : 'bg-white/20'}`} />
+          <span className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${isActive ? 'bg-[#c5a059] shadow-[0_0_8px_#c5a059]' : 'bg-white/20'}`} />
         </div>
 
       </div>
@@ -284,36 +211,38 @@ const ProjectCard = memo(function ProjectCard({ project, onClick, cardStyle, isA
 
 function ProjectGlimpse({ onNavigate }) {
   useScrollReveal();
-  const [activeCategory, setActiveCategory] = useState('RESIDENTIAL');
-  const [isScanning, setIsScanning] = useState(false);
+  const [activeCategory, setActiveCategory] = useState('ALL');
   const [selectedProject, setSelectedProject] = useState(null);
+  const [activeModalImgIdx, setActiveModalImgIdx] = useState(0);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isDesktop, setIsDesktop] = useState(true);
 
-  const categories = ['ALL', 'RESIDENTIAL', 'MODULAR KITCHEN', 'COMMERCIAL', 'RENOVATION'];
+  const categories = ['ALL', 'RESIDENTIAL', 'COMMERCIAL'];
 
-  const filteredProjects = activeCategory === 'ALL'
-    ? PROJECTS_DATA
-    : PROJECTS_DATA.filter(p => p.category === activeCategory);
+  const filteredProjects = useMemo(() => {
+    return activeCategory === 'ALL'
+      ? PROJECTS_DATA
+      : PROJECTS_DATA.filter((p) => p.category === activeCategory);
+  }, [activeCategory]);
 
-  // Keyboard shortcut (Escape) & scroll lock for selected project lightbox
+  // Keyboard shortcut (Escape & Arrows) & scroll lock for lightbox
   useEffect(() => {
     const handleKeyDown = (e) => {
+      if (!selectedProject) return;
       if (e.key === 'Escape') {
         setSelectedProject(null);
+        document.body.style.overflow = '';
+      } else if (e.key === 'ArrowRight') {
+        setActiveModalImgIdx((prev) => (prev + 1) % selectedProject.gallery.length);
+      } else if (e.key === 'ArrowLeft') {
+        setActiveModalImgIdx((prev) => (prev - 1 + selectedProject.gallery.length) % selectedProject.gallery.length);
       }
     };
-    if (selectedProject) {
-      window.addEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = 'hidden';
-    }
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = '';
-    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedProject]);
 
-  // Resize listener for responsive layout adjustments
+  // Resize listener for responsive 3D perspective adjustments
   useEffect(() => {
     const handleResize = () => {
       setIsDesktop(window.innerWidth >= 1024);
@@ -323,63 +252,93 @@ function ProjectGlimpse({ onNavigate }) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Update active index to center of array when filtered list changes
+  // Reset active index when category changes
   useEffect(() => {
-    if (filteredProjects.length > 0) {
-      setActiveIndex(Math.max(0, Math.floor((filteredProjects.length - 1) / 2)));
-    } else {
-      setActiveIndex(0);
-    }
+    setActiveIndex(0);
   }, [activeCategory]);
 
-  const triggerScanFetch = useCallback(() => {
-    if (isScanning) return;
-    setIsScanning(true);
-    setTimeout(() => {
-      setIsScanning(false);
-    }, 1400);
-  }, [isScanning]);
+  // AUTOMATIC RIGHT-TO-LEFT CONTINUOUS LOOP TIMER (Advances every 2.8s)
+  useEffect(() => {
+    if (selectedProject || filteredProjects.length <= 1) return;
 
-  // 3D Perspective Card Transform Calculation (Zero overlapping, smooth perspective side-by-side depth)
-  const getCardTransform = useCallback((idx) => {
-    const offset = idx - activeIndex;
-    const absOffset = Math.abs(offset);
+    const timer = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % filteredProjects.length);
+    }, 2800);
 
-    // X separation: 390px on desktop, 280px on mobile to guarantee zero card overlap
-    const stepX = isDesktop ? 390 : 280;
-    const tx = offset * stepX;
+    return () => clearInterval(timer);
+  }, [selectedProject, filteredProjects.length]);
 
-    // Z depth pushback for curved 3D gallery effect
-    const stepZ = isDesktop ? 120 : 70;
-    const tz = -absOffset * stepZ;
+  // 3D Perspective Card Transform Calculation with Shortest Cyclic Distance for Infinite Right-to-Left Loop
+  const getCardTransform = useCallback(
+    (idx) => {
+      const total = filteredProjects.length;
+      let offset = idx - activeIndex;
 
-    // Gentle Y-axis rotation toward center
-    const maxRotY = 18;
-    const ry = offset === 0 ? 0 : (offset > 0 ? -maxRotY : maxRotY);
+      // Shortest cyclic wrap-around so cards cycle continuously in a 3D loop
+      if (offset > total / 2) offset -= total;
+      if (offset < -total / 2) offset += total;
 
-    // Scale reduction for distant cards
-    const scale = 1 - Math.min(absOffset * 0.12, 0.3);
+      const absOffset = Math.abs(offset);
 
-    // Opacity fade for far cards
-    const opacity = absOffset > 2 ? 0 : (absOffset === 0 ? 1 : (absOffset === 1 ? 0.85 : 0.4));
+      // X separation: 380px on desktop, 270px on mobile
+      const stepX = isDesktop ? 380 : 270;
+      const tx = offset * stepX;
 
-    return {
-      transform: `perspective(1200px) translateX(${tx}px) translateZ(${tz}px) rotateY(${ry}deg) scale(${scale})`,
-      opacity: opacity,
-      zIndex: 100 - Math.round(absOffset * 10),
-      pointerEvents: absOffset > 2 ? 'none' : 'auto',
-      transition: 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s',
-      willChange: 'transform, opacity'
-    };
-  }, [activeIndex, isDesktop]);
+      // Z depth pushback for curved 3D gallery effect
+      const stepZ = isDesktop ? 120 : 70;
+      const tz = -absOffset * stepZ;
 
-  const handleCardClick = useCallback((project, idx) => {
-    if (idx !== activeIndex) {
-      setActiveIndex(idx);
-    } else {
-      setSelectedProject(project);
+      // Gentle Y-axis rotation toward center
+      const maxRotY = 18;
+      const ry = offset === 0 ? 0 : offset > 0 ? -maxRotY : maxRotY;
+
+      // Scale reduction for distant cards
+      const scale = 1 - Math.min(absOffset * 0.12, 0.3);
+
+      // Opacity fade for far cards
+      const opacity = absOffset > 2 ? 0 : absOffset === 0 ? 1 : absOffset === 1 ? 0.85 : 0.4;
+
+      return {
+        transform: `perspective(1200px) translateX(${tx}px) translateZ(${tz}px) rotateY(${ry}deg) scale(${scale})`,
+        opacity: opacity,
+        zIndex: 100 - Math.round(absOffset * 10),
+        pointerEvents: absOffset > 2 ? 'none' : 'auto',
+        transition: 'transform 0.75s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.75s ease-out',
+        willChange: 'transform, opacity'
+      };
+    },
+    [activeIndex, isDesktop, filteredProjects.length]
+  );
+
+  const handleCardClick = useCallback(
+    (project, idx) => {
+      if (idx !== activeIndex) {
+        setActiveIndex(idx);
+      } else {
+        setSelectedProject(project);
+        setActiveModalImgIdx(0);
+        document.body.style.overflow = 'hidden';
+      }
+    },
+    [activeIndex]
+  );
+
+  const closeProjectModal = useCallback(() => {
+    setSelectedProject(null);
+    document.body.style.overflow = '';
+  }, []);
+
+  const handleExploreAllClick = useCallback(() => {
+    if (selectedProject) {
+      document.body.style.overflow = '';
+      setSelectedProject(null);
     }
-  }, [activeIndex]);
+    if (onNavigate) {
+      onNavigate('projects');
+    } else {
+      window.history.pushState({ page: 'projects' }, '', '/projects');
+    }
+  }, [selectedProject, onNavigate]);
 
   return (
     <>
@@ -414,6 +373,22 @@ function ProjectGlimpse({ onNavigate }) {
                 Explore custom spaces hand-engineered in Madurai and Ramanathapuram. Click cards to view full project showcases.
               </p>
             </div>
+
+            <button
+              onClick={handleExploreAllClick}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-[#c5a059] text-black font-sans text-xs font-extrabold tracking-widest uppercase hover:bg-white hover:text-[#710014] transition-all duration-300 shadow-md cursor-pointer self-start md:self-end touch-manipulation group flex-shrink-0"
+            >
+              <span>View All Projects</span>
+              <svg
+                className="w-4 h-4 transform group-hover:translate-x-1 transition-transform"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                strokeWidth={2.5}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              </svg>
+            </button>
           </div>
 
           {/* Filter row */}
@@ -422,13 +397,12 @@ function ProjectGlimpse({ onNavigate }) {
               {categories.map((cat) => (
                 <button
                   key={cat}
-                  onClick={() => {
-                    setActiveCategory(cat);
-                  }}
-                  className={`px-5 py-2.5 rounded-none font-sans text-xs sm:text-sm font-extrabold tracking-widest uppercase transition-all duration-200 flex-shrink-0 touch-manipulation cursor-pointer ${activeCategory === cat
-                    ? 'bg-[#838f6f] text-white shadow-md'
-                    : 'bg-transparent text-white/50 hover:text-white'
-                    }`}
+                  onClick={() => setActiveCategory(cat)}
+                  className={`px-5 py-2.5 rounded-none font-sans text-xs sm:text-sm font-extrabold tracking-widest uppercase transition-all duration-200 flex-shrink-0 touch-manipulation cursor-pointer ${
+                    activeCategory === cat
+                      ? 'bg-[#838f6f] text-white shadow-md'
+                      : 'bg-transparent text-white/50 hover:text-white'
+                  }`}
                 >
                   {cat}
                 </button>
@@ -436,26 +410,15 @@ function ProjectGlimpse({ onNavigate }) {
             </div>
           </div>
 
-          {/* 3D Perspective Curved Container */}
-          <div className="relative w-full h-[450px] md:h-[560px] flex items-center justify-center overflow-visible">
+          {/* 3D Perspective Curved Container Automatically Moving Right to Left in Loop */}
+          <div className="relative w-full h-[450px] md:h-[560px] flex items-center justify-center overflow-visible my-2">
 
-            {/* Ring Center horizontal alignment line */}
+            {/* Center horizontal gold alignment line */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
               <div className="w-[102%] h-[1px] bg-gradient-to-r from-transparent via-[#c5a059]/20 to-transparent" />
             </div>
 
-            {/* Laser Line Scanning visual effect overlay */}
-            {isScanning && (
-              <div
-                className="absolute left-0 right-0 h-[2px] bg-[#c5a059] z-20 pointer-events-none laser-line"
-                style={{
-                  boxShadow: '0 0 14px 2.5px #c5a059',
-                  top: '50%'
-                }}
-              />
-            )}
-
-            {/* Cards Deck */}
+            {/* 3D Cards Deck */}
             <div className="relative w-full h-full flex items-center justify-center overflow-visible [transform-style:preserve-3d]">
               {filteredProjects.map((project, idx) => {
                 const isActive = idx === activeIndex;
@@ -463,8 +426,7 @@ function ProjectGlimpse({ onNavigate }) {
                 return (
                   <div
                     key={project.id}
-                    className={`transition-all duration-300 transform ${isScanning ? 'opacity-40 scale-[0.98]' : 'opacity-100 scale-100'
-                      }`}
+                    className="transition-all duration-300 transform"
                     style={{
                       position: 'absolute',
                       width: '100%',
@@ -486,6 +448,27 @@ function ProjectGlimpse({ onNavigate }) {
               })}
             </div>
 
+            {/* Left & Right Interactive Navigation Chevrons */}
+            <button
+              onClick={() => setActiveIndex((prev) => (prev - 1 + filteredProjects.length) % filteredProjects.length)}
+              aria-label="Previous Project"
+              className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/60 hover:bg-[#c5a059] hover:text-black text-white border border-white/15 flex items-center justify-center transition-all cursor-pointer shadow-xl z-30 touch-manipulation"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+              </svg>
+            </button>
+
+            <button
+              onClick={() => setActiveIndex((prev) => (prev + 1) % filteredProjects.length)}
+              aria-label="Next Project"
+              className="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/60 hover:bg-[#c5a059] hover:text-black text-white border border-white/15 flex items-center justify-center transition-all cursor-pointer shadow-xl z-30 touch-manipulation"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+              </svg>
+            </button>
+
           </div>
 
           {/* Indicator dots below ring */}
@@ -495,13 +478,17 @@ function ProjectGlimpse({ onNavigate }) {
                 key={idx}
                 onClick={() => setActiveIndex(idx)}
                 aria-label={`Show project 0${idx + 1}`}
-                className={`w-3.5 h-3.5 rounded-full flex items-center justify-center border transition-all duration-200 cursor-pointer touch-manipulation ${idx === activeIndex
-                  ? 'border-[#c5a059] bg-[#c5a059]/10 scale-110'
-                  : 'border-white/10 bg-white/5 hover:border-white/30 hover:bg-white/10'
-                  }`}
+                className={`w-3.5 h-3.5 rounded-full flex items-center justify-center border transition-all duration-200 cursor-pointer touch-manipulation ${
+                  idx === activeIndex
+                    ? 'border-[#c5a059] bg-[#c5a059]/10 scale-110'
+                    : 'border-white/10 bg-white/5 hover:border-white/30 hover:bg-white/10'
+                }`}
               >
-                <span className={`w-1.5 h-1.5 rounded-full transition-all duration-200 ${idx === activeIndex ? 'bg-[#c5a059] scale-100' : 'bg-transparent scale-0'
-                  }`} />
+                <span
+                  className={`w-1.5 h-1.5 rounded-full transition-all duration-200 ${
+                    idx === activeIndex ? 'bg-[#c5a059] scale-100' : 'bg-transparent scale-0'
+                  }`}
+                />
               </button>
             ))}
           </div>
@@ -509,8 +496,8 @@ function ProjectGlimpse({ onNavigate }) {
           {/* Bottom Action CTA */}
           <div className="flex justify-center pt-6">
             <button
-              onClick={() => onNavigate && onNavigate('projects')}
-              className="relative px-9 py-3.5 bg-white text-luxury-charcoal font-sans text-xs uppercase tracking-[0.2em] font-bold overflow-hidden group transition-all duration-300 shadow-[0_15px_30px_rgba(255,255,255,0.05)] rounded-full hover:shadow-[0_15px_35px_rgba(255,255,255,0.1)] touch-manipulation"
+              onClick={handleExploreAllClick}
+              className="relative px-9 py-3.5 bg-white text-luxury-charcoal font-sans text-xs uppercase tracking-[0.2em] font-bold overflow-hidden group transition-all duration-300 shadow-[0_15px_30px_rgba(255,255,255,0.05)] rounded-full hover:shadow-[0_15px_35px_rgba(255,255,255,0.1)] touch-manipulation cursor-pointer"
             >
               <span className="relative z-10 flex items-center gap-2">
                 <span>Explore Entire Gallery</span>
@@ -526,9 +513,7 @@ function ProjectGlimpse({ onNavigate }) {
 
       {/* Fullscreen High-Resolution Project Lightbox Modal */}
       {selectedProject && (
-        <div
-          className="fixed inset-0 z-[9999] bg-black/95 backdrop-blur-2xl flex flex-col justify-between p-4 sm:p-6 md:p-10 transition-all duration-200 animate-fadeIn"
-        >
+        <div className="fixed inset-0 z-[9999] bg-black/95 backdrop-blur-2xl flex flex-col justify-between p-4 sm:p-6 md:p-10 transition-all duration-200">
           {/* Top Header Bar */}
           <div className="flex items-center justify-between border-b border-white/10 pb-4 z-20">
             <div className="space-y-1">
@@ -541,7 +526,7 @@ function ProjectGlimpse({ onNavigate }) {
             </div>
 
             <button
-              onClick={() => setSelectedProject(null)}
+              onClick={closeProjectModal}
               aria-label="Close Lightbox"
               className="w-11 h-11 sm:w-12 sm:h-12 rounded-full border border-white/20 bg-white/10 hover:bg-white hover:text-black text-white flex items-center justify-center transition-all duration-200 cursor-pointer shadow-lg touch-manipulation"
             >
@@ -551,54 +536,90 @@ function ProjectGlimpse({ onNavigate }) {
             </button>
           </div>
 
-          {/* Main Stage: Large Visible Image Display */}
-          <div
-            onClick={() => setSelectedProject(null)}
-            className="relative flex-1 w-full my-4 flex items-center justify-center overflow-hidden rounded-2xl bg-[#0a0c10] border border-white/10 group cursor-pointer"
-          >
+          {/* Main Stage: Large Visible Image Display with Gallery Carousel */}
+          <div className="relative flex-1 w-full my-4 flex items-center justify-center overflow-hidden rounded-2xl bg-[#08090d] border border-white/10">
             <img
-              src={selectedProject.image}
-              alt={selectedProject.title}
+              src={selectedProject.gallery[activeModalImgIdx] || selectedProject.image}
+              alt={`${selectedProject.title} ${activeModalImgIdx + 1}`}
               width="1200"
               height="800"
               decoding="async"
-              className="w-full h-full object-contain max-h-[75vh] md:max-h-[80vh] transition-transform duration-500 group-hover:scale-[1.02]"
+              className="w-full h-full object-contain max-h-[65vh] md:max-h-[72vh] transition-all duration-300"
             />
 
-            {/* Gradient Overlay at bottom for readable text */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-transparent pointer-events-none" />
+            {/* Navigation Arrows for Gallery */}
+            {selectedProject.gallery.length > 1 && (
+              <>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveModalImgIdx((prev) => (prev - 1 + selectedProject.gallery.length) % selectedProject.gallery.length);
+                  }}
+                  aria-label="Previous Photo"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/60 hover:bg-[#c5a059] hover:text-black text-white border border-white/20 flex items-center justify-center transition-all cursor-pointer shadow-xl z-20 touch-manipulation"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                  </svg>
+                </button>
 
-            {/* Floating Info Overlay */}
-            <div className="absolute bottom-6 left-6 right-6 md:left-8 md:right-8 flex flex-col md:flex-row md:items-end justify-between gap-4 pointer-events-none">
-              <div className="max-w-3xl space-y-2 pointer-events-auto">
-                <span className="font-sans text-xs font-extrabold tracking-[0.25em] text-[#838f6f] uppercase">
-                  {selectedProject.category}
-                </span>
-                <p className="font-sans text-sm md:text-base text-white/90 leading-relaxed font-medium drop-shadow-md">
-                  {selectedProject.description}
-                </p>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveModalImgIdx((prev) => (prev + 1) % selectedProject.gallery.length);
+                  }}
+                  aria-label="Next Photo"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/60 hover:bg-[#c5a059] hover:text-black text-white border border-white/20 flex items-center justify-center transition-all cursor-pointer shadow-xl z-20 touch-manipulation"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                  </svg>
+                </button>
+              </>
+            )}
+
+            {/* Gallery Thumbnail Preview Bar */}
+            {selectedProject.gallery.length > 1 && (
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-black/75 backdrop-blur-md px-3.5 py-2 rounded-xl border border-white/15 max-w-[90%] overflow-x-auto z-20">
+                {selectedProject.gallery.map((img, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActiveModalImgIdx(i)}
+                    className={`w-12 h-9 rounded-md overflow-hidden border-2 transition-all flex-shrink-0 cursor-pointer ${
+                      activeModalImgIdx === i ? 'border-[#c5a059] scale-105' : 'border-white/20 opacity-60 hover:opacity-100'
+                    }`}
+                  >
+                    <img src={img} alt="" className="w-full h-full object-cover" />
+                  </button>
+                ))}
               </div>
-
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedProject(null);
-                  if (onNavigate) onNavigate('projects');
-                }}
-                className="px-6 py-3 bg-[#c5a059] text-black hover:bg-white transition-colors duration-200 font-sans text-xs font-extrabold uppercase tracking-widest rounded-full shadow-lg pointer-events-auto flex items-center gap-2 self-start md:self-end cursor-pointer touch-manipulation"
-              >
-                <span>EXPLORE ALL PROJECTS</span>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                </svg>
-              </button>
-            </div>
+            )}
           </div>
 
-          {/* Bottom Bar Footer hint */}
-          <div className="flex items-center justify-between text-white/50 font-sans text-[11px] font-bold tracking-widest uppercase pt-1">
-            <span>SHARKINGS INTERIORS & EXTERIORS • {selectedProject.branch}</span>
-            <span>CLICK ANYWHERE TO CLOSE (ESC)</span>
+          {/* Bottom Bar: Information & Direct Action */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-t border-white/10 pt-4">
+            <div className="space-y-1">
+              <p className="font-sans text-xs sm:text-sm text-white/85 max-w-2xl leading-relaxed">
+                {selectedProject.description}
+              </p>
+              <div className="flex flex-wrap gap-2 pt-1">
+                {selectedProject.tags.map((tag, tIdx) => (
+                  <span key={tIdx} className="text-[10px] font-sans font-semibold text-[#c5a059] bg-[#c5a059]/10 px-2.5 py-0.5 rounded border border-[#c5a059]/20">
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <button
+              onClick={handleExploreAllClick}
+              className="px-6 py-2.5 bg-[#c5a059] text-black hover:bg-white hover:text-[#710014] transition-all font-sans text-xs font-extrabold uppercase tracking-widest rounded-full shadow-lg flex items-center gap-2 flex-shrink-0 cursor-pointer touch-manipulation"
+            >
+              <span>Explore All On Projects Page</span>
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              </svg>
+            </button>
           </div>
         </div>
       )}
@@ -607,4 +628,3 @@ function ProjectGlimpse({ onNavigate }) {
 }
 
 export default memo(ProjectGlimpse);
-

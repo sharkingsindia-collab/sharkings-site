@@ -4,49 +4,49 @@
   <!-- Home Page -->
   <url>
     <loc>https://www.sharkingsinteriors.in/</loc>
-    <lastmod>2026-08-27</lastmod>
+    <lastmod>2026-08-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
     <image:image>
       <image:loc>https://www.sharkingsinteriors.in/slogo.webp</image:loc>
       <image:title>Sharkings Interiors and Exteriors Official Logo</image:title>
-      <image:caption>Best Interior Designers in Madurai and Ramanathapuram - Sharkings Interiors</image:caption>
+      <image:caption>Best Interior Designers in Madurai, Ramanathapuram &amp; South Tamil Nadu - Sharkings Interiors</image:caption>
     </image:image>
     <image:image>
       <image:loc>https://www.sharkingsinteriors.in/images/slide-living.webp</image:loc>
       <image:title>Luxury Living Room Interior Design Madurai</image:title>
-      <image:caption>Custom luxury living room interior design by Sharkings Interiors Madurai</image:caption>
+      <image:caption>Custom luxury living room interior design by Sharkings Interiors Madurai &amp; South Tamil Nadu</image:caption>
     </image:image>
     <image:image>
       <image:loc>https://www.sharkingsinteriors.in/showrrom.webp</image:loc>
       <image:title>Sharkings Experience Centre Madurai and Ramanathapuram</image:title>
-      <image:caption>Flagship interior experience showroom in Madurai &amp; Ramanathapuram</image:caption>
+      <image:caption>Flagship interior experience showrooms in Madurai &amp; Ramanathapuram serving South Tamil Nadu and all of Tamil Nadu</image:caption>
     </image:image>
   </url>
 
   <!-- Architectural Services Page -->
   <url>
     <loc>https://www.sharkingsinteriors.in/services</loc>
-    <lastmod>2026-08-27</lastmod>
+    <lastmod>2026-08-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
     <image:image>
       <image:loc>https://www.sharkingsinteriors.in/slogo.webp</image:loc>
       <image:title>Sharkings Interior Services Portfolio</image:title>
-      <image:caption>Modular Kitchens, Turnkey Projects, ACP Elevation, False Ceiling &amp; Container Homes</image:caption>
+      <image:caption>Modular Kitchens, Turnkey Projects, ACP Elevation, False Ceiling &amp; Container Architecture in Madurai, Ramnad &amp; Tamil Nadu</image:caption>
     </image:image>
   </url>
 
   <!-- Projects Portfolio Page -->
   <url>
     <loc>https://www.sharkingsinteriors.in/projects</loc>
-    <lastmod>2026-08-27</lastmod>
+    <lastmod>2026-08-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
     <image:image>
       <image:loc>https://www.sharkingsinteriors.in/slogo.webp</image:loc>
       <image:title>Sharkings Completed Projects Masterpieces</image:title>
-      <image:caption>Luxury Salons, Corporate Offices, and Residential Showcases executed by Sharkings</image:caption>
+      <image:caption>Luxury Salons, Corporate Offices, and Residential Showcases executed across Madurai, Ramnad, South Tamil Nadu and Tamil Nadu</image:caption>
     </image:image>
   </url>
 </urlset>

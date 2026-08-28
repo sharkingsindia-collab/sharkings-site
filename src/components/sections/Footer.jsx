@@ -63,7 +63,7 @@ function Footer({ onNavigate }) {
 
             {/* Description - hidden on small mobile for compactness */}
             <p className="hidden sm:block font-sans text-xs text-white/70 font-light leading-relaxed max-w-sm">
-              Since 2010, Sharkings Interiors & Exteriors is a full-service interior design firm in Madurai & Ramanathapuram, specializing in both residential and commercial design.
+              Since 2010, Sharkings Interiors &amp; Exteriors is a premier interior firm with flagship studios in Madurai &amp; Ramanathapuram, executing projects across South Tamil Nadu and all of Tamil Nadu.
             </p>
 
             {/* Contact Details */}
@@ -263,7 +263,7 @@ function Footer({ onNavigate }) {
           </div>
 
           <div>
-            Madurai & Ramanathapuram • Full-Service Interior Firm
+            Madurai &amp; Ramanathapuram • South Tamil Nadu • All Tamil Nadu Coverage
           </div>
         </div>
 

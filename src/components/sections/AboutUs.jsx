@@ -52,11 +52,11 @@ function AboutUs({ onNavigate }) {
 
             <div className="space-y-4">
               <span className="px-3.5 py-1 rounded-full bg-[#710014]/10 text-[#710014] text-xs font-sans font-extrabold tracking-widest uppercase border border-[#710014]/20 inline-block">
-                MADURAI & RAMANATHAPURAM
+                MADURAI • RAMANATHAPURAM • SOUTH TAMIL NADU
               </span>
 
               <p className="font-sans text-sm md:text-base lg:text-lg text-luxury-charcoal/90 leading-relaxed font-medium">
-                Since 2010, <strong className="font-semibold text-luxury-charcoal">Sharkings Interiors & Exteriors</strong> is a full-service interior design firm in Madurai & Ramanathapuram, specializing in both residential and commercial design. We will have the experience to ensure that the project runs smoothly and gives you the best possible results, whether you need a simple refresh of furniture and paint colors, or a comprehensive whole-house renovation.
+                Since 2010, <strong className="font-semibold text-luxury-charcoal">Sharkings Interiors & Exteriors</strong> is a full-service interior design firm with flagship experience centres in Madurai & Ramanathapuram, specializing in residential and commercial design across South Tamil Nadu and statewide throughout Tamil Nadu. We possess the design mastery and factory-grade infrastructure to ensure your project runs smoothly and delivers breathtaking results, from custom modular kitchens to whole-house turnkey renovations.
               </p>
 
               <div className="p-5 rounded-2xl bg-white border border-black/10 shadow-[0_10px_30px_rgba(0,0,0,0.03)] space-y-3">
