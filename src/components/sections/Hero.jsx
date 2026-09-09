@@ -4,10 +4,10 @@ import slogo from '../../assets/slogo.webp';
 const localSlides = [
   {
     image: '/images/slide-living.webp',
-    alt: 'Sharkings Interior - Best interior designers in Madurai and Ramanathapuram',
-    subtitle: 'MADURAI • RAMANATHAPURAM • SOUTH TAMIL NADU',
-    title: 'Best Interior Designers in Madurai & Ramanathapuram',
-    description: 'Specializing in residential & commercial design since 2010. Flagship design studios in Madurai & Ramnad, executing turnkey luxury interiors across South Tamil Nadu and all of Tamil Nadu.',
+    alt: 'Top interior designers in Madurai - Sharkings Interiors - Best interior design and interior work in Madurai, Ramanathapuram and South India',
+    subtitle: 'MADURAI • RAMANATHAPURAM • SOUTH TAMIL NADU • SOUTH INDIA',
+    title: 'Top Interior Designers in Madurai',
+    description: 'Sharkings Interiors & Exteriors — best interior designer in Madurai & Ramanathapuram since 2010. Expert interior work in Madurai: modular kitchens, luxury home interiors, false ceilings & turnkey projects. Best interior design in Madurai serving South Tamil Nadu, Tamil Nadu & South India.',
     badge: '01 / LIVING ROOMS',
     imageSide: 'right', // Slide 1: Text Left, Image Right
     accentHex: '#c5a059'

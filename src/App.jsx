@@ -46,9 +46,9 @@ function updateRouteMetadata(page) {
   const twitterDesc = document.querySelector('meta[name="twitter:description"]');
 
   if (page === 'services') {
-    const title = 'Interior & Exterior Services | Madurai, Ramanathapuram & South Tamil Nadu | Sharkings';
-    const desc = 'Explore full interior & exterior design services by Sharkings: Custom waterproof modular kitchens, turnkey residential interiors, false ceilings, wardrobe suites, ACP elevations, container homes, and commercial interiors in Madurai, Ramanathapuram, South Tamil Nadu and across Tamil Nadu.';
-    const keywords = 'Sharkings services, modular kitchen Madurai, turnkey interiors Madurai, modular kitchen Ramanathapuram, interior designers South Tamil Nadu, interior designers Tamil Nadu, container homes Madurai, false ceiling Madurai, ACP elevation Ramanathapuram, wardrobe design Madurai, best interior services Tamil Nadu';
+    const title = 'Interior Work & Design Services in Madurai | Ramanathapuram & South Tamil Nadu | Sharkings';
+    const desc = 'Top interior work services in Madurai by Sharkings: Custom waterproof modular kitchens, turnkey residential interiors, false ceilings, wardrobe suites, ACP elevations, container homes, and commercial interior work in Madurai, Ramanathapuram, South Tamil Nadu, Tamil Nadu & South India.';
+    const keywords = 'interior work madurai, interior work in madurai, modular kitchen Madurai, turnkey interiors Madurai, top interior designers in madurai services, best interior design in madurai, interior designer in madurai, modular kitchen Ramanathapuram, interior designers South Tamil Nadu, interior designers Tamil Nadu, interior designers south india, container homes Madurai, false ceiling Madurai, ACP elevation Ramanathapuram, wardrobe design Madurai, best interior services Tamil Nadu';
     const url = 'https://www.sharkingsinteriors.in/services';
 
     document.title = title;
@@ -64,9 +64,9 @@ function updateRouteMetadata(page) {
     if (twitterTitle) twitterTitle.setAttribute('content', title);
     if (twitterDesc) twitterDesc.setAttribute('content', desc);
   } else if (page === 'projects') {
-    const title = 'Completed Interior Design Projects | Madurai, Ramnad & South Tamil Nadu | Sharkings';
-    const desc = 'Browse completed interior design showcases by Sharkings: Luxury salons, corporate offices, modular home decor, and bespoke sofa suites delivered across Madurai, Ramanathapuram, South Tamil Nadu and across Tamil Nadu. Real photos, 3D floorplans & design stories.';
-    const keywords = 'Sharkings projects, interior design projects Madurai, interior design projects Ramanathapuram, interior projects South Tamil Nadu, salon interior Madurai, office interior Ramanathapuram, completed projects portfolio, home decor showcase Madurai, turnkey projects Tamil Nadu';
+    const title = 'Interior Design Projects in Madurai | Top Interior Work Portfolio | Sharkings';
+    const desc = 'Browse completed interior design projects and interior work by top interior designers in Madurai — Sharkings: Luxury salons, corporate offices, modular home decor, and bespoke sofa suites delivered across Madurai, Ramanathapuram, South Tamil Nadu, Tamil Nadu & South India. Real photos, 3D floorplans & design stories.';
+    const keywords = 'interior design projects Madurai, interior work Madurai projects, top interior designers in madurai projects, best interior design in madurai portfolio, interior projects Ramanathapuram, interior projects South Tamil Nadu, salon interior Madurai, office interior Ramanathapuram, completed projects portfolio, home decor showcase Madurai, turnkey projects Tamil Nadu, interior designers south india projects';
     const url = 'https://www.sharkingsinteriors.in/projects';
 
     document.title = title;
@@ -82,9 +82,9 @@ function updateRouteMetadata(page) {
     if (twitterTitle) twitterTitle.setAttribute('content', title);
     if (twitterDesc) twitterDesc.setAttribute('content', desc);
   } else {
-    const title = 'Best Interior Designers in Madurai & Ramanathapuram | South Tamil Nadu | Sharkings Interiors';
-    const desc = 'Mobile: +91 80980 90204. Specializing in residential & commercial design. Sharkings Interiors & Exteriors is the #1 best interior design company in Madurai & Ramanathapuram (Ramnad), serving South Tamil Nadu (Sivagangai, Virudhunagar, Theni, Dindigul, Tirunelveli) and across Tamil Nadu since 2010. Modular kitchens, luxury home interiors, false ceiling, wardrobe & turnkey projects.';
-    const keywords = 'best interior designers in madurai, interior designers in madurai, interior designers in ramanathapuram, interior designers in ramnad, interior designers in south tamil nadu, interior designers in tamil nadu, modular kitchen madurai, home interior designer in madurai, modular kitchen ramanathapuram, interior designers in sivagangai, interior designers in virudhunagar, interior designers in dindigul, interior designers in theni, interior designers in tirunelveli, turnkey interiors tamil nadu, sharkings interiors';
+    const title = 'Top Interior Designers in Madurai | Interior Work Madurai | Sharkings Interiors';
+    const desc = 'Top interior designers in Madurai. Sharkings Interiors & Exteriors – best interior designer in Madurai & Ramanathapuram (Ramnad). Interior work Madurai: modular kitchens, home interiors, false ceiling, wardrobe & turnkey projects. Best interior design in Madurai serving South Tamil Nadu, Tamil Nadu & South India since 2010. ☎ +91 80980 90204.';
+    const keywords = 'top interior designers in madurai, best interior designers in madurai, interior designers in madurai, interior designer in madurai, top interior designer in madurai, best interior designer in madurai, interior work madurai, best interior design in madurai, interior design in madurai, top 10 interior designers in madurai, best interior design company in madurai, home interior designer in madurai, modular kitchen madurai, interior work in madurai, interior designers in ramanathapuram, interior designers in ramnad, interior designers in south tamil nadu, interior designers in tamil nadu, interior designers in south india, turnkey interiors tamil nadu, sharkings interiors, sharkings interiors madurai';
     const url = 'https://www.sharkingsinteriors.in/';
 
     document.title = title;

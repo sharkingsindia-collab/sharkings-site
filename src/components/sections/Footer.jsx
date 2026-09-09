@@ -1,8 +1,7 @@
-import { useState, useCallback, memo } from 'react';
+import { useCallback, memo } from 'react';
 import slogo from '../../assets/slogo.webp';
 
 function Footer({ onNavigate }) {
-  const [seoOpen, setSeoOpen] = useState(false);
 
   const smoothScrollToTarget = useCallback((targetSelector) => {
     const elem = document.querySelector(targetSelector);
@@ -11,9 +10,7 @@ function Footer({ onNavigate }) {
     }
   }, []);
 
-  const toggleSeoDirectory = useCallback(() => {
-    setSeoOpen((prev) => !prev);
-  }, []);
+
 
   return (
     <footer className="relative w-full bg-[#38000a] text-[#f2f1ed] border-t border-[#c5a059]/30 z-30 pt-8 sm:pt-12 pb-6 sm:pb-8">
@@ -225,37 +222,6 @@ function Footer({ onNavigate }) {
 
         </div>
 
-        {/* SEO POPULAR SEARCH DIRECTORY */}
-        {/* <div className="border-t border-[#c5a059]/20 pt-6 space-y-3 font-sans text-[11px] text-white/60">
-          <div className="flex items-center justify-between cursor-pointer group touch-manipulation" onClick={toggleSeoDirectory}>
-            <h5 className="font-display text-[11px] font-bold text-[#c5a059] tracking-[0.2em] uppercase flex items-center gap-2">
-              <span>Popular Interior Searches — Madurai & Ramanathapuram (Ramnad)</span>
-            </h5>
-            <span className="text-[10px] text-[#c5a059] group-hover:underline">
-              {seoOpen ? 'Hide Keyword Directory ▲' : 'Toggle Keyword Directory ▾'}
-            </span>
-          </div>
-
-          {seoOpen && (
-            <div className="space-y-3 pt-2 text-white/50 text-[10px] leading-relaxed">
-              <div>
-                <strong className="text-[#c5a059] block mb-1">MADURAI & TAMIL NADU INTERIOR SERVICES & LOCALITIES:</strong>
-                Home Interior Designer in Madurai • Modular Kitchen Interior Designer • Professional Interior Designers • Best Interior Designer • Best Interior Designer in Villapuram Madurai • Best Interior Decorators in Villapuram • Madurai Interior Designer • Interior Designer in Salem • Interior Designer Works • Interior and Exterior Works in Madurai • Kitchen Interior Designer • Modular Kitchen Interior • Interior Designer in Sivagangai • Interior Designer in Dindigul • Interior Designer in Virudhunagar • Interior Designer in Theni • Interior Designer Cost in Madurai • Interior Designer Price in Madurai • Interior Designer Near Me Madurai • Top 10 Interior Designers in Madurai • Modular Kitchen Designers in Madurai • Living Room Interior Design Madurai • Bedroom Interior Design Madurai • False Ceiling Contractors Madurai • Wardrobe Design Madurai • ACP Elevation Madurai • Container Homes Madurai • Salon Interior Design Madurai • Office Interior Design Madurai • Turnkey Interior Designers Madurai • Villapuram Interior Designer • Anna Nagar Madurai Interior Designer • KK Nagar Madurai Interior Designer • SS Colony Interior Designer • Bypass Road Madurai • Kalavasal • Tallakulam • Pudur • Melur • Tirumangalam • Usilampatti.
-              </div>
-
-              <div>
-                <strong className="text-[#c5a059] block mb-1">RAMANATHAPURAM (RAMNAD) INTERIOR SERVICES & LOCALITIES:</strong>
-                Best Interior Designers in Ramanathapuram • Top Interior Designers in Ramnad • Modular Kitchen Ramanathapuram • Coastal Wardrobe Design Ramnad • Moisture Resistant Furniture Ramnad • False Ceiling Ramanathapuram • Subbaiah Nagar Ramnad • Ram Nagar Ramanathapuram • Kenikarai Ramnad • Rameswaram Interior Designer • Paramakudi Interior Designer • Kilakarai Interior Designer • Devipattinam • Mudukulathur • Kamuthi • Thiruvadanai • Sayalgudi • Mandapam • Erwadi • Rameswaram Road Ramnad.
-              </div>
-
-              <div>
-                <strong className="text-[#c5a059] block mb-1">INTERIOR & EXTERIOR SPECIALIZATIONS:</strong>
-                Acrylic Modular Kitchen • Marine Plywood Cabinets • Hettich & Blum Fitting • Sliding Wardrobe • Lacquered Glass Wardrobe • Gypsum False Ceiling • Profile Light Ceiling • Container Cafe Design • Commercial Office Partition • Aluminium & Glass Partition • ACP Sheet Cladding • Front Elevation Design • 3D Interior Spatial Walkthrough • Full House Renovation • 2BHK / 3BHK Interior Cost Estimate.
-              </div>
-            </div>
-          )}
-        </div> */}
-
         {/* MINIMAL FOOTER SUB-BAR */}
         <div className="border-t border-[#c5a059]/20 pt-4 sm:pt-6 flex flex-col sm:flex-row items-center justify-between gap-2 font-sans text-[10px] sm:text-[11px] text-white/50 text-center sm:text-left">
           <div>
@@ -263,7 +229,7 @@ function Footer({ onNavigate }) {
           </div>
 
           <div>
-            Madurai &amp; Ramanathapuram • South Tamil Nadu • All Tamil Nadu Coverage
+            Madurai &amp; Ramanathapuram • South Tamil Nadu • Tamil Nadu • South India
           </div>
         </div>
 

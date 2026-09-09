@@ -65,7 +65,7 @@ function WhyUs({ whyUsRef }) {
           </h2>
 
           <p className="font-sans text-sm sm:text-base text-luxury-charcoal/80 leading-relaxed font-medium max-w-2xl">
-            We handle design, factory manufacturing, and installation for homes, offices, and commercial spaces across Madurai, Ramanathapuram, South Tamil Nadu, and throughout Tamil Nadu.
+            We handle complete interior work — design, factory manufacturing, and installation for homes, offices, and commercial spaces across Madurai, Ramanathapuram, South Tamil Nadu, throughout Tamil Nadu and South India.
           </p>
         </div>
 
