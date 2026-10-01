@@ -655,11 +655,9 @@ function InteractiveStudio({
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-4 reveal-3d-popup">
           <div className="flex items-center justify-center gap-3">
-            <span className="w-8 h-[1px] bg-[#838f6f]/40" />
             <span className="font-sans text-xs md:text-sm font-extrabold tracking-[0.35em] text-[#838f6f] uppercase">
               VIRTUAL SPATIAL ATELIER
             </span>
-            <span className="w-8 h-[1px] bg-[#838f6f]/40" />
           </div>
 
           <h2 className="font-display text-3xl md:text-5xl font-normal text-luxury-cream leading-tight uppercase tracking-wider">

@@ -30,11 +30,9 @@ function AboutUs({ onNavigate }) {
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3 reveal-3d-popup">
           <div className="flex items-center justify-center gap-3">
-            <span className="w-8 h-[1px] bg-[#710014]/30" />
             <span className="font-sans text-xs md:text-sm font-extrabold tracking-[0.35em] text-[#710014] uppercase">
               ABOUT US
             </span>
-            <span className="w-8 h-[1px] bg-[#710014]/30" />
           </div>
 
           <h2 className="font-display text-3xl sm:text-5xl lg:text-6xl font-normal text-[#1a1a1a] tracking-tight">
@@ -56,7 +54,7 @@ function AboutUs({ onNavigate }) {
               </span>
 
               <p className="font-sans text-sm md:text-base lg:text-lg text-luxury-charcoal/90 leading-relaxed font-medium">
-                Since 2010, <strong className="font-semibold text-luxury-charcoal">Sharkings Interiors & Exteriors</strong> is recognized among the top interior designers in Madurai — a full-service interior design firm with flagship experience centres in Madurai & Ramanathapuram. We specialize in residential and commercial interior work in Madurai, delivering the best interior design across South Tamil Nadu, statewide throughout Tamil Nadu, and South India. We possess the design mastery and factory-grade infrastructure to ensure your project runs smoothly and delivers breathtaking results, from custom modular kitchens to whole-house turnkey renovations.
+                Since 2010, <strong className="font-semibold text-luxury-charcoal">Sharkings Interiors & Exteriors</strong> is recognized among the top interior designers in Madurai and is a full-service interior design firm with flagship experience centres in Madurai & Ramanathapuram. We specialize in residential and commercial interior work in Madurai, delivering the best interior design across South Tamil Nadu, statewide throughout Tamil Nadu, and South India. We possess the design mastery and factory-grade infrastructure to ensure your project runs smoothly and delivers breathtaking results, from custom modular kitchens to whole-house turnkey renovations.
               </p>
 
               <div className="p-5 rounded-2xl bg-white border border-black/10 shadow-[0_10px_30px_rgba(0,0,0,0.03)] space-y-3">
@@ -67,7 +65,7 @@ function AboutUs({ onNavigate }) {
                   </span>
                 </div>
                 <p className="font-sans text-sm md:text-base text-luxury-charcoal/85 leading-relaxed font-medium">
-                  Our designers successfully participate in projects from initial concepts, furniture and decorative item selections, decorative material selections, construction document production, budgeting, city submittals, and project coordination – always with precision, professionalism, attention to detail, exceptional customer service, and expert project management skills.
+                  Our designers successfully participate in projects from initial concepts, furniture and decorative item selections, decorative material selections, construction document production, budgeting, city submittals, and project coordination, always with precision, professionalism, attention to detail, exceptional customer service, and expert project management skills.
                 </p>
               </div>
             </div>

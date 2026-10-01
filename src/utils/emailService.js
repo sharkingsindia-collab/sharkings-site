@@ -55,7 +55,7 @@ export async function sendConsultationEmail(bookingData) {
 
   const emailSubject = `📅 New VIP Consultation Booking [${bookingCode}] - ${name}`;
 
-  const venueTitle = venue === 'madurai' ? 'Madurai Studio (Villapuram)' : venue === 'ramanathapuram' ? 'Ramanathapuram Studio (Kenikarai)' : 'Virtual Video Call';
+  const venueTitle = venue === 'madurai' ? 'Madurai Office (Villapuram)' : venue === 'ramanathapuram' ? 'Ramanathapuram Showroom (Kenikarai)' : 'Virtual Video Call';
 
   const formattedMessage = `
 VIP CONSULTATION BOOKING DETAILS [${bookingCode}]
@@ -63,7 +63,7 @@ VIP CONSULTATION BOOKING DETAILS [${bookingCode}]
 • Client Name: ${name}
 • Phone Number: ${phone}
 • Email Address: ${email || 'Not provided'}
-• Chosen Studio: ${venueTitle}
+• Chosen Branch: ${venueTitle}
 • Project Scope: ${scope}
 • Date & Time: ${date || 'Flexible Date'} at ${time}
 • Budget Bracket: ${budget}

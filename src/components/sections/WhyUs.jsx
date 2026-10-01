@@ -54,7 +54,6 @@ function WhyUs({ whyUsRef }) {
         {/* Section Header */}
         <div className="max-w-3xl space-y-2">
           <div className="flex items-center gap-2.5">
-            <span className="w-6 h-[1px] bg-[#710014]" />
             <span className="font-sans text-xs font-extrabold tracking-[0.3em] text-[#710014] uppercase">
               WHY CHOOSE US
             </span>
@@ -65,7 +64,7 @@ function WhyUs({ whyUsRef }) {
           </h2>
 
           <p className="font-sans text-sm sm:text-base text-luxury-charcoal/80 leading-relaxed font-medium max-w-2xl">
-            We handle complete interior work — design, factory manufacturing, and installation for homes, offices, and commercial spaces across Madurai, Ramanathapuram, South Tamil Nadu, throughout Tamil Nadu and South India.
+            We handle complete interior work including design, factory manufacturing, and installation for homes, offices, and commercial spaces across Madurai, Ramanathapuram, South Tamil Nadu, throughout Tamil Nadu and South India.
           </p>
         </div>
 

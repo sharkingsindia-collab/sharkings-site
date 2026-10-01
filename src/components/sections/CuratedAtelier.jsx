@@ -105,11 +105,9 @@ function CuratedAtelier({
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3 reveal-3d-popup">
           <div className="flex items-center justify-center gap-3">
-            <span className="w-8 h-[1px] bg-[#710014]/30" />
             <span className="font-sans text-xs md:text-sm font-extrabold tracking-[0.35em] text-[#710014] uppercase">
               WHAT WE DO
             </span>
-            <span className="w-8 h-[1px] bg-[#710014]/30" />
           </div>
 
           <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-normal text-[#1a1a1a] tracking-tight">

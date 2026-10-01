@@ -60,7 +60,7 @@ function Footer({ onNavigate }) {
 
             {/* Description - hidden on small mobile for compactness */}
             <p className="hidden sm:block font-sans text-xs text-white/70 font-light leading-relaxed max-w-sm">
-              Since 2010, Sharkings Interiors &amp; Exteriors is a premier interior firm with flagship studios in Madurai &amp; Ramanathapuram, executing projects across South Tamil Nadu and all of Tamil Nadu.
+              Since 2010, Sharkings Interiors &amp; Exteriors is a premier interior firm with flagship branches in Madurai &amp; Ramanathapuram, executing projects across South Tamil Nadu and all of Tamil Nadu.
             </p>
 
             {/* Contact Details */}
@@ -135,7 +135,7 @@ function Footer({ onNavigate }) {
                   }}
                   className="hover:text-[#c5a059] transition-colors hidden md:flex items-center gap-1.5 touch-manipulation"
                 >
-                  <span className="text-[#c5a059]">›</span> 3D Studio
+                  <span className="text-[#c5a059]">›</span> 3D Planner
                 </a>
               </li>
               <li>
@@ -160,7 +160,7 @@ function Footer({ onNavigate }) {
                   }}
                   className="hover:text-[#c5a059] transition-colors flex items-center gap-1.5 touch-manipulation"
                 >
-                  <span className="text-[#c5a059]">›</span> Design Studios
+                  <span className="text-[#c5a059]">›</span> Branches
                 </a>
               </li>
               <li>
@@ -190,17 +190,17 @@ function Footer({ onNavigate }) {
             </ul>
           </div>
 
-          {/* COLUMN 3: STUDIO LOCATIONS (4 Cols) */}
+          {/* COLUMN 3: BRANCH LOCATIONS (4 Cols) */}
           <div className="md:col-span-4 space-y-3">
             <h4 className="font-display text-xs font-bold text-[#c5a059] tracking-[0.2em] uppercase border-b border-[#c5a059]/20 pb-2">
-              OUR DESIGN STUDIOS
+              OUR BRANCHES
             </h4>
 
             <div className="space-y-5 font-sans">
               {/* Madurai */}
               <div className="space-y-1.5">
                 <h5 className="font-display text-sm md:text-base font-semibold tracking-wide text-white flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-[#c5a059]" /> Madurai Studio
+                  <span className="w-2 h-2 rounded-full bg-[#c5a059]" /> Madurai Office
                 </h5>
                 <p className="text-xs sm:text-sm text-white/85 font-light leading-relaxed pl-4">
                   Plot no. 3552, TNHB Colony, Madurai, Tamil Nadu 625001.
@@ -210,7 +210,7 @@ function Footer({ onNavigate }) {
               {/* Ramanathapuram */}
               <div className="space-y-1.5 pt-3.5 border-t border-white/10">
                 <h5 className="font-display text-sm md:text-base font-semibold tracking-wide text-white flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-[#c5a059]" /> Ramanathapuram Studio
+                  <span className="w-2 h-2 rounded-full bg-[#c5a059]" /> Ramanathapuram Showroom
                 </h5>
                 <p className="text-xs sm:text-sm text-white/85 font-light leading-relaxed pl-4">
                   Bus Stop, 13/2993/26, Madurai - Rameswaram Hwy, Subbaiah Nagar, Ram Nagar,

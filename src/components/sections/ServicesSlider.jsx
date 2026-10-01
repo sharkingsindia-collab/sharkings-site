@@ -209,7 +209,6 @@ function ServicesSlider({ servicesRef, onNavigate }) {
                 {/* Text Description */}
                 <div className="lg:col-span-5 space-y-2.5 sm:space-y-5 md:space-y-6">
                   <div className="flex items-center gap-3">
-                    <span className="w-8 h-[1px] bg-luxury-sage" />
                     <span className="font-sans text-xs md:text-sm font-extrabold tracking-[0.35em] text-luxury-sage uppercase">
                       {slide.serviceNum}
                     </span>
@@ -218,7 +217,6 @@ function ServicesSlider({ servicesRef, onNavigate }) {
                   <h2 className="font-display text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-normal text-luxury-cream leading-tight">
                     {slide.title}
                   </h2>
-                  <div className="w-16 h-[1px] bg-luxury-cream/20 hidden sm:block" />
 
                   <p className="font-sans text-xs sm:text-base md:text-lg text-[#d4d3cf] leading-relaxed font-medium line-clamp-4 sm:line-clamp-none">
                     {slide.description}
@@ -272,11 +270,9 @@ function ServicesSlider({ servicesRef, onNavigate }) {
           >
             <div className="max-w-4xl mx-auto w-full text-center space-y-8">
               <div className="flex justify-center items-center gap-3">
-                <span className="w-8 h-[1px] bg-luxury-sage" />
                 <span className="font-sans text-[11px] md:text-xs font-bold tracking-[0.35em] text-luxury-sage uppercase">
                   OUR SERVICES
                 </span>
-                <span className="w-8 h-[1px] bg-luxury-sage" />
               </div>
 
               <h2 className="font-display text-3xl md:text-5xl lg:text-7xl font-extralight text-luxury-cream leading-tight tracking-wide">

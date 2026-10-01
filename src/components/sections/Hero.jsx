@@ -7,7 +7,7 @@ const localSlides = [
     alt: 'Top interior designers in Madurai - Sharkings Interiors - Best interior design and interior work in Madurai, Ramanathapuram and South India',
     subtitle: 'MADURAI • RAMANATHAPURAM • SOUTH TAMIL NADU • SOUTH INDIA',
     title: 'Top Interior Designers in Madurai',
-    description: 'Sharkings Interiors & Exteriors — best interior designer in Madurai & Ramanathapuram since 2010. Expert interior work in Madurai: modular kitchens, luxury home interiors, false ceilings & turnkey projects. Best interior design in Madurai serving South Tamil Nadu, Tamil Nadu & South India.',
+    description: 'Sharkings Interiors & Exteriors, the best interior designer in Madurai & Ramanathapuram since 2010. Expert interior work in Madurai: modular kitchens, luxury home interiors, false ceilings & turnkey projects. Best interior design in Madurai serving South Tamil Nadu, Tamil Nadu & South India.',
     badge: '01 / LIVING ROOMS',
     imageSide: 'right', // Slide 1: Text Left, Image Right
     accentHex: '#c5a059'
@@ -188,7 +188,6 @@ function Hero({
                     >
                       {/* Subtitle Pill */}
                       <div className="flex items-center gap-2.5">
-                        <span className="w-7 h-[1.5px] bg-[#c5a059]" />
                         <span className="font-sans text-[11px] sm:text-xs font-extrabold tracking-[0.25em] text-[#c5a059] uppercase drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">
                           {slide.subtitle}
                         </span>
@@ -281,7 +280,7 @@ function Hero({
                         </div>
 
                         {/* Decorative Architectural Frame Accents */}
-                        <div className="hidden sm:block absolute -bottom-3 -right-3 w-14 h-14 border-r-2 border-b-2 border-[#c5a059]/70 pointer-events-none" />
+
                         <div className="hidden sm:block absolute -top-3 -left-3 w-14 h-14 border-l-2 border-t-2 border-[#c5a059]/70 rounded-tl-3xl pointer-events-none" />
                       </div>
                     </div>

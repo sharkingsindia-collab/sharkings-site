@@ -6,7 +6,7 @@ const FAQ_ITEMS = [
   {
     num: '01',
     question: 'How do we get started with a project?',
-    answer: 'We start with a friendly chat at our Madurai or Ramanathapuram studios (or online) to understand what you need, your space, and your budget.'
+    answer: 'We start with a friendly chat at our Madurai office or Ramanathapuram showroom (or online) to understand what you need, your space, and your budget.'
   },
   {
     num: '02',
@@ -21,7 +21,7 @@ const FAQ_ITEMS = [
   {
     num: '04',
     question: 'Can I check material and wood samples in person?',
-    answer: 'Definitely. We have over 100+ wood veneers, laminates, quartz, and hardware samples available to touch and check out at both of our studios.'
+    answer: 'Definitely. We have over 100+ wood veneers, laminates, quartz, and hardware samples available to touch and check out at both of our branches.'
   }
 ];
 
@@ -76,11 +76,9 @@ function GetInTouch({ getInTouchRef }) {
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-4 reveal-3d-popup">
           <div className="flex items-center justify-center gap-3">
-            <span className="w-8 h-[1px] bg-[#710014]" />
             <span className="font-sans text-xs font-extrabold tracking-[0.3em] text-[#710014] uppercase">
               CONTACT US
             </span>
-            <span className="w-8 h-[1px] bg-[#710014]" />
           </div>
 
           <h2 className="font-display text-3xl sm:text-5xl lg:text-6xl font-normal text-[#1a1a1a] tracking-tight leading-[1.15]">

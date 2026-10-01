@@ -46,8 +46,8 @@ const SPATIAL_SCOPES = [
 ];
 
 const VENUES = [
-  { id: 'madurai', label: 'Madurai Studio', info: 'TNHB Colony, Villapuram' },
-  { id: 'ramanathapuram', label: 'Ramanathapuram Studio', info: 'Kenikarai Main Road' },
+  { id: 'madurai', label: 'Madurai Office', info: 'TNHB Colony, Villapuram' },
+  { id: 'ramanathapuram', label: 'Ramanathapuram Showroom', info: 'Kenikarai Main Road' },
   // { id: 'virtual', label: 'Virtual Online Call', info: 'Live Video Consultation' }
 ];
 
@@ -140,7 +140,6 @@ export default function BookConsultation({ consultationRef, scrollProgress = 0, 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end border-b border-white/10 pb-12 reveal-3d-popup">
           <div className="lg:col-span-8 space-y-4">
             <div className="flex items-center gap-3">
-              <span className="w-10 h-[1px] bg-luxury-sage" />
               <span className="font-sans text-[10px] md:text-xs font-bold tracking-[0.35em] text-luxury-sage uppercase">
                 SCHEDULE A VISIT
               </span>
@@ -153,13 +152,13 @@ export default function BookConsultation({ consultationRef, scrollProgress = 0, 
 
           <div className="lg:col-span-4 space-y-4">
             <p className="font-sans text-xs md:text-sm text-luxury-cream/70 leading-relaxed font-light">
-              Sit down with our design team at our studio to talk about your home, check out real material samples, and review custom 3D layouts together.
+              Sit down with our design team at our branch to talk about your home, check out real material samples, and review custom 3D layouts together.
             </p>
 
             <div className="flex items-center gap-4 text-xs font-sans text-luxury-sage font-medium">
               <span className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span>Studios Open Mon-Sat</span>
+                <span>Branches Open Mon-Sat</span>
               </span>
 
               {/* <span>Free 45-Min Chat</span> */}
@@ -190,7 +189,7 @@ export default function BookConsultation({ consultationRef, scrollProgress = 0, 
                   <h3 className="font-display text-lg font-light text-luxury-cream mt-0.5">
                     One-on-One Consultation
                   </h3>
-                  <p className="font-sans text-[10px] text-white/50">Madurai & Ramanathapuram Studios</p>
+                  <p className="font-sans text-[10px] text-white/50">Madurai & Ramanathapuram Branches</p>
                 </div>
               </div>
 
@@ -245,7 +244,7 @@ export default function BookConsultation({ consultationRef, scrollProgress = 0, 
             <div className="p-5 rounded-2xl bg-gradient-to-r from-white/5 to-transparent border border-white/10 flex items-center justify-between">
               <div>
                 <span className="text-[9px] font-sans font-bold tracking-widest text-luxury-sage uppercase block">PREFER TO TALK NOW?</span>
-                <span className="font-sans text-xs text-white/70">Call our direct studio line</span>
+                <span className="font-sans text-xs text-white/70">Call our direct branch line</span>
               </div>
               <a
                 href="tel:+918098090204"

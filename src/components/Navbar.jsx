@@ -5,9 +5,9 @@ const NAV_ITEMS = [
   { label: 'About Us', href: '#about', id: 'about' },
   { label: 'Why Us', href: '#why-us', id: 'why-us' },
   { label: 'Services', href: '/services', isPage: true, pageTarget: 'services', id: 'services' },
-  { label: '3D Studio', href: '#interactive-studio', id: 'interactive-studio' },
+  { label: '3D Planner', href: '#interactive-studio', id: 'interactive-studio' },
   { label: 'Projects', href: '/projects', isPage: true, pageTarget: 'projects', id: 'projects' },
-  { label: 'Showrooms', href: '#showrooms', id: 'showrooms' },
+  { label: 'Branches', href: '#showrooms', id: 'showrooms' },
   { label: 'Reviews', href: '#testimonials', id: 'testimonials' }
 ];
 

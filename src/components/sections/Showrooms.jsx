@@ -4,8 +4,8 @@ import { useScrollReveal } from '../../hooks/useScrollReveal';
 const SHOWROOMS_DATA = [
   {
     id: 'madurai',
-    name: 'Madurai Experience Centre',
-    tagline: 'Main Flagship Atelier & Spatial Gallery',
+    name: 'Madurai Office',
+    tagline: 'Head Office & Spatial Gallery',
     badge: 'EXPERIENCE CENTRE',
     landmark: 'Landmark: TNHB Colony, Villapuram',
     address: 'Plot no, 3552, TNHB Colony, Villapuram, Madurai, Tamil Nadu 625001',
@@ -13,8 +13,8 @@ const SHOWROOMS_DATA = [
     email: 'sharkingsindia@gmail.com',
     hours: 'Monday - Saturday: 10:00 AM to 8:30 PM (Sunday Closed)',
     status: 'OPEN NOW',
-    mapUrl: 'https://maps.google.com/maps?q=3552,+TNHB+Colony,+Villapuram,+Madurai,+Tamil+Nadu+625001&t=&z=15&ie=UTF8&iwloc=&output=embed',
-    directMapUrl: 'https://maps.google.com/?q=3552,+TNHB+Colony,+Villapuram,+Madurai,+Tamil+Nadu+625001',
+    mapUrl: 'https://maps.google.com/maps?q=3552,+TNHB+Colony,+Villapuram,+Madurai,+Tamil+Nadu+625001&t=k&z=16&ie=UTF8&iwloc=&output=embed',
+    directMapUrl: 'https://maps.google.com/?q=3552,+TNHB+Colony,+Villapuram,+Madurai,+Tamil+Nadu+625001&t=k',
     images: [
       {
         url: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=1000&auto=format&fit=crop',
@@ -38,8 +38,8 @@ const SHOWROOMS_DATA = [
   },
   {
     id: 'ramanathapuram',
-    name: 'Ramanathapuram Experience Centre',
-    tagline: 'Coastal Design Studio & Material Atelier',
+    name: 'Ramanathapuram Showroom',
+    tagline: 'Coastal Showroom & Material Atelier',
     badge: 'EXPERIENCE CENTRE',
     landmark: 'Landmark: Near New Bus Stand, Kenikarai Main Road',
     address: 'Bus Stop, 13/2993/26, Madurai - Rameswaram Hwy, Subbaiah Nagar, Ram Nagar, Ramanathapuram, Tamil Nadu 623501.',
@@ -159,19 +159,17 @@ function Showrooms({ showroomRef, isDesktop = true }) {
         {/* SECTION HEADER (Rich Light Theme with Royal Burgundy Accent) */}
         <div className="text-center max-w-3xl mx-auto space-y-4 reveal-3d-popup">
           <div className="flex items-center justify-center gap-3">
-            <span className="w-8 h-[1px] bg-[#710014]/30" />
             <span className="font-sans text-xs md:text-sm font-extrabold tracking-[0.35em] text-[#710014] uppercase">
-              OUR STUDIOS
+              OUR BRANCHES
             </span>
-            <span className="w-8 h-[1px] bg-[#710014]/30" />
           </div>
 
           <h2 className="font-display text-3xl sm:text-5xl lg:text-6xl font-normal text-[#1a1a1a] tracking-tight">
-            Visit Our <span className="italic font-normal text-[#710014]">Design Studios</span>
+            Visit Our <span className="italic font-normal text-[#710014]">Branches</span>
           </h2>
 
           <p className="font-sans text-sm md:text-base text-luxury-charcoal/75 leading-relaxed font-medium max-w-2xl mx-auto">
-            Drop by our studio to check out real wood finishes, look at metal hardware in person, and chat with our designers over a cup of coffee to plan your space.
+            Drop by our branch to check out real wood finishes, look at metal hardware in person, and chat with our designers over a cup of coffee to plan your space.
           </p>
 
           {/* LOCATION TABS SWITCHER (Royal Burgundy Pill Tabs) */}
@@ -219,7 +217,7 @@ function Showrooms({ showroomRef, isDesktop = true }) {
                       {currentLocation.badge}
                     </span>
                     <span className="text-xs font-sans text-luxury-charcoal/60 font-semibold">
-                      STUDIO LOCATION
+                      BRANCH LOCATION
                     </span>
                   </div>
                   <h3 className="font-display text-2xl sm:text-3xl font-normal text-luxury-charcoal">
@@ -383,7 +381,7 @@ function Showrooms({ showroomRef, isDesktop = true }) {
                     <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between z-20">
                       <div className="bg-[#0f1118]/85 backdrop-blur-md border border-white/10 px-4 py-2 rounded-xl text-white">
                         <span className="text-[9px] font-sans font-bold tracking-widest text-[#c5a059] uppercase block">
-                          {currentLocation.name.split(' ')[0]} STUDIO
+                          {currentLocation.name.split(' ')[0]} BRANCH
                         </span>
                         <p className="font-display text-xs text-white/90">
                           {currentLocation.images[activeGalleryImgIdx].caption}

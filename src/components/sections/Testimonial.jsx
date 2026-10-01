@@ -95,11 +95,9 @@ function Testimonial({ testimonialRef }) {
         {/* Minimal Header */}
         <div className="text-center max-w-2xl mx-auto space-y-3">
           <div className="flex items-center justify-center gap-3">
-            <span className="w-6 h-[1px] bg-luxury-sage" />
             <span className="font-sans text-xs sm:text-sm font-extrabold tracking-[0.35em] text-luxury-sage uppercase">
               CLIENT STORIES
             </span>
-            <span className="w-6 h-[1px] bg-luxury-sage" />
           </div>
 
           <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-normal text-luxury-cream tracking-wide">
