@@ -84,16 +84,16 @@ function ReturnToHomeFAB() {
   return (
     <div 
       ref={containerRef}
-      className="fixed bottom-5 right-5 sm:bottom-8 sm:right-8 z-[100] transition-all duration-500 ease-out flex items-center gap-3 opacity-0 translate-y-12 pointer-events-none"
+      className="fixed bottom-5 right-5 sm:bottom-8 sm:right-8 z-40 transition-all duration-500 ease-out flex items-center gap-3 opacity-0 translate-y-12 pointer-events-none"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       {/* Tooltip Badge on Hover */}
       <div 
         ref={tooltipRef}
-        className="px-3 py-1.5 rounded-none bg-[#141210] border border-[#c5a059]/40 text-[#c5a059] font-sans text-[10px] font-bold tracking-widest uppercase shadow-xl transition-all duration-300 pointer-events-none whitespace-nowrap opacity-0 translate-x-2"
+        className="px-3.5 py-1.5 rounded-md bg-[#141210] border border-[#c5a059]/45 text-[#d6b36c] font-sans text-xs font-semibold tracking-widest uppercase shadow-xl transition-all duration-300 pointer-events-none whitespace-nowrap opacity-0 translate-x-2"
       >
-        RETURN TO HOME
+        Return to Top
       </div>
 
       {/* Circular Progress + Floating Compass Button */}

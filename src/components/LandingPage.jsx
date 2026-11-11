@@ -13,19 +13,16 @@ import GetInTouch from './sections/GetInTouch';
 import Footer from './sections/Footer';
 import ReturnToHomeFAB from './sections/ReturnToHomeFAB';
 
-// Lazy load Three.js heavy section - only loads on desktop when visible
+// Lazy load Three.js heavy section - only loads on desktop (>= 1024px)
 const InteractiveStudio = lazy(() => import('./sections/InteractiveStudio'));
 
-let initialPreloadDone = false;
-
 const LandingPage = ({ onNavigate }) => {
-  const [loading, setLoading] = useState(!initialPreloadDone);
-  const [progress, setProgress] = useState(initialPreloadDone ? 100 : 0);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [prevActiveIndex, setPrevActiveIndex] = useState(null);
   const [isPaused, setIsPaused] = useState(false);
 
-  const [isDesktop, setIsDesktop] = useState(true);
+  const [isDesktop, setIsDesktop] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth >= 1024 : true
+  );
 
   // 3D Studio state (Modular Kitchen)
   const [cabinetFinishIdx, setCabinetFinishIdx] = useState(0);
@@ -33,7 +30,6 @@ const LandingPage = ({ onNavigate }) => {
   const [kitchenLayout, setKitchenLayout] = useState('l-shaped');
   const [underCabinetLightOn, setUnderCabinetLightOn] = useState(true);
   const [studioAutoRotate, setStudioAutoRotate] = useState(false);
-  const [wallColorIdx, setWallColorIdx] = useState(0);
 
   // Curation tab state
   const [activeTabIdx, setActiveTabIdx] = useState(1);
@@ -45,7 +41,7 @@ const LandingPage = ({ onNavigate }) => {
   const showroomRef = useRef(null);
   const getInTouchRef = useRef(null);
 
-  // Monitor viewport size for responsive layout styling (debounced)
+  // Monitor viewport size for desktop-only 3D Studio (debounced)
   useEffect(() => {
     let resizeTimer = null;
     const handleResize = () => {
@@ -55,94 +51,46 @@ const LandingPage = ({ onNavigate }) => {
       }, 200);
     };
     window.addEventListener('resize', handleResize);
-    handleResize(); // Trigger once on mount
     return () => {
       window.removeEventListener('resize', handleResize);
       clearTimeout(resizeTimer);
     };
   }, []);
 
-  // Preloading key visual assets for initial hero viewport — instant reveal
+  // Background-cache secondary hero slides without blocking initial render
   useEffect(() => {
-    if (initialPreloadDone) {
-      setLoading(false);
-      setProgress(100);
-      return;
-    }
-
-    let isDone = false;
-
-    const finishPreload = () => {
-      if (isDone) return;
-      isDone = true;
-      initialPreloadDone = true;
-      setProgress(100);
-      setLoading(false);
-    };
-
-    // Safety fallback timeout: max 1.2s wait time on low-end networks
-    const timeoutId = setTimeout(finishPreload, 1200);
-
-    // Preload primary hero slide image
-    const mainHeroImg = new Image();
-    mainHeroImg.src = '/images/slide-living.webp';
-
-    const handleMainLoad = () => {
-      clearTimeout(timeoutId);
-      finishPreload();
-    };
-
-    mainHeroImg.onload = handleMainLoad;
-    mainHeroImg.onerror = handleMainLoad;
-
-    // Asynchronously cache secondary slides in background without blocking initial paint
-    setTimeout(() => {
-      ['/images/slide-dining.webp', '/images/slide-bedroom.webp'].forEach(url => {
+    const timer = setTimeout(() => {
+      ['/images/slide-dining.webp', '/images/slide-bedroom.webp'].forEach((url) => {
         const img = new Image();
         img.src = url;
       });
     }, 400);
 
-    return () => clearTimeout(timeoutId);
+    return () => clearTimeout(timer);
   }, []);
 
-  // Auto slide interval (fast 3.5s rotation)
+  // Auto slide interval
   useEffect(() => {
-    if (loading) return;
-
     if (!isPaused) {
       timerRef.current = setInterval(() => {
-        setActiveIndex((prev) => {
-          setPrevActiveIndex(prev);
-          return (prev + 1) % 3; // 3 slides total
-        });
-      }, 3500);
+        setActiveIndex((prev) => (prev + 1) % 3);
+      }, 3800);
     }
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [isPaused, loading]);
+  }, [isPaused]);
 
   const handlePrev = useCallback(() => {
-    setActiveIndex((prev) => {
-      setPrevActiveIndex(prev);
-      return (prev - 1 + 3) % 3;
-    });
+    setActiveIndex((prev) => (prev - 1 + 3) % 3);
   }, []);
 
   const handleNext = useCallback(() => {
-    setActiveIndex((prev) => {
-      setPrevActiveIndex(prev);
-      return (prev + 1) % 3;
-    });
+    setActiveIndex((prev) => (prev + 1) % 3);
   }, []);
 
   const selectSlide = useCallback((index) => {
-    setActiveIndex((prev) => {
-      if (index === prev) return prev;
-      setPrevActiveIndex(prev);
-      return index;
-    });
+    setActiveIndex(index);
   }, []);
 
   return (
@@ -151,13 +99,11 @@ const LandingPage = ({ onNavigate }) => {
 
       <Hero
         onNavigate={onNavigate}
-        loading={loading}
-        progress={progress}
         activeIndex={activeIndex}
-        prevActiveIndex={prevActiveIndex}
         handlePrev={handlePrev}
         handleNext={handleNext}
         selectSlide={selectSlide}
+        onPauseChange={setIsPaused}
       />
 
       <WhyUs whyUsRef={whyUsRef} />
@@ -173,10 +119,10 @@ const LandingPage = ({ onNavigate }) => {
         onNavigate={onNavigate}
       />
 
-      {/* 3D Studio completely isolated from mobile devices for zero WebGL overhead */}
+      {/* 3D Studio completely isolated from mobile & tablet devices for zero WebGL overhead */}
       {isDesktop && (
-        <div className="hidden md:block">
-          <Suspense fallback={<div className="w-full h-96 bg-[#0f1117] flex items-center justify-center"><span className="text-white/30 text-xs tracking-widest uppercase">Loading 3D Studio...</span></div>}>
+        <div className="hidden lg:block">
+          <Suspense fallback={<div className="w-full h-96 bg-[#0f1117] flex items-center justify-center"><span className="text-white/60 text-xs tracking-widest uppercase">Loading 3D Studio...</span></div>}>
             <InteractiveStudio
               cabinetFinishIdx={cabinetFinishIdx}
               setCabinetFinishIdx={setCabinetFinishIdx}
@@ -188,9 +134,6 @@ const LandingPage = ({ onNavigate }) => {
               setUnderCabinetLightOn={setUnderCabinetLightOn}
               studioAutoRotate={studioAutoRotate}
               setStudioAutoRotate={setStudioAutoRotate}
-              wallColorIdx={wallColorIdx}
-              setWallColorIdx={setWallColorIdx}
-              loading={loading}
             />
           </Suspense>
         </div>
@@ -200,18 +143,17 @@ const LandingPage = ({ onNavigate }) => {
 
       <ProjectGlimpse onNavigate={onNavigate} />
 
-      <AboutUs onNavigate={onNavigate} />
+      <AboutUs />
 
       <Testimonial testimonialRef={testimonialRef} />
 
-      <Showrooms showroomRef={showroomRef} isDesktop={isDesktop} />
+      <Showrooms showroomRef={showroomRef} />
 
-      <GetInTouch getInTouchRef={getInTouchRef} isDesktop={isDesktop} />
+      <GetInTouch getInTouchRef={getInTouchRef} />
 
       <Footer onNavigate={onNavigate} />
 
       <ReturnToHomeFAB />
-
     </div>
   );
 };

@@ -1,4 +1,5 @@
 import { memo, useRef, useEffect, useCallback } from 'react';
+import ScrollReveal from '../ScrollReveal';
 import modularKitchenImg from '../../assets/modular-kitchen.webp';
 import acpelvationImg from '../../assets/ACP-elevation.webp';
 import falseCeilingImg from '../../assets/false-ceiling-work.webp';
@@ -7,7 +8,8 @@ const SERVICES_DATA = [
   {
     serviceNum: 'SERVICE 01',
     title: 'Modular Kitchen',
-    description: 'We design and install modern modular kitchens that are both stylish and functional. Our layouts maximize space and provide smart storage solutions. We use high-quality materials and durable fittings for long-lasting performance. Each kitchen is customized to match the client\'s taste and lifestyle.',
+    description:
+      'We design and install modern modular kitchens that balance precision aesthetics and daily functionality. Using BWP marine plywood and durable hardware, every layout maximizes storage and ergonomics.',
     buttonText: 'Explore Kitchen Designs',
     image: modularKitchenImg,
     alt: 'Modern Modular Kitchen Design'
@@ -15,7 +17,8 @@ const SERVICES_DATA = [
   {
     serviceNum: 'SERVICE 02',
     title: 'ACP Elevation',
-    description: 'We design modern ACP (Aluminium Composite Panel) elevations to enhance the exterior of buildings. Our panels are durable, weather-resistant, and visually appealing. Customized colors, textures, and patterns are available to match the client\'s style. We focus on quality installation and precise finishing. ACP elevation works add a premium look to any property.',
+    description:
+      'Modern Aluminium Composite Panel (ACP) and HPL architectural facades engineered to elevate commercial buildings and residences with weather-resistant durability and clean structural detailing.',
     buttonText: 'Explore Service',
     image: acpelvationImg,
     alt: 'ACP Elevation Design'
@@ -23,14 +26,15 @@ const SERVICES_DATA = [
   {
     serviceNum: 'SERVICE 03',
     title: 'False Ceiling Work',
-    description: 'We provide elegant false ceiling solutions that enhance the look and feel of interiors. Our services include gypsum and POP ceiling designs with integrated lighting. False ceilings conceal wiring and improve insulation. We offer modern patterns and durable finishes to suit any décor. Professional installation ensures lasting quality and aesthetics.',
+    description:
+      'Architectural gypsum, POP, and wood-accented false ceilings with concealed profile lighting and acoustic planning that transform room ambiance and cleanly integrate electrical services.',
     buttonText: 'Explore Service',
     image: falseCeilingImg,
     alt: 'False Ceiling Design'
   }
 ];
 
-const TOTAL_SLIDES = SERVICES_DATA.length + 1; // 3 services + 1 CTA
+const TOTAL_SLIDES = SERVICES_DATA.length + 1;
 
 function ServicesSlider({ servicesRef, onNavigate }) {
   const slideRefs = useRef([]);
@@ -41,7 +45,6 @@ function ServicesSlider({ servicesRef, onNavigate }) {
   const lastActiveRef = useRef(-1);
   const dimensionsRef = useRef({ offsetTop: 0, totalScrollable: 1 });
 
-  // Cache element dimensions — zero DOM reads during scroll
   const updateDimensions = useCallback(() => {
     if (servicesRef?.current) {
       const elem = servicesRef.current;
@@ -52,7 +55,6 @@ function ServicesSlider({ servicesRef, onNavigate }) {
     }
   }, [servicesRef]);
 
-  // Ultra-fast scroll handler: Direct DOM mutations, zero React re-renders
   const updateTransform = useCallback(() => {
     const { offsetTop, totalScrollable } = dimensionsRef.current;
     const scrolled = window.scrollY - offsetTop;
@@ -62,30 +64,26 @@ function ServicesSlider({ servicesRef, onNavigate }) {
       progress = Math.min(scrolled / totalScrollable, 1);
     }
 
-    // Which slide is active based on scroll progress
     const activeIdx = Math.min(Math.floor(progress * TOTAL_SLIDES), TOTAL_SLIDES - 1);
 
-    // Update progress bar via DOM (no state)
     if (progressBarRef.current) {
       progressBarRef.current.style.width = `${progress * 100}%`;
     }
 
-    // Only update card visibility when active index changes
     if (activeIdx !== lastActiveRef.current) {
       const prevIdx = lastActiveRef.current;
       lastActiveRef.current = activeIdx;
 
-      // Hide previous card
       if (prevIdx >= 0 && prevIdx < slideRefs.current.length && slideRefs.current[prevIdx]) {
         const prevEl = slideRefs.current[prevIdx];
         prevEl.style.opacity = '0';
-        prevEl.style.transform = prevIdx < activeIdx
-          ? 'translateY(-40px) scale(0.96)'
-          : 'translateY(40px) scale(0.96)';
+        prevEl.style.transform =
+          prevIdx < activeIdx
+            ? 'translateY(-40px) scale(0.96)'
+            : 'translateY(40px) scale(0.96)';
         prevEl.style.pointerEvents = 'none';
       }
 
-      // Show active card
       if (activeIdx >= 0 && activeIdx < slideRefs.current.length && slideRefs.current[activeIdx]) {
         const activeEl = slideRefs.current[activeIdx];
         activeEl.style.opacity = '1';
@@ -93,27 +91,26 @@ function ServicesSlider({ servicesRef, onNavigate }) {
         activeEl.style.pointerEvents = 'auto';
       }
 
-      // Update dot indicators
       dotRefs.current.forEach((dot, i) => {
         if (!dot) return;
         if (i === activeIdx) {
           dot.style.width = '10px';
           dot.style.height = '10px';
-          dot.style.background = '#838F6F';
-          dot.style.boxShadow = '0 0 8px rgba(131,143,111,0.6)';
+          dot.style.background = '#c5a059';
+          dot.style.boxShadow = '0 0 8px rgba(197,160,89,0.6)';
         } else {
           dot.style.width = '6px';
           dot.style.height = '6px';
-          dot.style.background = 'rgba(242,241,237,0.25)';
+          dot.style.background = 'rgba(242,241,237,0.35)';
           dot.style.boxShadow = 'none';
         }
       });
 
-      // Update vertical label
       if (labelRef.current) {
-        labelRef.current.textContent = activeIdx < SERVICES_DATA.length
-          ? SERVICES_DATA[activeIdx].serviceNum
-          : 'ALL SERVICES';
+        labelRef.current.textContent =
+          activeIdx < SERVICES_DATA.length
+            ? SERVICES_DATA[activeIdx].serviceNum
+            : 'ALL SERVICES';
       }
     }
   }, []);
@@ -122,7 +119,6 @@ function ServicesSlider({ servicesRef, onNavigate }) {
     updateDimensions();
     let isIntersecting = false;
 
-    // Initialize: show first slide, hide others
     slideRefs.current.forEach((el, i) => {
       if (!el) return;
       if (i === 0) {
@@ -151,13 +147,16 @@ function ServicesSlider({ servicesRef, onNavigate }) {
       if (isIntersecting) updateTransform();
     };
 
-    const observer = new IntersectionObserver(([entry]) => {
-      isIntersecting = entry.isIntersecting;
-      if (isIntersecting) {
-        updateDimensions();
-        updateTransform();
-      }
-    }, { rootMargin: '250px 0px 250px 0px' });
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isIntersecting = entry.isIntersecting;
+        if (isIntersecting) {
+          updateDimensions();
+          updateTransform();
+        }
+      },
+      { rootMargin: '250px 0px 250px 0px' }
+    );
 
     if (servicesRef?.current) {
       observer.observe(servicesRef.current);
@@ -175,8 +174,21 @@ function ServicesSlider({ servicesRef, onNavigate }) {
   }, [servicesRef, updateDimensions, updateTransform]);
 
   const handleNavigateServices = useCallback(() => {
-    onNavigate && onNavigate('services');
+    if (onNavigate) onNavigate('services');
   }, [onNavigate]);
+
+  const scrollToSlide = useCallback(
+    (idx) => {
+      updateDimensions();
+      const { offsetTop, totalScrollable } = dimensionsRef.current;
+      const targetProgress = idx === 0 ? 0 : (idx + 0.5) / TOTAL_SLIDES;
+      window.scrollTo({
+        top: offsetTop + targetProgress * totalScrollable,
+        behavior: 'smooth'
+      });
+    },
+    [updateDimensions]
+  );
 
   return (
     <div
@@ -186,49 +198,45 @@ function ServicesSlider({ servicesRef, onNavigate }) {
     >
       {/* Sticky Viewport */}
       <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-center bg-luxury-charcoal">
-
         {/* Ambient Radial Gradient Layer */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(113,0,20,0.12),transparent_70%)] pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(113,0,20,0.15),transparent_70%)] pointer-events-none" />
 
         {/* Card Stack Container */}
         <div className="relative w-full h-full flex items-center justify-center">
-
-          {/* Service Cards — stacked, CSS transitions handle smoothness */}
-          {SERVICES_DATA.map((slide, idx) => (
-            <div
-              key={idx}
-              ref={el => slideRefs.current[idx] = el}
-              className="absolute inset-0 w-full h-full flex items-center px-6 md:px-16 lg:px-24"
-              style={{
-                transition: 'opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-                willChange: 'opacity, transform'
-              }}
-            >
-              <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-8 lg:gap-12 items-center pt-12 sm:pt-0">
-
+          {SERVICES_DATA.map((slide, idx) => {
+            const slideInner = (
+              <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-12 items-center pt-14 sm:pt-0">
                 {/* Text Description */}
-                <div className="lg:col-span-5 space-y-2.5 sm:space-y-5 md:space-y-6">
+                <div className="lg:col-span-5 space-y-3 sm:space-y-5">
                   <div className="flex items-center gap-3">
-                    <span className="font-sans text-xs md:text-sm font-extrabold tracking-[0.35em] text-luxury-sage uppercase">
+                    <span className="font-sans text-xs font-bold tracking-[0.22em] text-[#b7c4a1] uppercase">
                       {slide.serviceNum}
                     </span>
                   </div>
 
-                  <h2 className="font-display text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-normal text-luxury-cream leading-tight">
+                  <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-medium text-luxury-cream leading-tight">
                     {slide.title}
                   </h2>
 
-                  <p className="font-sans text-xs sm:text-base md:text-lg text-[#d4d3cf] leading-relaxed font-medium line-clamp-4 sm:line-clamp-none">
+                  <p className="font-sans text-sm sm:text-base md:text-lg text-[#e0dfd9] leading-relaxed font-normal">
                     {slide.description}
                   </p>
 
                   <div className="pt-1 sm:pt-2">
                     <button
+                      type="button"
                       onClick={handleNavigateServices}
-                      className="inline-flex items-center gap-2 font-sans text-xs md:text-sm tracking-wider text-luxury-sage font-bold uppercase hover:text-luxury-cream transition-colors group cursor-pointer touch-manipulation"
+                      className="inline-flex items-center gap-2 font-sans text-xs md:text-sm tracking-[0.14em] text-[#d6b36c] font-bold uppercase hover:text-white transition-colors group cursor-pointer touch-manipulation"
                     >
                       <span>{slide.buttonText}</span>
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={2}
+                        stroke="currentColor"
+                        className="w-4 h-4 group-hover:translate-x-1 transition-transform"
+                      >
                         <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                       </svg>
                     </button>
@@ -237,8 +245,8 @@ function ServicesSlider({ servicesRef, onNavigate }) {
 
                 {/* Framed Visual Showcase */}
                 <div className="lg:col-span-7 flex justify-center">
-                  <div className="relative group w-full lg:w-auto rounded-2xl overflow-hidden shadow-2xl">
-                    <div className="relative overflow-hidden w-full lg:w-[45vw] h-[22vh] sm:h-[32vh] lg:h-[60vh] rounded-2xl border border-luxury-cream/10">
+                  <div className="relative group w-full lg:w-auto rounded-xl overflow-hidden shadow-2xl">
+                    <div className="relative overflow-hidden w-full lg:w-[45vw] h-[24vh] sm:h-[34vh] lg:h-[58vh] rounded-xl border border-luxury-cream/15">
                       <img
                         src={slide.image}
                         alt={slide.alt}
@@ -251,42 +259,68 @@ function ServicesSlider({ servicesRef, onNavigate }) {
                     </div>
                   </div>
                 </div>
-
               </div>
-            </div>
-          ))}
+            );
+
+            return (
+              <div
+                key={slide.serviceNum}
+                ref={(el) => {
+                  slideRefs.current[idx] = el;
+                }}
+                className="absolute inset-0 w-full h-full flex items-center px-6 md:px-16 lg:px-24"
+                style={{
+                  transition:
+                    'opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+                  willChange: 'opacity, transform'
+                }}
+              >
+                {idx === 0 ? (
+                  <ScrollReveal variant="scale" className="w-full">
+                    {slideInner}
+                  </ScrollReveal>
+                ) : (
+                  slideInner
+                )}
+              </div>
+            );
+          })}
 
           {/* Slide 4: View Full Catalog CTA */}
           <div
-            ref={el => slideRefs.current[SERVICES_DATA.length] = el}
+            ref={(el) => {
+              slideRefs.current[SERVICES_DATA.length] = el;
+            }}
             className="absolute inset-0 w-full h-full flex items-center px-6 md:px-16 lg:px-24"
             style={{
               opacity: 0,
               transform: 'translateY(40px) scale(0.96)',
               pointerEvents: 'none',
-              transition: 'opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+              transition:
+                'opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
               willChange: 'opacity, transform'
             }}
           >
-            <div className="max-w-4xl mx-auto w-full text-center space-y-8">
+            <div className="max-w-4xl mx-auto w-full text-center space-y-6 sm:space-y-8">
               <div className="flex justify-center items-center gap-3">
-                <span className="font-sans text-[11px] md:text-xs font-bold tracking-[0.35em] text-luxury-sage uppercase">
+                <span className="font-sans text-xs font-bold tracking-[0.22em] text-[#b7c4a1] uppercase">
                   OUR SERVICES
                 </span>
               </div>
 
-              <h2 className="font-display text-3xl md:text-5xl lg:text-7xl font-extralight text-luxury-cream leading-tight tracking-wide">
-                Custom Interior Design & Full Catalogs
+              <h2 className="font-display text-3xl sm:text-5xl lg:text-6xl font-medium text-luxury-cream leading-tight tracking-tight">
+                Custom Interior Design &amp; Full Catalogs
               </h2>
 
-              <p className="font-sans text-sm md:text-base text-[#d4d3cf] max-w-xl mx-auto leading-relaxed font-light">
-                Browse our complete project catalog to see custom layouts, material options, finishes, and timelines for your home or office.
+              <p className="font-sans text-sm md:text-base text-[#e0dfd9] max-w-xl mx-auto leading-relaxed font-normal">
+                Browse our complete catalog to inspect turnkey packages, material finishes, modular specifications, and delivery timelines for your residence or commercial space.
               </p>
 
-              <div className="pt-4">
+              <div className="pt-2">
                 <button
+                  type="button"
                   onClick={handleNavigateServices}
-                  className="relative px-8 py-3.5 bg-luxury-cream text-luxury-charcoal font-sans text-xs uppercase tracking-widest font-semibold overflow-hidden group transition-all duration-300 shadow-[0_10px_30px_rgba(131,143,111,0.1)] hover:shadow-[0_10px_35px_rgba(131,143,111,0.2)] cursor-pointer touch-manipulation"
+                  className="relative px-8 py-3.5 rounded-md bg-luxury-cream text-luxury-charcoal font-sans text-xs uppercase tracking-[0.14em] font-bold overflow-hidden group transition-all duration-300 shadow-lg cursor-pointer touch-manipulation"
                 >
                   <span className="relative z-10 transition-colors duration-300 group-hover:text-luxury-cream">
                     Browse Services Catalog
@@ -296,23 +330,35 @@ function ServicesSlider({ servicesRef, onNavigate }) {
               </div>
             </div>
           </div>
-
         </div>
 
         {/* Dot Indicators — right side */}
-        <div className="absolute right-6 md:right-12 top-1/2 -translate-y-1/2 flex flex-col items-center gap-3 z-30">
+        <div className="absolute right-4 md:right-10 top-1/2 -translate-y-1/2 flex flex-col items-center gap-1 z-30">
           {Array.from({ length: TOTAL_SLIDES }).map((_, idx) => (
-            <div
+            <button
               key={idx}
-              ref={el => dotRefs.current[idx] = el}
-              className="rounded-full transition-all duration-300"
-              style={{
-                width: idx === 0 ? '10px' : '6px',
-                height: idx === 0 ? '10px' : '6px',
-                background: idx === 0 ? '#838F6F' : 'rgba(242,241,237,0.25)',
-                boxShadow: idx === 0 ? '0 0 8px rgba(131,143,111,0.6)' : 'none'
-              }}
-            />
+              type="button"
+              onClick={() => scrollToSlide(idx)}
+              aria-label={
+                idx < SERVICES_DATA.length
+                  ? `Jump to ${SERVICES_DATA[idx].title}`
+                  : 'Jump to Full Services Catalog'
+              }
+              className="p-1.5 cursor-pointer flex items-center justify-center touch-manipulation focus:outline-none"
+            >
+              <span
+                ref={(el) => {
+                  dotRefs.current[idx] = el;
+                }}
+                className="block rounded-full transition-all duration-300"
+                style={{
+                  width: idx === 0 ? '10px' : '6px',
+                  height: idx === 0 ? '10px' : '6px',
+                  background: idx === 0 ? '#c5a059' : 'rgba(242,241,237,0.35)',
+                  boxShadow: idx === 0 ? '0 0 8px rgba(197,160,89,0.6)' : 'none'
+                }}
+              />
+            </button>
           ))}
         </div>
 
@@ -320,7 +366,7 @@ function ServicesSlider({ servicesRef, onNavigate }) {
         <div className="absolute left-6 md:left-12 top-1/2 -translate-y-1/2 z-30 hidden lg:block">
           <span
             ref={labelRef}
-            className="font-sans text-[10px] font-bold tracking-[0.3em] text-luxury-sage/60 uppercase"
+            className="font-sans text-xs font-bold tracking-[0.22em] text-[#b7c4a1] uppercase"
             style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}
           >
             SERVICE 01
@@ -328,14 +374,13 @@ function ServicesSlider({ servicesRef, onNavigate }) {
         </div>
 
         {/* Timeline Progress Bar */}
-        <div className="absolute bottom-8 left-6 md:left-16 right-6 md:right-16 h-[1px] bg-luxury-cream/10 z-30">
+        <div className="absolute bottom-8 left-6 md:left-16 right-6 md:right-16 h-[2px] bg-luxury-cream/15 z-30 rounded-full overflow-hidden">
           <div
             ref={progressBarRef}
-            className="h-full bg-luxury-sage transform-gpu will-change-transform"
+            className="h-full bg-[#c5a059] transform-gpu will-change-transform"
             style={{ width: '0%' }}
           />
         </div>
-
       </div>
     </div>
   );

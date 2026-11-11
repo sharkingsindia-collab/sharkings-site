@@ -16,7 +16,7 @@ function WhatsAppFAB() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chat on WhatsApp"
-      className="fixed bottom-5 left-5 sm:bottom-8 sm:left-8 z-[99] w-14 h-14 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-full flex items-center justify-center shadow-[0_4px_16px_rgba(0,0,0,0.25)] hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer touch-manipulation focus:outline-none"
+      className="fixed bottom-5 left-5 sm:bottom-8 sm:left-8 z-40 w-14 h-14 bg-[#25D366] hover:bg-[#1fa851] text-white rounded-full flex items-center justify-center shadow-[0_6px_20px_rgba(0,0,0,0.28)] hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
     >
       {/* Clean WhatsApp SVG Icon */}
       <svg

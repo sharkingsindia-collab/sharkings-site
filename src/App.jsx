@@ -29,6 +29,11 @@ function getRouteFromLocation() {
     return 'projects';
   }
 
+  // Normalize unknown paths cleanly back to root landing path
+  if (pathname !== '/') {
+    window.history.replaceState({ page: 'landing' }, '', '/');
+  }
+
   return 'landing';
 }
 
@@ -135,12 +140,17 @@ export default function App() {
     updateRouteMetadata(page);
 
     if (targetAnchor) {
-      setTimeout(() => {
+      let attempts = 0;
+      const scrollToAnchor = () => {
         const el = document.querySelector(targetAnchor);
         if (el) {
-          el.scrollIntoView({ behavior: 'smooth' });
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else if (attempts < 10) {
+          attempts += 1;
+          requestAnimationFrame(scrollToAnchor);
         }
-      }, 100);
+      };
+      requestAnimationFrame(scrollToAnchor);
     } else {
       window.scrollTo(0, 0);
     }

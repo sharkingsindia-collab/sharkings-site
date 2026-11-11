@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback, memo } from 'react';
+import { useState, useEffect, useCallback, useRef, memo } from 'react';
+import ScrollReveal from './ScrollReveal';
 
 // Billionaires Project Assets
 import b1 from '../assets/Billionaires/sharking1.webp';
@@ -82,17 +83,25 @@ const PROJECTS_DATA = [
 function ProjectPage({ onNavigate }) {
   const [selectedProject, setSelectedProject] = useState(null);
   const [activeGalleryIndex, setActiveGalleryIndex] = useState(0);
+  const modalTouchXRef = useRef(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // Synchronize body overflow cleanly with modal state and restore on unmount
+  useEffect(() => {
+    document.body.style.overflow = selectedProject ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [selectedProject]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (!selectedProject) return;
       if (e.key === 'Escape') {
         setSelectedProject(null);
-        document.body.style.overflow = '';
       } else if (e.key === 'ArrowRight') {
         setActiveGalleryIndex((prev) => (prev + 1) % selectedProject.gallery.length);
       } else if (e.key === 'ArrowLeft') {
@@ -107,21 +116,18 @@ function ProjectPage({ onNavigate }) {
   const openProjectModal = useCallback((proj) => {
     setSelectedProject(proj);
     setActiveGalleryIndex(0);
-    document.body.style.overflow = 'hidden';
   }, []);
 
   const closeProjectModal = useCallback(() => {
     setSelectedProject(null);
-    document.body.style.overflow = '';
   }, []);
 
   const handleContactNavigate = useCallback(() => {
-    onNavigate('landing');
-    setTimeout(() => {
-      const el = document.querySelector('#get-in-touch');
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
-    }, 300);
-  }, [onNavigate]);
+    if (selectedProject) {
+      setSelectedProject(null);
+    }
+    onNavigate('landing', '#get-in-touch');
+  }, [selectedProject, onNavigate]);
 
   const prevGalleryImg = useCallback(() => {
     if (!selectedProject) return;
@@ -134,7 +140,7 @@ function ProjectPage({ onNavigate }) {
   }, [selectedProject]);
 
   return (
-    <div className="min-h-screen bg-[#f9f8f4] text-[#1a1a1a] font-sans selection:bg-[#710014] selection:text-white relative overflow-x-hidden">
+    <div className="min-h-screen bg-[#f9f8f4] text-[#1a1a1a] font-sans selection:bg-[#710014] selection:text-white relative overflow-x-clip">
       
       {/* Background Architectural Grid */}
       <div
@@ -149,20 +155,21 @@ function ProjectPage({ onNavigate }) {
       />
 
       {/* Clean Navbar Header */}
-      <header className="w-full bg-[#f9f8f4]/90 backdrop-blur-md border-b border-[#e5e0d3] sticky top-0 z-50 py-4 sm:py-5">
+      <header className="w-full bg-[#f9f8f4]/95 backdrop-blur-md border-b border-[#e5e0d3] sticky top-0 z-50 py-3.5 sm:py-4">
         <div className="max-w-7xl mx-auto px-5 sm:px-12 flex items-center justify-between">
           
           <button
+            type="button"
             onClick={() => onNavigate('landing')}
-            className="flex items-center gap-2 font-sans text-xs font-bold tracking-[0.2em] text-[#1a1a1a] hover:text-[#710014] transition-colors uppercase cursor-pointer focus:outline-none group touch-manipulation"
+            className="flex items-center gap-2 font-sans text-xs font-bold tracking-[0.16em] text-[#1a1a1a] hover:text-[#710014] transition-colors uppercase cursor-pointer focus:outline-none group touch-manipulation"
           >
             <svg className="w-4 h-4 transform group-hover:-translate-x-1 transition-transform text-[#710014]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
             </svg>
-            <span>HOME</span>
+            <span>Home</span>
           </button>
 
-          {/* Brand Identity Logo (Mobile, Tablet, Laptop & Desktop) */}
+          {/* Brand Identity Logo */}
           <div className="flex items-center justify-center">
             <img
               src={slogo}
@@ -175,10 +182,11 @@ function ProjectPage({ onNavigate }) {
           </div>
 
           <button
+            type="button"
             onClick={handleContactNavigate}
-            className="px-4 py-2 sm:px-5 sm:py-2.5 bg-[#710014] text-white text-[10px] font-sans font-bold tracking-wider uppercase hover:bg-[#580010] transition-colors cursor-pointer shadow-sm touch-manipulation"
+            className="px-4 py-2 sm:px-5 sm:py-2.5 rounded-md bg-[#710014] text-white text-xs font-sans font-bold tracking-[0.12em] uppercase hover:bg-[#580010] transition-colors cursor-pointer shadow-sm touch-manipulation"
           >
-            CONTACT US
+            Contact Us
           </button>
 
         </div>
@@ -188,32 +196,34 @@ function ProjectPage({ onNavigate }) {
       <main className="max-w-7xl mx-auto px-5 sm:px-12 lg:px-16 py-8 sm:py-12 space-y-8 sm:space-y-10 relative z-10">
         
         {/* Title Block */}
-        <div className="space-y-3 border-b border-[#e5e0d3] pb-6">
-          <span className="font-sans text-xs sm:text-sm font-extrabold tracking-[0.35em] text-[#710014] uppercase block">
-            SIGNATURE SHOWCASES • MADURAI • RAMANATHAPURAM • SOUTH TAMIL NADU
-          </span>
+        <ScrollReveal variant="up">
+          <div className="space-y-3 border-b border-[#e5e0d3] pb-6">
+            <span className="font-sans text-xs font-bold tracking-[0.2em] text-[#710014] uppercase block">
+              SIGNATURE SHOWCASES • MADURAI • RAMANATHAPURAM • SOUTH TAMIL NADU
+            </span>
 
-          <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-normal text-[#1a1a1a] leading-tight uppercase tracking-wider">
-            Completed Interior Design Projects in Madurai, Ramnad &amp; South Tamil Nadu
-          </h1>
+            <h1 className="font-display text-3xl sm:text-5xl lg:text-[54px] font-medium text-[#1a1a1a] leading-tight tracking-tight">
+              Completed Interior Design Portfolio
+            </h1>
 
-          <p className="font-sans text-sm sm:text-base text-[#333333] leading-relaxed font-medium max-w-3xl">
-            A showcase of signature residential villas, modular home decors, luxury salons, and commercial spaces crafted across Madurai, Ramanathapuram, South Tamil Nadu, and across Tamil Nadu. Select any project to explore the complete gallery and design story.
-          </p>
-        </div>
+            <p className="font-sans text-sm sm:text-base text-[#333333] leading-relaxed font-normal max-w-3xl">
+              Explore completed residential villas, bespoke modular home interiors, luxury salons, and corporate environments crafted across Madurai, Ramanathapuram, and South Tamil Nadu. Select any project to inspect the full gallery.
+            </p>
+          </div>
+        </ScrollReveal>
 
         {/* 2-COLUMN CLIENT PROJECTS GRID */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10">
-          {PROJECTS_DATA.map((proj) => (
-            <div
-              key={proj.id}
-              onClick={() => openProjectModal(proj)}
-              className="bg-white border border-[#e5e0d3] rounded-3xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 group cursor-pointer flex flex-col justify-between touch-manipulation"
-            >
+          {PROJECTS_DATA.map((proj, idx) => (
+            <ScrollReveal key={proj.id} variant="up" delay={(idx % 2) * 100} className="flex">
+              <div
+                onClick={() => openProjectModal(proj)}
+                className="w-full bg-white border border-[#e5e0d3] rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 group cursor-pointer flex flex-col justify-between touch-manipulation"
+              >
               <div className="space-y-4 p-5 sm:p-6">
                 
                 {/* Cover Image */}
-                <div className="relative aspect-[16/10] overflow-hidden rounded-2xl bg-[#eee9df]">
+                <div className="relative aspect-[16/10] overflow-hidden rounded-lg bg-[#eee9df]">
                   <img
                     src={proj.coverImage}
                     alt={proj.title}
@@ -223,25 +233,25 @@ function ProjectPage({ onNavigate }) {
                     decoding="async"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  <div className="absolute bottom-4 right-4 bg-black/80 backdrop-blur-md text-white text-[11px] font-sans font-extrabold tracking-widest px-3 py-1.5 uppercase rounded shadow flex items-center gap-1.5">
-                    <svg className="w-3.5 h-3.5 text-[#c5a059]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="absolute bottom-3.5 right-3.5 bg-black/85 backdrop-blur-md text-white text-xs font-sans font-bold tracking-wider px-3 py-1.5 uppercase rounded-md shadow flex items-center gap-1.5">
+                    <svg className="w-3.5 h-3.5 text-[#e0be7a]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    <span>{proj.gallery.length} PHOTOS</span>
+                    <span>{proj.gallery.length} Photos</span>
                   </div>
                 </div>
 
                 {/* Details */}
                 <div className="space-y-2">
-                  <span className="text-xs font-sans font-extrabold tracking-widest text-[#710014] uppercase block">
+                  <span className="text-xs font-sans font-bold tracking-[0.14em] text-[#710014] uppercase block">
                     {proj.category}
                   </span>
 
-                  <h3 className="font-display text-2xl sm:text-3xl font-normal text-[#1a1a1a] uppercase group-hover:text-[#710014] transition-colors">
+                  <h2 className="font-display text-2xl sm:text-3xl font-medium text-[#1a1a1a] group-hover:text-[#710014] transition-colors">
                     {proj.title}
-                  </h3>
+                  </h2>
 
-                  <p className="font-sans text-sm text-[#444444] font-medium leading-relaxed">
+                  <p className="font-sans text-sm text-[#333333] font-normal leading-relaxed">
                     {proj.description}
                   </p>
                 </div>
@@ -250,12 +260,16 @@ function ProjectPage({ onNavigate }) {
 
               {/* Card Footer Button */}
               <div className="px-5 sm:px-6 pb-6 pt-2">
-                <button className="w-full py-3.5 bg-[#710014] text-white text-xs sm:text-sm font-sans font-extrabold tracking-widest uppercase hover:bg-[#580010] transition-colors shadow-sm text-center cursor-pointer rounded-none touch-manipulation">
-                  INSPECT PROJECT GALLERY →
+                <button
+                  type="button"
+                  className="w-full py-3.5 rounded-md bg-[#710014] text-white text-xs font-sans font-bold tracking-[0.14em] uppercase hover:bg-[#580010] transition-colors shadow-sm text-center cursor-pointer touch-manipulation"
+                >
+                  Inspect Project Gallery →
                 </button>
               </div>
 
-            </div>
+              </div>
+            </ScrollReveal>
           ))}
         </div>
 
@@ -263,7 +277,15 @@ function ProjectPage({ onNavigate }) {
 
       {/* Full-Screen Exhibition Split Showcase Modal */}
       {selectedProject && (
-        <div className="fixed inset-0 z-[200] bg-[#0a0c10]/95 backdrop-blur-3xl flex flex-col lg:flex-row overflow-hidden transition-all duration-300">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={selectedProject.title}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) closeProjectModal();
+          }}
+          className="fixed inset-0 z-[150] bg-[#0a0c10]/95 backdrop-blur-3xl flex flex-col lg:flex-row overflow-hidden transition-all duration-300"
+        >
 
           {/* LEFT SIDEBAR / MOBILE TOP SHEET: Info Panel */}
           <div className="w-full lg:w-[35%] xl:w-[32%] bg-[#f9f8f4] border-b lg:border-b-0 lg:border-r border-[#e5e0d3] p-6 sm:p-10 flex flex-col justify-between overflow-y-auto z-10 text-[#1a1a1a] max-h-[50vh] lg:max-h-full">
@@ -271,42 +293,45 @@ function ProjectPage({ onNavigate }) {
             <div className="space-y-6 sm:space-y-8">
               {/* Back Button */}
               <button
+                type="button"
                 onClick={closeProjectModal}
-                className="flex items-center gap-2 font-sans text-xs font-bold tracking-[0.2em] text-[#555555] hover:text-[#710014] transition-colors uppercase cursor-pointer focus:outline-none touch-manipulation"
+                className="flex items-center gap-2 font-sans text-xs font-bold tracking-[0.14em] text-[#333333] hover:text-[#710014] transition-colors uppercase cursor-pointer focus:outline-none touch-manipulation"
               >
                 <svg className="w-4 h-4 text-[#710014]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
                 </svg>
-                <span>BACK TO PORTFOLIO</span>
+                <span>Back to Portfolio</span>
               </button>
 
               {/* Info Details */}
               <div className="space-y-3 sm:space-y-4 pt-1">
-                <span className="font-sans text-xs font-extrabold tracking-[0.35em] text-[#710014] uppercase block">
+                <span className="font-sans text-xs font-bold tracking-[0.2em] text-[#710014] uppercase block">
                   {selectedProject.category}
                 </span>
 
-                <h2 className="font-display text-2xl sm:text-4xl font-normal text-[#1a1a1a] leading-tight uppercase tracking-wider">
+                <h2 className="font-display text-2xl sm:text-4xl font-medium text-[#1a1a1a] leading-tight tracking-tight">
                   {selectedProject.title}
                 </h2>
 
-                <p className="font-sans text-sm md:text-base text-[#444444] leading-relaxed font-medium pt-1">
+                <p className="font-sans text-sm md:text-base text-[#333333] leading-relaxed font-normal pt-1">
                   {selectedProject.description}
                 </p>
 
                 {/* Thumbnail Strip */}
                 {selectedProject.gallery.length > 1 && (
-                  <div className="pt-4 border-t border-[#e5e0d3] space-y-2">
-                    <span className="text-xs font-sans font-extrabold tracking-wider text-[#710014] uppercase block">
-                      PROJECT GALLERY ({selectedProject.gallery.length} PHOTOS)
+                  <div className="pt-4 border-t border-[#e5e0d3] space-y-2.5">
+                    <span className="text-xs font-sans font-bold tracking-wider text-[#710014] uppercase block">
+                      Project Gallery ({selectedProject.gallery.length} Photos)
                     </span>
-                    <div className="flex items-center gap-2.5 overflow-x-auto pb-1 scrollbar-none">
+                    <div className="flex items-center gap-2.5 overflow-x-auto pb-1 scrollbar-thin">
                       {selectedProject.gallery.map((imgUrl, idx) => (
                         <button
                           key={idx}
+                          type="button"
+                          aria-label={`View gallery photo ${idx + 1}`}
                           onClick={() => setActiveGalleryIndex(idx)}
-                          className={`relative w-20 h-14 rounded-xl overflow-hidden border-2 transition-all cursor-pointer flex-shrink-0 touch-manipulation ${
-                            activeGalleryIndex === idx ? 'border-[#710014] scale-105 shadow-md' : 'border-transparent opacity-60 hover:opacity-100'
+                          className={`relative w-20 h-14 rounded-lg overflow-hidden border-2 transition-all cursor-pointer flex-shrink-0 touch-manipulation ${
+                            activeGalleryIndex === idx ? 'border-[#710014] scale-105 shadow-md' : 'border-transparent opacity-65 hover:opacity-100'
                           }`}
                         >
                           <img
@@ -327,34 +352,51 @@ function ProjectPage({ onNavigate }) {
             </div>
 
             {/* Bottom Footer Info */}
-            <div className="hidden sm:flex items-center justify-between pt-6 border-t border-[#e5e0d3] font-sans text-xs tracking-widest text-[#777777] uppercase">
+            <div className="hidden sm:flex items-center justify-between pt-6 border-t border-[#e5e0d3] font-sans text-xs tracking-widest text-[#4a4a4a] uppercase">
               <span className="font-bold">SHARKINGS INTERIORS</span>
-              <span className="font-extrabold text-[#710014]">
-                0{activeGalleryIndex + 1} / 0{selectedProject.gallery.length}
+              <span className="font-bold text-[#710014]">
+                {String(activeGalleryIndex + 1).padStart(2, '0')} / {String(selectedProject.gallery.length).padStart(2, '0')}
               </span>
             </div>
 
           </div>
 
           {/* RIGHT SIDE: Full Gallery Media Stage */}
-          <div className="w-full lg:w-[65%] xl:w-[68%] h-[50vh] lg:h-full relative bg-black overflow-hidden flex items-center justify-center">
+          <div
+            onTouchStart={(e) => {
+              if (e.touches?.[0]) modalTouchXRef.current = e.touches[0].clientX;
+            }}
+            onTouchEnd={(e) => {
+              const startX = modalTouchXRef.current;
+              modalTouchXRef.current = null;
+              if (startX === null || !e.changedTouches?.[0] || selectedProject.gallery.length <= 1) return;
+              const deltaX = startX - e.changedTouches[0].clientX;
+              if (deltaX > 40) {
+                nextGalleryImg();
+              } else if (deltaX < -40) {
+                prevGalleryImg();
+              }
+            }}
+            className="w-full lg:w-[65%] xl:w-[68%] h-[50vh] lg:h-full relative bg-black overflow-hidden flex items-center justify-center touch-pan-y"
+          >
 
             {/* Gallery Image */}
             <img
               src={selectedProject.gallery[activeGalleryIndex]}
-              alt={selectedProject.title}
+              alt={`${selectedProject.title} photo ${activeGalleryIndex + 1}`}
               width="1200"
               height="800"
               loading="lazy"
               decoding="async"
-              className="w-full h-full object-cover transition-all duration-500 ease-out"
+              className="w-full h-full object-contain transition-all duration-500 ease-out"
             />
 
             {/* Close Button Top Right for Mobile */}
             <button
+              type="button"
               onClick={closeProjectModal}
               aria-label="Close Modal"
-              className="lg:hidden absolute top-4 right-4 w-9 h-9 rounded-full bg-black/80 text-white flex items-center justify-center backdrop-blur-md focus:outline-none touch-manipulation"
+              className="lg:hidden absolute top-4 right-4 w-9 h-9 rounded-md bg-black/80 text-white border border-white/20 flex items-center justify-center backdrop-blur-md focus:outline-none touch-manipulation"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -364,9 +406,10 @@ function ProjectPage({ onNavigate }) {
             {/* Navigation Arrows at Bottom Right */}
             <div className="absolute bottom-6 right-6 flex items-center gap-3 z-30">
               <button
+                type="button"
                 onClick={prevGalleryImg}
                 aria-label="Previous Image"
-                className="w-11 h-11 sm:w-12 sm:h-12 rounded-full border border-white/20 bg-black/60 backdrop-blur-md flex items-center justify-center text-white hover:border-[#710014] hover:bg-[#710014] transition-all duration-300 cursor-pointer focus:outline-none touch-manipulation"
+                className="w-11 h-11 rounded-md border border-white/25 bg-black/70 backdrop-blur-md flex items-center justify-center text-white hover:border-[#710014] hover:bg-[#710014] transition-all duration-300 cursor-pointer focus:outline-none touch-manipulation"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
@@ -374,9 +417,10 @@ function ProjectPage({ onNavigate }) {
               </button>
 
               <button
+                type="button"
                 onClick={nextGalleryImg}
                 aria-label="Next Image"
-                className="w-11 h-11 sm:w-12 sm:h-12 rounded-full border border-white/20 bg-black/60 backdrop-blur-md flex items-center justify-center text-white hover:border-[#710014] hover:bg-[#710014] transition-all duration-300 cursor-pointer focus:outline-none touch-manipulation"
+                className="w-11 h-11 rounded-md border border-white/25 bg-black/70 backdrop-blur-md flex items-center justify-center text-white hover:border-[#710014] hover:bg-[#710014] transition-all duration-300 cursor-pointer focus:outline-none touch-manipulation"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
@@ -390,16 +434,16 @@ function ProjectPage({ onNavigate }) {
       )}
 
       {/* Footer */}
-      <footer className="w-full bg-[#38000a] text-white py-8 px-6 md:px-16 border-t border-white/10 mt-16">
+      <footer className="w-full bg-[#38000a] text-white py-8 px-6 md:px-16 border-t border-white/15 mt-16">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <span className="font-display text-xs tracking-widest text-[#c5a059] uppercase">
-              SHARKINGS INTERIORS & EXTERIORS • MADURAI & RAMANATHAPURAM
+            <span className="font-sans text-xs font-bold tracking-wider text-[#e0be7a] uppercase">
+              SHARKINGS INTERIORS &amp; EXTERIORS • MADURAI &amp; RAMANATHAPURAM
             </span>
           </div>
 
-          <div className="font-sans text-xs text-white/60">
-            © {new Date().getFullYear()} Sharkings Interiors & Exteriors. All Rights Reserved.
+          <div className="font-sans text-xs text-white/80">
+            © {new Date().getFullYear()} Sharkings Interiors &amp; Exteriors. All Rights Reserved.
           </div>
         </div>
       </footer>

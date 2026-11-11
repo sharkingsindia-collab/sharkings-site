@@ -48,46 +48,6 @@ Website: https://www.sharkingsinteriors.in
 }
 
 /**
- * Send Consultation Booking Form Email
- */
-export async function sendConsultationEmail(bookingData) {
-  const { name, phone, email, venue, scope, date, time, budget, notes, bookingCode } = bookingData;
-
-  const emailSubject = `📅 New VIP Consultation Booking [${bookingCode}] - ${name}`;
-
-  const venueTitle = venue === 'madurai' ? 'Madurai Office (Villapuram)' : venue === 'ramanathapuram' ? 'Ramanathapuram Showroom (Kenikarai)' : 'Virtual Video Call';
-
-  const formattedMessage = `
-VIP CONSULTATION BOOKING DETAILS [${bookingCode}]
-----------------------------------------
-• Client Name: ${name}
-• Phone Number: ${phone}
-• Email Address: ${email || 'Not provided'}
-• Chosen Branch: ${venueTitle}
-• Project Scope: ${scope}
-• Date & Time: ${date || 'Flexible Date'} at ${time}
-• Budget Bracket: ${budget}
-
-SPECIAL DESIGN REQUIREMENTS:
-----------------------------------------
-${notes || 'None specified'}
-
-----------------------------------------
-Direct Call: tel:${phone}
-Website: https://www.sharkingsinteriors.in
-  `.trim();
-
-  return sendFrontendEmail({
-    subject: emailSubject,
-    name,
-    email: email || 'no-reply@sharkingsinteriors.in',
-    phone,
-    topic: `Consultation - ${scope}`,
-    message: formattedMessage
-  });
-}
-
-/**
  * Core Universal Frontend Email Sender
  */
 async function sendFrontendEmail(payload) {
@@ -114,15 +74,20 @@ async function sendFrontendEmail(payload) {
     });
 
     const result = await response.json();
-    if (result.success) {
-      console.log('✅ Email successfully sent via Web3Forms API:', result);
+    if (response.ok && result.success) {
       return { success: true, message: 'Email sent successfully!' };
-    } else {
-      console.warn('⚠️ Web3Forms response notice:', result);
-      return { success: true, message: 'Form submitted successfully!' };
     }
+
+    console.warn('⚠️ Web3Forms submission rejected:', result);
+    return {
+      success: false,
+      message: result?.message || 'Unable to submit inquiry right now. Please call or WhatsApp us directly.'
+    };
   } catch (error) {
     console.error('❌ Error sending email from frontend:', error);
-    return { success: true, message: 'Form submitted successfully!' };
+    return {
+      success: false,
+      message: 'Network error while sending your message. Please call +91 80980 90204 or chat on WhatsApp.'
+    };
   }
 }
