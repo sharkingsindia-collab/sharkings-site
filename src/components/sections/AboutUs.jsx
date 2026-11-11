@@ -1,6 +1,6 @@
 import { useCallback, memo } from 'react';
 import { useScrollReveal } from '../../hooks/useScrollReveal';
-import homeInteriorImg from '../../assets/home-interior.webp';
+import aboutShowroomImg from '../../assets/about-showroom.webp';
 
 function AboutUs({ onNavigate }) {
   useScrollReveal();
@@ -104,13 +104,13 @@ function AboutUs({ onNavigate }) {
             <div className="relative rounded-3xl overflow-hidden shadow-[0_25px_70px_rgba(0,0,0,0.1)] border border-black/10 group">
 
               <img
-                src="/showroom3.jpeg"
-                alt="Sharkings Full Service Living Interior"
-                width="600"
-                height="750"
+                src={aboutShowroomImg}
+                alt="Sharkings Interiors & Exteriors Experience Centre Showroom"
+                width="576"
+                height="1024"
                 loading="lazy"
                 decoding="async"
-                className="w-full aspect-[4/5] object-cover group-hover:scale-105 transition-transform duration-500"
+                className="w-full aspect-[4/5] object-cover object-[center_42%] group-hover:scale-105 transition-transform duration-500"
               />
 
               {/* Gradient Overlay */}

@@ -135,11 +135,11 @@ const ProjectCard = memo(function ProjectCard({ project, onClick, cardStyle, isA
       className={`absolute w-[240px] sm:w-[300px] md:w-[340px] aspect-[3/4] bg-[#121622] rounded-2xl border overflow-hidden shadow-2xl transition-all duration-500 ease-out cursor-pointer select-none group touch-manipulation hover:-translate-y-1.5 ${
         isActive
           ? 'border-[#c5a059]/70 ring-1 ring-[#c5a059]/50 shadow-[0_20px_50px_rgba(0,0,0,0.7)]'
-          : 'border-white/10 hover:border-white/30 opacity-75'
+          : 'border-white/15 hover:border-white/40'
       }`}
     >
       {/* Image background showcase */}
-      <div className="absolute inset-0 w-full h-full overflow-hidden z-0 bg-black/50">
+      <div className="absolute inset-0 w-full h-full overflow-hidden z-0 bg-[#121622]">
         <img
           src={project.image}
           alt={project.title}
@@ -147,11 +147,11 @@ const ProjectCard = memo(function ProjectCard({ project, onClick, cardStyle, isA
           height="480"
           loading="lazy"
           decoding="async"
-          className="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:scale-105 group-hover:opacity-100 transition-transform duration-500 ease-out pointer-events-none"
+          className="absolute inset-0 w-full h-full object-cover opacity-100 brightness-[1.03] group-hover:scale-105 transition-transform duration-500 ease-out pointer-events-none"
         />
 
-        {/* Soft gradient overlay for text legibility */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/20 z-10 pointer-events-none" />
+        {/* Bottom-only gradient vignette for text legibility without dimming the photo */}
+        <div className="absolute inset-x-0 bottom-0 h-[45%] bg-gradient-to-t from-black/85 via-black/35 to-transparent z-10 pointer-events-none" />
 
         {/* Top Pill Bar (Exact Original Style) */}
         <div className="absolute top-4 left-4 z-20 pointer-events-none">
@@ -285,8 +285,8 @@ function ProjectGlimpse({ onNavigate }) {
       // Scale reduction for distant cards
       const scale = 1 - Math.min(absOffset * 0.12, 0.3);
 
-      // Opacity fade for far cards
-      const opacity = absOffset > 2 ? 0 : absOffset === 0 ? 1 : absOffset === 1 ? 0.85 : 0.4;
+      // Keep adjacent & outer cards bright while preserving 3D depth
+      const opacity = absOffset > 2 ? 0 : absOffset === 0 ? 1 : absOffset === 1 ? 0.95 : 0.82;
 
       return {
         transform: `perspective(1200px) translateX(${tx}px) translateZ(${tz}px) rotateY(${ry}deg) scale(${scale})`,

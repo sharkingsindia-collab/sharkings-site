@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { useScrollReveal } from '../../hooks/useScrollReveal';
-import news1Img from '../../assets/news-1.webp';
-import modularKitchenImg from '../../assets/modular-kitchen.webp';
+import beforeKitchenImg from '../../assets/before-kitchen.webp';
+import afterKitchenImg from '../../assets/after-kitchen.webp';
 
 function BeforeAfter() {
   useScrollReveal();
@@ -100,10 +100,10 @@ function BeforeAfter() {
           {/* BEFORE: Underneath Real Raw Site Layer */}
           <div className="absolute inset-0 w-full h-full z-0 bg-luxury-charcoal">
             <img
-              src={news1Img}
-              alt="Bare Site Frame Before Renovation"
-              width="1200"
-              height="675"
+              src={beforeKitchenImg}
+              alt="Bare Kitchen Space Before Renovation"
+              width="1024"
+              height="576"
               loading="lazy"
               decoding="async"
               className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
@@ -123,10 +123,10 @@ function BeforeAfter() {
             style={{ clipPath: 'inset(0 50% 0 0)' }}
           >
             <img
-              src={modularKitchenImg}
+              src={afterKitchenImg}
               alt="Sharkings Modular Kitchen After Renovation"
-              width="1200"
-              height="675"
+              width="1024"
+              height="576"
               loading="lazy"
               decoding="async"
               className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
